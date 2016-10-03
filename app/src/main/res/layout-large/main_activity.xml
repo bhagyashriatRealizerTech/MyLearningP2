@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="7">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:text="Welcome to"
+        android:textSize="24sp"
+        android:layout_marginTop="90dp"
+        android:id="@+id/txtWelcomeSchGen"
+        android:textColor="#FFF"
+        android:gravity="center"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:padding="10dp"
+        android:id="@+id/txtSchoolNm"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/genie_logo_action_bar"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:text="An Escape through day to day hassles."
+        android:textSize="23sp"
+        style="@style/TextViewsBold15"
+        android:id="@+id/txtSlogan"
+        android:textColor="#ED0F7D"
+        android:gravity="center"/>
+    <!--<View-->
+    <!--android:layout_width="250dp"-->
+    <!--android:layout_height="10dp"-->
+    <!--android:layout_gravity="center"-->
+    <!--android:background="@drawable/shadow">-->
+    <!--</View>-->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:layout_gravity="center"
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:gravity="center">
+        <LinearLayout
+            android:layout_width="400dp"
+            android:layout_height="80dp"
+            android:background="@drawable/border"
+            android:orientation="horizontal"
+            android:id="@+id/RegisterLayout">
+            <TextView
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:gravity="center|left"
+                android:background="@drawable/regicon"/>
+            <Button
+                android:text="Register"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:textColor="#FFF"
+                android:id="@+id/btn_main_register"
+                android:layout_width="180dp"
+                android:background="#00000000"
+                android:textSize="24sp"
+                android:layout_gravity="center|right"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="400dp"
+            android:layout_height="80dp"
+            android:background="@drawable/border"
+            android:layout_marginTop="60dp"
+            android:orientation="horizontal"
+            android:id="@+id/LoginLayout">
+            <TextView
+                android:layout_width="63dp"
+                android:layout_height="63dp"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="7dp"
+                android:background="@drawable/loginicon" />
+            <Button
+                android:text="Login"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:id="@+id/btn_main_login"
+                android:layout_width="220dp"
+                android:textColor="#FFF"
+                android:textSize="24sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#00000000"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1">
+        <TextView style="@style/TextViewsBold15"
+            android:layout_marginBottom="3dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:textColor="#4682B4"
+            android:text="© 2016 RealizerTech"/>
+    </FrameLayout>
+</LinearLayout>
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical"-->
+    <!--android:background="#FFF">-->
+    <!--&lt;!&ndash;91C9FF&ndash;&gt;-->
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Welcome to"-->
+        <!--android:textSize="26sp"-->
+        <!--android:layout_marginTop="90dp"-->
+        <!--android:id="@+id/txtWelcomeSchGen"-->
+        <!--android:textColor="#FFF"-->
+        <!--android:gravity="center"/>-->
+    <!--<TextView-->
+        <!--android:layout_width="450dp"-->
+        <!--android:layout_height="120dp"-->
+        <!--android:padding="10dp"-->
+        <!--android:id="@+id/txtSchoolNm"-->
+        <!--android:layout_marginTop="30dp"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:background="@drawable/genie_logo_action_bar"/>-->
+    <!--&lt;!&ndash;<View&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="250dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="10dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_gravity="center"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:background="@drawable/shadow">&ndash;&gt;-->
+    <!--&lt;!&ndash;</View>&ndash;&gt;-->
+
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:padding="10dp"-->
+        <!--android:layout_marginTop="100dp"-->
+        <!--android:orientation="vertical"-->
+        <!--android:gravity="center">-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="400dp"-->
+            <!--android:layout_height="80dp"-->
+            <!--android:background="@drawable/border"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:id="@+id/RegisterLayout">-->
+            <!--<TextView-->
+                <!--android:layout_width="65dp"-->
+                <!--android:layout_height="65dp"-->
+                <!--android:layout_marginTop="8dp"-->
+                <!--android:layout_marginLeft="8dp"-->
+                <!--android:gravity="center|left"-->
+                <!--android:background="@drawable/regicon"/>-->
+            <!--<Button-->
+                <!--android:text="Register"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textColor="#FFF"-->
+                <!--android:id="@+id/btn_main_register"-->
+                <!--android:layout_width="180dp"-->
+                <!--android:background="#00000000"-->
+                <!--android:textSize="26sp"-->
+                <!--android:layout_gravity="center|right"-->
+                <!--/>-->
+        <!--</LinearLayout>-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="400dp"-->
+            <!--android:layout_height="80dp"-->
+            <!--android:background="@drawable/border"-->
+            <!--android:layout_marginTop="120dp"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:id="@+id/LoginLayout">-->
+            <!--<TextView-->
+                <!--android:layout_width="63dp"-->
+                <!--android:layout_height="63dp"-->
+                <!--android:gravity="center"-->
+                <!--android:layout_marginTop="8dp"-->
+                <!--android:layout_marginLeft="7dp"-->
+                <!--android:background="@drawable/loginicon" />-->
+            <!--<Button-->
+                <!--android:text="Login"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:id="@+id/btn_main_login"-->
+                <!--android:layout_width="220dp"-->
+                <!--android:textColor="#FFF"-->
+                <!--android:textSize="26sp"-->
+                <!--android:layout_gravity="center_horizontal"-->
+                <!--android:background="#00000000"-->
+                <!--/>-->
+        <!--</LinearLayout>-->
+
+    <!--</LinearLayout>-->
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_weight="1">-->
+        <!--<TextView style="@style/TextViewsBold15"-->
+            <!--android:layout_marginBottom="0dp"-->
+            <!--android:layout_gravity="bottom|center_horizontal"-->
+            <!--android:textColor="#4682B4"-->
+            <!--android:text="© 2016 RealizerTech"/>-->
+    <!--</FrameLayout>-->
+<!--</LinearLayout>-->
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="WheelArrayDefault">
+        <item>AigeStudio</item>
+        <item>Aige</item>
+        <item>Amor de irmão</item>
+        <item>armastan</item>
+        <item>a szerelem.</item>
+    </string-array>
+    <string-array name="WheelArrayWeek">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
+</resources>
