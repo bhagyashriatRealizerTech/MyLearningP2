@@ -168,15 +168,17 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
 
                 ParentHomeworkListModel homeworkObj = (ParentHomeworkListModel) o;
                 String path = homeworkObj.getImage();
+                String hwText = homeworkObj.getHomework();
                 if (path.equals("NoImage")) {
 
                 } else {
 
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("ImageString", path);
+                    editor.putString("HomeworkImage", path);
+                    editor.putString("HomeworkText", hwText);
                     editor.commit();
-                    loadPhoto(path);
+                    loadPhoto(0);
                 }
 
 
@@ -350,9 +352,11 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
         return results;
     }
 
-    private void loadPhoto(String path_lst) {
+    private void loadPhoto(int pos) {
         Intent i = new Intent(getActivity(),FullImageViewActivity.class);
         i.putExtra("FLAG", 1);
+        i.putExtra("HEADERTEXT",htext);
+        i.putExtra("POSITION",pos);
         startActivity(i);
     }
 
@@ -390,11 +394,84 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
 
         JSONObject rootObj = null;
         Log.d("String", json);
-        try {
 
             if(htext.equalsIgnoreCase("Homework"))
             {
-                rootObj = new JSONObject(json);
+                try {
+                    rootObj = new JSONObject(json);
+                    JSONObject obj=rootObj.getJSONObject("fetchHomeWorkResult");
+                    String schoolCode= obj.getString("SchoolCode");
+                    String std= obj.getString("Std");
+                    String division= obj.getString("div");
+                    String givenby= obj.getString("givenBy");
+                    String hwdate= obj.getString("hwDate");
+                    JSONArray img  = obj.getJSONArray("hwImage64Lst");
+                    JSONArray text  = obj.getJSONArray("hwTxtLst");
+                    String subject= obj.getString("subject");
+
+                    if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
+                    {
+                        ParentHomeworkListModel model=new ParentHomeworkListModel();
+                        model.setSchoolcode(schoolCode);
+                        model.setStandard(std);
+                        model.setDivision(division);
+                        model.setGivenBy(givenby);
+                        model.setHwdate(hwdate);
+                        model.setImage(img.toString());
+                        model.setHomework(text.toString());
+                        model.setSubject(subject);
+                        model.setWork(htext);
+                        String[] IMG=new String[img.length()];
+                        DALHomework dh=new DALHomework(getActivity());
+                        ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
+                        boolean isPresent=false;
+
+                        for (int j=0;j<results.size();j++)
+                        {
+                            if (img.toString().equals("[]") && !text.toString().equals("") )
+                            {
+                                if (results.get(j).getHomework().equalsIgnoreCase(text.toString()))
+                                {
+                                    isPresent=true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (results.get(j).getImage().equalsIgnoreCase(img.toString()) &&
+                                        results.get(j).getHomework().equalsIgnoreCase(text.toString()))
+                                {
+                                    isPresent=true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!isPresent)
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                IMG[i] = img.getString(i);
+                            }
+
+                            for (int i = 0; i < IMG.length; i++) {
+                                String newPath = new Utility().getURLImage(IMG[i]);
+                                if (!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
+                                    new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
+                                }
+                            }
+
+                            dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,htext);
+                            Toast.makeText(getActivity(), "Homework Downloaded Successfully...", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+
+               /* rootObj = new JSONObject(json);
                 JSONObject obj = rootObj.getJSONObject("fetchHomeWorkResult");
                 String schoolCode = obj.getString("SchoolCode");
                 String std = obj.getString("Std");
@@ -413,11 +490,82 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                         // Toast.makeText(getActivity(), "Homework Done", Toast.LENGTH_SHORT).show();
                         n = -1;
                     }
-                }
+                }*/
             }
             else  if(htext.equalsIgnoreCase("Classwork"))
             {
-                rootObj = new JSONObject(json);
+                try {
+                    rootObj = new JSONObject(json);
+                    JSONObject obj = rootObj.getJSONObject("fetchClassWorkResult");
+                    String schoolCode = obj.getString("SchoolCode");
+                    String std = obj.getString("Std");
+                    String division = obj.getString("div");
+                    String givenby = obj.getString("givenBy");
+                    String hwdate = obj.getString("cwDate");
+                    JSONArray img = obj.getJSONArray("cwImage64Lst");
+                    JSONArray text = obj.getJSONArray("CwTxtLst");
+                    String subject = obj.getString("subject");
+
+                    if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null")) {
+                        ParentHomeworkListModel model = new ParentHomeworkListModel();
+                        model.setSchoolcode(schoolCode);
+                        model.setStandard(std);
+                        model.setDivision(division);
+                        model.setGivenBy(givenby);
+                        model.setHwdate(hwdate);
+                        model.setImage(img.toString());
+                        model.setHomework(text.toString());
+                        model.setSubject(subject);
+                        model.setWork(htext);
+                        String[] IMG = new String[img.length()];
+
+                        DALHomework dh=new DALHomework(getActivity());
+                        ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
+                        boolean isPresent=false;
+
+                        for (int j=0;j<results.size();j++)
+                        {
+                            if (img.toString().equals("[]") && !text.toString().equals("") )
+                            {
+                                if (results.get(j).getHomework().equalsIgnoreCase(text.toString()))
+                                {
+                                    isPresent=true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (results.get(j).getImage().equalsIgnoreCase(img.toString()))
+                                {
+                                    isPresent=true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!isPresent)
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                IMG[i] = img.getString(i);
+                            }
+
+                            for (int i = 0; i < IMG.length; i++) {
+                                String newPath = new Utility().getURLImage(IMG[i]);
+                                if (!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
+                                    new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
+                                }
+                            }
+
+                            dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, htext);
+                            Toast.makeText(getActivity(), "Classwork Downloaded Successfully...", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+                /*rootObj = new JSONObject(json);
                 JSONObject obj = rootObj.getJSONObject("fetchClassWorkResult");
                 String schoolCode = obj.getString("SchoolCode");
                 String std = obj.getString("Std");
@@ -436,18 +584,8 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                         // Toast.makeText(getActivity(), "Homework Done", Toast.LENGTH_SHORT).show();
                         n = -1;
                     }
-                }
+                }*/
             }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("JSON", e.toString());
-            Log.e("HWJ(LocalizedMessage)", e.getLocalizedMessage());
-            Log.e("HWJ(StackTrace)", e.getStackTrace().toString());
-            Log.e("HWJ(Cause)", e.getCause().toString());
-        }
-
         return true;
     }
 
@@ -463,11 +601,11 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
             case R.id.action_download:
                 if(htext.toString().equals("Homework"))
                 {
-                    GetHomWrk();
+                    GetHomWrk1();
                 }
                 else if(htext.toString().equals("Classwork"))
                 {
-                    GetHomWrk();
+                    GetHomWrk1();
                 }
                 return true;
             default:
@@ -498,23 +636,42 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
         Intent intent=new Intent(getActivity(),DrawerActivity.class);
         startActivity(intent);
     }
-    public String getStringPath(String urlString)
+
+
+    public void GetHomWrk1()
     {
-        StringBuilder sb=new StringBuilder();
-        for(int i=0;i<urlString.length();i++)
-        {
-            char c='\\';
-            if (urlString.charAt(i) =='\\')
-            {
-                urlString.replace("\"","");
-                sb.append("/");
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("MM/d/yyyy");
+        String datetody = df.format(calendar.getTime());
+        String UserData[]=  DAP.GetSTDDIVData();
+        DALQueris qrt = new DALQueris(getActivity());
+        ArrayList<String> subjects = qrt.GetAllSub();
+
+        for (int k = 0; k < subjects.size(); k++) {
+
+            ParentHomeworkListModel home = new ParentHomeworkListModel();
+            home.setSchoolcode(UserData[2]);
+            home.setStandard(UserData[0]);
+            home.setDivision(UserData[1]);
+            home.setHwdate(datetody);
+            home.setSubject(subjects.get(k));
+            if(isConnectingToInternet()) {
+                if(htext.equalsIgnoreCase("Homework"))
+                {
+                    HomeworkAsyncTaskPost obj1 = new HomeworkAsyncTaskPost(home, getActivity(), ParentHomeWorkFragment.this);
+                    obj1.execute();
+                }
+                else if(htext.equalsIgnoreCase("Classwork"))
+                {
+                    ClassworkAsyncTaskPost obj1 = new ClassworkAsyncTaskPost(home, getActivity(), ParentHomeWorkFragment.this);
+                    obj1.execute();
+                }
             }
             else
             {
-                sb.append(urlString.charAt(i));
+                Toast.makeText(getActivity(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
             }
         }
-        return sb.toString();
     }
 }
 

@@ -173,7 +173,7 @@ public class TeacherQueryMessageCenterListAdapter extends BaseAdapter {
             holder.initial.setVisibility(View.GONE);
             holder.profilepic.setVisibility(View.VISIBLE);
             if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                new GetImages(newURL,holder.profilepic,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+                new GetImages(newURL,holder.profilepic,holder.initial,messageList.get(position).getTname(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
             else
             {
                 File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);

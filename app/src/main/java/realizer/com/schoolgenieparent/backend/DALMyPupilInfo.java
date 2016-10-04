@@ -24,7 +24,7 @@ public class DALMyPupilInfo {
     public long insertStudInfo(String userId,String pwd,String std,String division,String classrollno,String rollno,String fname
             ,String mname,String lname,String dob,String bldgrp,String fathername,String mothername,String contactno,
                                String emergencycontactno,String address,String hobbies,String comment,String isactive,String Activetill,
-                               String registrationcode,String acdyear,String schoolcode)
+                               String registrationcode,String acdyear,String schoolcode,String thumbnailurl)
     {
         ContentValues conV = new ContentValues();
         conV.put("UserId", userId);
@@ -50,19 +50,19 @@ public class DALMyPupilInfo {
         conV.put("RegistrationCode", registrationcode);
         conV.put("AcademicYear", acdyear);
         conV.put("SchoolCode", schoolcode);
+        conV.put("ThumbnailURL", thumbnailurl);
         long newRowInserted = db.insert("StudentInfo", null, conV);
         return newRowInserted;
     }
 
     public String[] GetAllTableData(String User) {
-        Cursor c = db.rawQuery("SELECT * FROM StudentInfo ", null);
+        Cursor c = db.rawQuery("SELECT * FROM StudentInfo WHERE UserId = '"+User+"'", null);
         String Stud[]=new String[20];
         if (c != null) {
             if (c.moveToFirst()) {
                 System.out.print("while moving  - C != null");
                 do {
-                    String user = c.getString(c.getColumnIndex("UserId"));
-                    if(user.equals(User)) {
+
                         Stud[0] = c.getString(c.getColumnIndex("FName"));
                         Stud[1] = c.getString(c.getColumnIndex("MName"));
                         Stud[2] = c.getString(c.getColumnIndex("LName"));
@@ -77,7 +77,7 @@ public class DALMyPupilInfo {
                         Stud[11] = c.getString(c.getColumnIndex("Address"));
                         Stud[12] = c.getString(c.getColumnIndex("SchoolCode"));
                         Stud[13] = c.getString(c.getColumnIndex("AcademicYear"));
-                    }
+                        Stud[14] = c.getString(c.getColumnIndex("ThumbnailURL"));
                 }
                 while (c.moveToNext());
             }

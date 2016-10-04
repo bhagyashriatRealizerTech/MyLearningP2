@@ -4,7 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.ResultReceiver;
 
-import realizer.com.schoolgenieparent.ProgressWheel;
+import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
  * Created by Bhagyashri on 4/2/2016.

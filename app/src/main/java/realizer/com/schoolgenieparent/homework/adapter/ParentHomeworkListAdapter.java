@@ -18,40 +18,41 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import realizer.com.schoolgenieparent.R;
+import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.StoreBitmapImages;
+import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
 
 public class ParentHomeworkListAdapter extends BaseAdapter {
-
-
-        private static ArrayList<ParentHomeworkListModel> hList;
-        private LayoutInflater mhomeworkdetails;
-        private Context context1;
-        boolean isImageFitToScreen;
-        View convrtview;
+    private static ArrayList<ParentHomeworkListModel> hList;
+    private LayoutInflater mhomeworkdetails;
+    private Context context1;
+    boolean isImageFitToScreen;
+    View convrtview;
 
 
 
-        public ParentHomeworkListAdapter(Context context, ArrayList<ParentHomeworkListModel> homeworklist) {
-            hList = homeworklist;
-            mhomeworkdetails = LayoutInflater.from(context);
-            context1 = context;
-        }
-        @Override
-        public int getCount() {
-            return hList.size();
-        }
+    public ParentHomeworkListAdapter(Context context, ArrayList<ParentHomeworkListModel> homeworklist) {
+        hList = homeworklist;
+        mhomeworkdetails = LayoutInflater.from(context);
+        context1 = context;
+    }
+    @Override
+    public int getCount() {
+        return hList.size();
+    }
 
-        @Override
-        public Object getItem(int position) {
+    @Override
+    public Object getItem(int position) {
 
-            return hList.get(position);
-        }
+        return hList.get(position);
+    }
 
-        @Override
-        public long getItemId(int position) {
+    @Override
+    public long getItemId(int position) {
 
-            return position;
-        }
+        return position;
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -60,54 +61,45 @@ public class ParentHomeworkListAdapter extends BaseAdapter {
         convrtview = convertView;
 
         if (convertView == null) {
-            convertView = mhomeworkdetails.inflate(R.layout.parent_homework_list_layout, null);
+            convertView = mhomeworkdetails.inflate(R.layout.teacher_homework_list_layout, null);
             holder = new ViewHolder();
             holder.subject = (TextView) convertView.findViewById(R.id.txthomeworksubject);
-            holder.homework = (TextView) convertView.findViewById(R.id.txthomework);
+            holder.homework = (TextView) convertView.findViewById(R.id.txthomework1);
             holder.image = (ImageView) convertView.findViewById(R.id.imghomework);
-
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        if (position % 2 == 0) {
-            convertView.setBackgroundColor(Color.parseColor("#87CEFF"));
-        } else {
-            convertView.setBackgroundColor(Color.parseColor("#ffffff"));
+
+        holder.subject.setText(hList.get(position).getSubject() + " :");
+
+        if(hList.get(position).getHomework().equals("NoText"))
+        {
+            holder.homework.setText("");
         }
-
-        holder.subject.setText(hList.get(position).getSubject());
-
-       if(hList.get(position).getHomework().equals("NoText"))
-       {
-           holder.homework.setText("");
-       }
         else
-       {
+        {
+            try{
+                JSONArray arr = new JSONArray(hList.get(position).getHomework());
+                holder.homework.setText(arr.getString(0));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-           ViewGroup.LayoutParams layoutParams = holder.homework.getLayoutParams();
-           layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-           layoutParams.height =  ViewGroup.LayoutParams.WRAP_CONTENT;
-           holder.homework.setLayoutParams(layoutParams);
-           holder.homework.setPadding(5,5,5,5);
-           try{
-               JSONArray arr = new JSONArray(hList.get(position).getHomework());
-               holder.homework.setText(arr.getString(0));
-           } catch (JSONException e) {
-               e.printStackTrace();
-           }
-
-       }
+        }
 
 
         if(hList.get(position).getImage().equals("NoImage"))
         {
-
+            holder.image.setVisibility(View.GONE);
         }
         else {
-            String s =holder.homework.getText().toString();
-            holder.homework.setText(s+"\n Click Here To View Image");
 
+            holder.image.setVisibility(View.VISIBLE);
+            String newPath = new Utility().getURLImage(hList.get(position).getImage());
+            if(!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
+                new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
+            }
         }
 
         return convertView;
@@ -131,11 +123,9 @@ public class ParentHomeworkListAdapter extends BaseAdapter {
         return resizedBitmap;
     }
     static class ViewHolder
-        {
-            TextView subject;
-            TextView homework;
-            ImageView image;
-
-        }
+    {
+        TextView subject;
+        TextView homework;
+        ImageView image;
     }
-
+}

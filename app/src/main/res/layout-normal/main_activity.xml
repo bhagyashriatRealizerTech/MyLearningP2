@@ -3,21 +3,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="7">
+    android:background="@color/white">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
         android:text="Welcome to"
         android:textSize="18sp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/txtWelcomeSchGen"
         android:textColor="#FFF"
         android:gravity="center"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/registrationbg"
+        android:backgroundTintMode="screen"
+        android:layout_height="0dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="3">
+
+    </FrameLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"
+        android:layout_weight="0.8"
         android:padding="10dp"
         android:id="@+id/txtSchoolNm"
         android:layout_marginLeft="20dp"
@@ -46,27 +58,28 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_weight="2"
         android:layout_gravity="center"
         android:padding="10dp"
         android:orientation="vertical"
         android:gravity="center">
         <LinearLayout
             android:layout_width="230dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/border"
             android:orientation="horizontal"
+            android:layout_marginBottom="7dp"
             android:id="@+id/RegisterLayout">
-            <TextView
+           <!-- <TextView
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
                 android:gravity="center|left"
-                android:background="@drawable/regicon"/>
+                android:background="@drawable/regicon"/>-->
             <Button
                 android:text="Register"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textColor="#FFF"
                 android:id="@+id/btn_main_register"
@@ -78,21 +91,21 @@
         </LinearLayout>
         <LinearLayout
             android:layout_width="230dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/border"
-            android:layout_marginTop="60dp"
             android:orientation="horizontal"
+            android:layout_marginTop="7dp"
             android:id="@+id/LoginLayout">
-            <TextView
+         <!--   <TextView
                 android:layout_width="33dp"
                 android:layout_height="33dp"
                 android:gravity="center"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="7dp"
-                android:background="@drawable/loginicon" />
+                android:background="@drawable/loginicon" />-->
             <Button
                 android:text="Login"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/btn_main_login"
                 android:layout_width="220dp"
@@ -108,7 +121,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        android:layout_weight="1">
+        android:layout_weight="0.5">
         <TextView style="@style/TextViewsBold15"
             android:layout_marginBottom="3dp"
             android:layout_gravity="bottom|center_horizontal"
@@ -116,4 +129,3 @@
             android:text="© 2016 RealizerTech"/>
     </FrameLayout>
 </LinearLayout>
-

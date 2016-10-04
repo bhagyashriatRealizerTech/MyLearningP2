@@ -6,14 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,9 +25,14 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.File;
 import java.lang.reflect.Field;
 
 import realizer.com.schoolgenieparent.R;
+import realizer.com.schoolgenieparent.Utils.GetImages;
+import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.Singleton;
+import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
 
 /**
@@ -39,7 +42,9 @@ public class FullImageViewActivity extends FragmentActivity {
     static int NUM_ITEMS ;
     ImageFragmentPagerAdapter imageFragmentPagerAdapter;
     ViewPager viewPager;
+    static ProgressWheel loading;
     static String[] IMG;
+    static String[] TEXT;
     static ImageView imageView;
     static ActionBar bar;
     static Bitmap decodedByte;
@@ -50,34 +55,63 @@ public class FullImageViewActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
-        bar = getActionBar();
-        //bar.setTitle("");
-//        bar.hide();
-        Bundle b = getIntent().getExtras();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String path = preferences.getString("ImageString","");
-
         setContentView(R.layout.fragment_page);
-
+        loading = (ProgressWheel)findViewById(R.id.loading);
+        loading.setVisibility(View.VISIBLE);
+        Bundle bundle = getIntent().getExtras();
+        String headertext = bundle.getString("HEADERTEXT");
+        int position= bundle.getInt("POSITION");
+        int positionList= bundle.getInt("ListNo");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String path = preferences.getString("HomeworkImage", "");
+        String hwtext = preferences.getString("HomeworkText", "");
         try {
-            JSONArray jarr = new JSONArray(path);
-            NUM_ITEMS = jarr.length();
-            IMG = new String[NUM_ITEMS];
-            barr = new Bitmap[NUM_ITEMS];
-            imgv = new ImageView[NUM_ITEMS];
 
-            for(int i=0;i<NUM_ITEMS;i++)
-            {
-                IMG[i] = jarr.getString(i);
+            try {
+                if (headertext.equalsIgnoreCase("Homework") || headertext.equalsIgnoreCase("Classwork"))
+                {
+                    JSONArray jarr = new JSONArray(path);
+                    NUM_ITEMS = jarr.length();
+                    IMG = new String[NUM_ITEMS];
+
+                    barr = new Bitmap[NUM_ITEMS];
+                    imgv = new ImageView[NUM_ITEMS];
+
+                    for(int i=0;i<NUM_ITEMS;i++)
+                    {
+                        IMG[i] = jarr.getString(i);
+                    }
+
+                    JSONArray jarrtext = new JSONArray(hwtext);
+                    TEXT = new String[jarrtext.length()];
+                    for(int i=0;i<jarrtext.length();i++)
+                    {
+                        TEXT[i] = jarrtext.getString(i);
+                    }
+                }
+                else
+                {
+                    IMG=path.split("@@@");
+                    NUM_ITEMS = IMG.length;
+                    //IMG = new String[NUM_ITEMS];
+                    barr = new Bitmap[NUM_ITEMS];
+                    imgv = new ImageView[NUM_ITEMS];
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         imageFragmentPagerAdapter = new ImageFragmentPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.pager1);
+
         try {
             Field mScroller;
             mScroller = ViewPager.class.getDeclaredField("mScroller");
@@ -89,7 +123,22 @@ public class FullImageViewActivity extends FragmentActivity {
         } catch (IllegalAccessException e) {
         }
         viewPager.setAdapter(imageFragmentPagerAdapter);
+        viewPager.setCurrentItem(position);
     }
+
+
+
+    @Override
+    public void onBackPressed() {
+        /*Singleton.setFragment(Singleton.getMainFragment());
+        finish();*/
+        Singleton.setSelectedFragment(Singleton.getMainFragment());
+        if (getFragmentManager().getBackStackEntryCount() > 0)
+            getFragmentManager().popBackStack();
+
+        finish();
+    }
+
     public static class ImageFragmentPagerAdapter extends FragmentPagerAdapter {
         public ImageFragmentPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -114,34 +163,35 @@ public class FullImageViewActivity extends FragmentActivity {
             View swipeView = inflater.inflate(R.layout.fullimageview_parent, container, false);
             imageView = (ImageView) swipeView.findViewById(R.id.imageView);
             txtcnt = (TextView) swipeView.findViewById(R.id.txtcounter);
+
             Bundle bundle = getArguments();
             int position = bundle.getInt("position");
             Log.d("FILENAME", "" + IMG[position]);
 
             String filePath = IMG[position];
-            byte[] decodedString = Base64.decode(filePath, Base64.DEFAULT);
-             decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+            String newURL=new Utility().getURLImage(filePath);
+            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                new GetImages(newURL,imageView,null,null,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+            else
+            {
+                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length-1]);
+                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
+                //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                imageView.setImageBitmap(decodedByte);
+            }
+
+           /* File image = ImageStorage.getImage(newPath.split("/")[newPath.split("/").length - 1]);
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);*/
+
             barr[position] = decodedByte;
-            imageView.setImageBitmap(decodedByte);
-            txtcnt.setText("" + (position + 1) + " / " + NUM_ITEMS);
+            //imageView.setImageBitmap(decodedByte);
+            txtcnt.setText(TEXT[position]);
 
             imgv[position] = imageView;
-//            imageView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    bar.show();
-//
-//                    Handler h = new Handler();
-//                    h.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            // DO DELAYED STUFF
-//                            bar.hide();
-//                        }
-//                    }, 5000);
-//                }
-//            });
-
+            loading.setVisibility(View.GONE);
             return swipeView;
         }
 
@@ -182,6 +232,4 @@ public class FullImageViewActivity extends FragmentActivity {
                 matrix, true);
         imgv[viewPager.getCurrentItem()].setImageBitmap(rotated);
     }
-
-
 }

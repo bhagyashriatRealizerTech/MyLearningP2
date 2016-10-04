@@ -47,6 +47,8 @@ import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.homework.TeacherHomeworkFragment;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
+import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
+import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
 
 //import com.realizer.schoolgenie.chat.TeacherQueryFragment1;
 //import com.realizer.schoolgenie.funcenter.TeacherFunCenterFolderFragment;
@@ -168,9 +170,10 @@ public class DrawerActivity extends AppCompatActivity
                     sb.append(urlString.charAt(i));
                 }
             }
+
             String newURL=sb.toString();
             if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                new GetImages(newURL,userImage,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+                new GetImages(newURL,userImage,userInitials,userName.getText().toString(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
             else
             {
                 File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length-1]);
@@ -280,6 +283,12 @@ public class DrawerActivity extends AppCompatActivity
             fragment = Communication("Communication");
  //           Toast.makeText(DrawerActivity.this, "In Progress..!", Toast.LENGTH_SHORT).show();
         }
+        else if (id == R.id.nav_mypupil) {
+            fragment = MyPupil();
+        } else if (id == R.id.nav_myclass) {
+            fragment = MyClassList();
+            //           Toast.makeText(DrawerActivity.this, "In Progress..!", Toast.LENGTH_SHORT).show();
+        }
 //        else if (id == R.id.nav_chat)
 //        {
 //            fragment = Quries();
@@ -385,28 +394,20 @@ public class DrawerActivity extends AppCompatActivity
         return fragment;
     }
 
+    public Fragment MyPupil() {
+        fragment = new MyPupilInfoFragment();
+        return fragment;
+    }
+
+    public Fragment MyClassList() {
+        fragment = new MyClassStudentFragment();
+        return fragment;
+    }
+
     public Fragment InviteTojoin(String name) {
-       /* String year =String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-        HolidayListAsyncTaskGet obj = new HolidayListAsyncTaskGet(UserGlobalData.getInstance().geCompanyLocation(),UserGlobalData.getInstance().getCompanyCode(),year, MainActivity.this,this);
-        try{
-            result= obj.execute().get();
-            String holidayList =result.toString();
-            fragment = new HolidayFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("AnswerHolidayList", holidayList);
-            fragment.setArguments(bundle);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return fragment;*/
-        // getSupportActionBar().setTitle(Config.actionBarTitle("DashBoard",DrawerActivity.this));
-        //String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";
+
         fragment = new InviteToJoinActivity();
         Bundle bundle = new Bundle();
-        //bundle.putString("HomeworkList", homewrklist);
         bundle.putString("HEADERTEXT", name);
         fragment.setArguments(bundle);
         return fragment;

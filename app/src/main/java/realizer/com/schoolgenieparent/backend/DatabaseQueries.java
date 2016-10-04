@@ -54,17 +54,34 @@ public class DatabaseQueries {
     }
 
 //Insert Student Information
-    public long insertStudInfo(String standard,String division,String Studarr)
+    public long insertStudInfo(String standard,String division,String Studarr,String UserId)
     {
         //deleteTable();
         ContentValues conV = new ContentValues();
         conV.put("Std", standard);
         conV.put("Div", division);
         conV.put("StudArr", Studarr);
+        conV.put("UserID", UserId);
         long newRowInserted = db.insert("StudInfo", null, conV);
 
         return newRowInserted;
     }
+
+    //Insert Student Information
+    public long updateStudInfo(String standard,String division,String Studarr,String UserId)
+    {
+        //deleteTable();
+        ContentValues conV = new ContentValues();
+        conV.put("Std", standard);
+        conV.put("Div", division);
+        conV.put("StudArr", Studarr);
+        conV.put("UserID", UserId);
+        long newRowInserted = db.update("StudInfo", conV, "UserID='" + UserId+"'", null);
+
+        return newRowInserted;
+    }
+
+
 
     //Insert Teacher Information
     public long insertTeacherInfo(String standard,String division,String Studarr)
@@ -115,21 +132,17 @@ public class DatabaseQueries {
 
 
     //Select All Data From StudInfo
-    public String GetAllTableData(String Std,String Div) {
+    public String GetAllTableData(String userid) {
 
-        Cursor c = db.rawQuery("SELECT * FROM StudInfo ", null);
-        String Stud = "";
+        Cursor c = db.rawQuery("SELECT * FROM StudInfo WHERE UserID = '"+userid+"'", null);
+        String Stud = null;
 
         int cnt = 1;
         if (c != null) {
             if (c.moveToFirst()) {
                 System.out.print("while moving  - C != null");
                 do {
-                    String std = c.getString(c.getColumnIndex("Std"));
-                    String div = c.getString(c.getColumnIndex("Div"));
-                    if(std.equals(Std) && div.equals(Div)) {
                         Stud = c.getString(c.getColumnIndex("StudArr"));
-                    }
                 }
                 while (c.moveToNext());
             }

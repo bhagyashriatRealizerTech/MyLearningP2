@@ -11,8 +11,8 @@ import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
  * Created by Win on 12/21/2015.
  */
 public class SqliteHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "SchoolDiaryTeacher";
-    private static final int DATABASE_VERSION =14;
+    private static final String DATABASE_NAME = "SchoolGeniePToP";
+    private static final int DATABASE_VERSION =21;
     Context mycontext;
     private static final String STUDINFO =
             "CREATE TABLE StudentInfo(  UserId TEXT," +
@@ -37,9 +37,10 @@ public class SqliteHelper extends SQLiteOpenHelper {
                     "ActiveTill TEXT,"+
                     "RegistrationCode TEXT,"+
                     "AcademicYear TEXT,"+
-                    "SchoolCode TEXT"+
-                    ")";
+                    "SchoolCode TEXT,"+
+                    "ThumbnailURL TEXT)";
     private static final String STDSUBALLOCATE ="CREATE TABLE StdDivSub(Std TEXT,Div TEXT, Sub TEXT)";
+    private static final String STUDLIST ="CREATE TABLE StudInfo(Std TEXT,Div TEXT, UserID TEXT,StudArr TEXT)";
     private static final String QUERYINFO =
             "CREATE TABLE QueryInfo(Stndard TEXT,TeacherName TEXT,TeacherId TEXT,Division TEXT,TeacherSubject TEXT,ThumbnailURL TEXT)";
     //    private static final String TEACHERINFO ="CREATE TABLE TeacherInfo(Id TEXT,DispName TEXT, Pic TEXT)";
@@ -75,7 +76,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
 
         db.execSQL(STUDINFO);
           db.execSQL(STDSUBALLOCATE);
-//        db.execSQL(TEACHERINFO);
+          db.execSQL(STUDLIST);
 //        db.execSQL(STDSUBJECT);
 //        db.execSQL(Announcement);
 //        db.execSQL(Chatting);
@@ -100,6 +101,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
 
         db.execSQL("DROP TABLE if exists " + "StudentInfo");
         db.execSQL("DROP TABLE if exists " + "QueryInfo");
+        db.execSQL("DROP TABLE if exists " + "StudInfo");
         db.execSQL("DROP TABLE if exists " + "StdDivSub");
         db.execSQL("DROP TABLE if exists " + "TeacherInfo");
         db.execSQL("DROP TABLE if exists " + "StdSubject");

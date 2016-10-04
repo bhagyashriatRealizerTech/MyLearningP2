@@ -3,8 +3,11 @@ package realizer.com.schoolgenieparent.registeration;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,9 +40,9 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
     Calendar myCalendar;
     DatePickerDialog.OnDateSetListener date;
     Button btnRegister;
-    TextView txtStandard,txtDivision,txtRegistration,txtAddress,txtSchoolname;
+    TextView txtStandard,txtDivision,txtRegistration,txtAddress,txtSchoolname,txtRegDob;
 
-    EditText edtPassword,edtConfirmPass,edtStdFname,edtStdLname,edtEmailId,edtPhoneno,edtUserid,edtDob;
+    EditText edtPassword,edtConfirmPass,edtStdFname,edtStdLname,edtEmailId,edtPhoneno,edtUserid;
     static String division,standard,schoolname,schoolcode,schooladdress,conpass,pass,studFname,studLname,emailid,phoneno,userId,dob;
 
     @Override
@@ -60,7 +63,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         txtDivision= (TextView) findViewById(R.id.txt_reg_division);
         edtEmailId= (EditText) findViewById(R.id.edt_reg_emailid);
         edtPhoneno= (EditText) findViewById(R.id.edt_reg_phoneno);
-        edtDob= (EditText) findViewById(R.id.edt_reg_dob);
+        txtRegDob= (TextView) findViewById(R.id.txt_reg_dob);
 
         final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
@@ -94,14 +97,14 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
 
         };
 
-        edtDob.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(Registration2Activity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
+//        edtDob.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new DatePickerDialog(Registration2Activity.this, date, myCalendar
+//                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+//                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+//            }
+//        });
 
 
         //RegistrationAsyncTaskGet asyncTaskGet=new RegistrationAsyncTaskGet(Registration2Activity.this,Registration2Activity.this,"StudentLogin");
@@ -153,9 +156,16 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
                     rgm.setPassword(pass);
                     rgm.setUserId(userId);
                     rgm.setContactNo(phoneno);
+                    Boolean connect=isConnectingToInternet();
+                    if (connect) {
 
-                    RegistrationAsyncTaskPost asyncTaskPost=new RegistrationAsyncTaskPost(rgm,Registration2Activity.this,Registration2Activity.this);
-                    asyncTaskPost.execute();
+                        RegistrationAsyncTaskPost asyncTaskPost = new RegistrationAsyncTaskPost(rgm, Registration2Activity.this, Registration2Activity.this);
+                        asyncTaskPost.execute();
+                    }
+                    else
+                    {
+                        Toast.makeText(Registration2Activity.this, "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+                    }
 
                 }
                 else
@@ -164,6 +174,13 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
                 }
             }
         });
+    }
+    public void regdobclick(View view)
+    {
+        new DatePickerDialog(Registration2Activity.this, date, myCalendar
+                .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
     }
     public void GetAllData()
     {
@@ -174,11 +191,27 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         emailid=edtEmailId.getText().toString();
         phoneno=edtPhoneno.getText().toString();
         userId=edtUserid.getText().toString();
-        dob=edtDob.getText().toString();
+
     }
 
     @Override
     public void onTaskCompleted(String s) {
+
+
+        if (s.equals("true")) {
+            Intent intent = new Intent(Registration2Activity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else if(s.equals("400"))
+        {
+            Toast.makeText(Registration2Activity.this, "Username Already Exist.", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(Registration2Activity.this, "Registration Not done.", Toast.LENGTH_SHORT).show();
+        }
+
 
 //        try {
 //            JSONObject rootObj = new JSONObject(s);
@@ -194,9 +227,6 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
 //                }
 //                else
 //                {
-                    Intent intent = new Intent(Registration2Activity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
 //                }
 //            }
 //            else
@@ -216,8 +246,26 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
     }
     public void upDateLable()
     {
-        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        String myFormat = "d/M/yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        edtDob.setText(sdf.format(myCalendar.getTime()));
+        txtRegDob.setText(sdf.format(myCalendar.getTime()));
+        dob=txtRegDob.getText().toString();
+    }
+    public boolean isConnectingToInternet(){
+
+        ConnectivityManager connectivity =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                    {
+                        return true;
+                    }
+
+        }
+        return false;
     }
 }

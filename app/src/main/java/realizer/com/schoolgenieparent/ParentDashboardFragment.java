@@ -22,13 +22,15 @@ import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.homework.TeacherHomeworkFragment;
 import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
+import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
+import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
 
 /**
  * Created by Win on 23/08/2016.
  */
 public class ParentDashboardFragment extends Fragment implements View.OnClickListener
 {
-    TextView inviteother, homework, viewStar, timeTable, funCenter, communication, trackPupil,alert, publicHoliday, classwork;
+    TextView inviteother, homework, viewStar, timeTable, funCenter, communication, trackPupil,alert, publicHoliday, classwork , mypupil,myclass;
     ViewPager Tab;
 
     ActionBar actionBar;
@@ -52,6 +54,8 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         alert.setOnClickListener(this);
         publicHoliday.setOnClickListener(this);
         classwork.setOnClickListener(this);
+        mypupil.setOnClickListener(this);
+        myclass.setOnClickListener(this);
         //payment.setOnClickListener(this);
 //        Tab.setOnPageChangeListener(
 //                new ViewPager.SimpleOnPageChangeListener() {
@@ -134,6 +138,21 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
                     break;
 
+                case R.id.txtpdashpupilinfo:
+                    //frag = Homework("Classwork");
+                    frag =MyPupil();
+                    break;
+
+                case R.id.txtpdashstudentlist:
+                    //frag = Homework("Classwork");
+                    frag =MyClassList();
+                    break;
+
+                case R.id.txtpdashtrack:
+                    //frag = Homework("Classwork");
+                    Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
+                    break;
+
                 case R.id.txtpdashclasswork:
                     //frag = Homework("Classwork");
                     frag =GetHomework("Classwork");
@@ -159,30 +178,31 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         //trackPupil = (TextView) v.findViewById(R.id.txtpdashtrackpupil);
         publicHoliday = (TextView) v.findViewById(R.id.txtpdashpublicholiday);
         classwork = (TextView) v.findViewById(R.id.txtpdashclasswork);
+        mypupil = (TextView) v.findViewById(R.id.txtpdashpupilinfo);
+        myclass = (TextView) v.findViewById(R.id.txtpdashstudentlist);
         //payment = (TextView) v.findViewById(R.id.txtpdashReport);
     }
-    public void MyClass(String res) {
 
-       /* String classList="1.,,2nd,,B,,Hindi@@@2.,,4th,,A,,English@@@3.,,2nd,,A,,English@@@4.,,7th,,B,,History@@@5.,,3rd,,B,,English@@@6.,,6th,,B,,History";
-        TeacherMyClassDialogBoxActivity newTermDialogFragment = new TeacherMyClassDialogBoxActivity();
-        FragmentManager fragmentManager = getFragmentManager();
-        Bundle b =new Bundle();
-        b.putString("StudentClassList", classList);
-        b.putInt("MYCLASS",1);
-        newTermDialogFragment.setArguments(b);
-        newTermDialogFragment.setCancelable(false);
-        newTermDialogFragment.show(fragmentManager, "Dialog!");*/
-
-        String allStudentList = "1.,,Ajay Shah@@@2.,,Nilam Jadhav@@@3.,,Farhan Bodale@@@4.,,Pravin Jadhav@@@5.,,Ram Magar@@@6.,,Sahil Kadam@@@7.,,Hisha Mulye@@@8.,,Supriya Vichare@@@9.,,Ajay Shah@@@10.,,Nilam Jadhav@@@11.,,Farhan Bodale@@@12.,,Pravin Jadhav@@@13.,,Ram Magar@@@14.,,Sahil Kadam@@@15.,,Hisha Mulye@@@16.,,Supriya Vichare";
-        //TeacherMyClassStudentFragment fragment = new TeacherMyClassStudentFragment();
+    // For Homework
+    public Fragment MyPupil() {
+        // Get Output as
+        MyPupilInfoFragment fragment = new MyPupilInfoFragment();
         Bundle bundle = new Bundle();
-        //FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        bundle.putString("StudentClassList", allStudentList);
-        //fragment.setArguments(bundle);
-        //fragmentTransaction.addToBackStack(null);
-        //fragmentTransaction.replace(R.id.frame_container, fragment);
-        //fragmentTransaction.commit();
-
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.frame_container, fragment);
+        fragmentTransaction.commit();
+        return fragment;
+    }
+    // For Homework
+    public Fragment MyClassList() {
+        // Get Output as
+        MyClassStudentFragment fragment = new MyClassStudentFragment();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.frame_container, fragment);
+        fragmentTransaction.commit();
+        return fragment;
     }
     // For Homework
     public Fragment Homework(String res) {

@@ -1,14 +1,21 @@
 package realizer.com.schoolgenieparent.invitejoin;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
 import android.telephony.SmsManager;
@@ -19,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import realizer.com.schoolgenieparent.DrawerActivity;
@@ -39,7 +48,7 @@ import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
  */
 public class InviteToJoinActivity extends Fragment implements OnBackPressFragment
 {
-    EditText edtName,edtNumber;
+
     Button btnSendInvite;
     String htext;
     TextView txtapplink;
@@ -54,6 +63,8 @@ public class InviteToJoinActivity extends Fragment implements OnBackPressFragmen
     String allmobno[];
     String mobno;
     String listMobno;
+    String[] value=null;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,43 +77,47 @@ public class InviteToJoinActivity extends Fragment implements OnBackPressFragmen
 
         String values="";
         sb=new StringBuilder();
-        edtName= (EditText) rootview.findViewById(R.id.edtInviteName);
-        edtNumber= (EditText) rootview.findViewById(R.id.edtInviteNumber);
         btnSendInvite= (Button) rootview.findViewById(R.id.btnSendInvite);
         lstInviteNumber= (ListView) rootview.findViewById(R.id.lstinvitenumber);
         inviteMsgTxt= (EditText) rootview.findViewById(R.id.edtInviteMsgtxt);
         txtapplink= (TextView) rootview.findViewById(R.id.txtappLink);
         lstInviteNumber.setAdapter(null);
+
+        List<String> contact=new ArrayList<>();
+        Cursor phones = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+        while (phones.moveToNext())
+        {
+            String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            contact.add(name+"  "+phoneNumber);
+            //Toast.makeText(getApplicationContext(),name, Toast.LENGTH_LONG).show();
+        }
+        phones.close();
+
+        value = new String[contact.size()];
+        value=contact.toArray(value);
+
+
+
         btnSendInvite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String inviteMsg=inviteMsgTxt.getText().toString();
-                if (namelist.equals(null))
-                {
+                String inviteMsg = inviteMsgTxt.getText().toString();
+                if (namelist.equals(null)) {
                     Toast.makeText(getActivity(), "Add Mobile Numbers", Toast.LENGTH_SHORT).show();
-                }
-                else if (inviteMsg.equals(""))
-                {
+                } else if (inviteMsg.equals("")) {
                     Toast.makeText(getActivity(), "Enter Message", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     if (!lstInviteNumber.equals(null)) {
-                        for (int i = 1; i <=mobList.size(); i++)
-                        {
+                        for (int i = 1; i <= mobList.size(); i++) {
                             //sb.append(mobList.get(i)+" ");
-                        if (mobList.size()==1)
-                        {
-                            sb.append(mobList.get(i-1));
-                        }
-                        else if (i==mobList.size())
-                        {
-                            sb.append(mobList.get(i-1));
-                        }
-                        else
-                        {
-                            sb.append(mobList.get(i-1)+";");
-                        }
+                            if (mobList.size() == 1) {
+                                sb.append(mobList.get(i - 1));
+                            } else if (i == mobList.size()) {
+                                sb.append(mobList.get(i - 1));
+                            } else {
+                                sb.append(mobList.get(i - 1) + ";");
+                            }
                         }
                         mobno = sb.toString();
 
@@ -110,12 +125,12 @@ public class InviteToJoinActivity extends Fragment implements OnBackPressFragmen
 
 
                         //String mobno = mobno;
-                        String allmobno[]=mobno.split(";");
-                        String smss = inviteMsgTxt.getText().toString()+" \n"+txtapplink.getText().toString();
+                        String allmobno[] = mobno.split(";");
+                        String smss = inviteMsgTxt.getText().toString() + " \n" + txtapplink.getText().toString();
                         sendSMS(allmobno, smss);
-                        Toast.makeText(getActivity(), "Message sent \n"+smss, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Message sent \n" + smss, Toast.LENGTH_SHORT).show();
                         sb = null;
-                        namelist=null;
+                        namelist = null;
                         inviteMsgTxt.setText("");
                         lstInviteNumber.setAdapter(null);
                     } else {
@@ -219,22 +234,58 @@ public class InviteToJoinActivity extends Fragment implements OnBackPressFragmen
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_add, menu);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                namelist.add(edtName.getText().toString()+" "+edtNumber.getText().toString());
-                mobList.add(edtNumber.getText().toString());
-                adapter=new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,namelist);
-                lstInviteNumber.setAdapter(adapter);
-                edtName.setText("");
-                edtNumber.setText("");
+//                if (namelist.isEmpty()&&edtName.getText().toString().equals("")||edtNumber.getText().toString().equals(""))
+//                {
+//                    Toast.makeText(getActivity(), "Enter Name and Number", Toast.LENGTH_SHORT).show();
+//                }
+//                else
+//                {
+//                    namelist.add(edtName.getText().toString()+" "+edtNumber.getText().toString());
+//
+//                    adapter=new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,namelist);
+//                    lstInviteNumber.setAdapter(adapter);
+//                    edtName.setText("");
+//                    edtNumber.setText("");
+//                }
+
+
+                AlertDialog.Builder alertdialogbuilder = new AlertDialog.Builder(getActivity());
+                alertdialogbuilder.setTitle("Select A Item ");
+                alertdialogbuilder.setItems(value, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String selectedText = Arrays.asList(value).get(which);
+
+                        if (namelist.contains(selectedText))
+                        {
+                            Toast.makeText(getActivity(), "This contact is selected", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            namelist.add(selectedText);
+                            adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, namelist);
+                            lstInviteNumber.setAdapter(adapter);
+                        }
+
+                    }
+                });
+
+                AlertDialog dialog = alertdialogbuilder.create();
+
+                dialog.show();
+
+
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 }

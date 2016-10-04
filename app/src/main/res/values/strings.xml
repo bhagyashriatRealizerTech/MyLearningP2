@@ -32,7 +32,8 @@
     <!-- =================== Left Drawer Item Text ======================= -->
 
     <string name="DashBoard">DashBoard</string>
-    <string name="MyClass">My Class</string>
+    <string name="MyClass">Student List</string>
+    <string name="MyPupil">My Pupil</string>
     <string name="Homework">Homework</string>
     <string name="RewardStar">Reward Star</string>
     <string name="TimeTable">Time Table</string>

@@ -45,7 +45,7 @@ public class HomeworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPreExecute() {
         // super.onPreExecute();
-        dialog= ProgressDialog.show(myContext, "", "Please wait Homework is Loading...");
+        dialog= ProgressDialog.show(myContext, "", "Please wait Downloading Homework...");
     }
 
     @Override

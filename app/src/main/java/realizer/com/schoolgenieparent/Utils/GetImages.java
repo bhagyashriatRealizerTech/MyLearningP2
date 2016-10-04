@@ -3,11 +3,15 @@ package realizer.com.schoolgenieparent.Utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+
+import realizer.com.schoolgenieparent.R;
 
 /**
  * Created by Bhagyashri on 9/12/2016.
@@ -15,12 +19,16 @@ import java.net.URLConnection;
 public class GetImages extends AsyncTask<Object, Object, Object> {
     private String requestUrl, imagename_;
     private ImageView view;
+    private TextView tview;
+    private String username;
     private Bitmap bitmap ;
     private FileOutputStream fos;
-    public GetImages(String requestUrl, ImageView view, String _imagename_) {
+    public GetImages(String requestUrl, ImageView view, TextView tview,String username ,String _imagename_) {
         this.requestUrl = requestUrl;
         this.view = view;
         this.imagename_ = _imagename_ ;
+        this.tview = tview;
+        this.username = username;
     }
 
     @Override
@@ -36,10 +44,32 @@ public class GetImages extends AsyncTask<Object, Object, Object> {
 
     @Override
     protected void onPostExecute(Object o) {
-        if(!ImageStorage.checkifImageExists(imagename_))
+        if(bitmap != null) {
+            if (!ImageStorage.checkifImageExists(imagename_)) {
+                view.setImageBitmap(bitmap);
+                ImageStorage.saveToSdCard(bitmap, imagename_);
+            }
+        }
+        else if(tview != null && username != null)
         {
-            view.setImageBitmap(bitmap);
-            ImageStorage.saveToSdCard(bitmap, imagename_);
+            String name[] = username.trim().split(" ");
+            char fchar  = name[0].toUpperCase().charAt(0);
+            char lchar  = name[0].toUpperCase().charAt(0);
+            for(int i =0;i<name.length;i++)
+            {
+                if(!name[i].equals("") && i==0)
+                    fchar = name[i].toUpperCase().charAt(0);
+                else if(!name.equals("") && i==(name.length-1))
+                    lchar = name[i].toUpperCase().charAt(0);
+
+            }
+            tview.setVisibility(View.VISIBLE);
+            view.setVisibility(View.GONE);
+            tview.setText(fchar+""+lchar);
+        }
+        else
+        {
+            view.setImageResource(R.drawable.chat_icon);
         }
     }
 }

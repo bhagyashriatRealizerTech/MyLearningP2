@@ -56,6 +56,40 @@ public class DALHomework {
         return newRowInserted;
     }
 
+
+    public ArrayList<ParentHomeworkListModel> GetHomeworkAllInfoData(String date) {
+
+        Cursor c = db.rawQuery("SELECT * FROM HomeworkInfo where HomeworkDate = "+"'"+date+"'", null);
+        ArrayList<ParentHomeworkListModel> result = new ArrayList<>();
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    ParentHomeworkListModel o = new ParentHomeworkListModel();
+
+                    o.setSchoolcode(c.getString(c.getColumnIndex("SchoolCode")));
+                    o.setHomework(c.getString(c.getColumnIndex("HwTxtLst")));
+                    o.setImage(c.getString(c.getColumnIndex("HwImage64Lst")));
+                    o.setSubject(c.getString(c.getColumnIndex("Subject")));
+                    o.setStandard(c.getString(c.getColumnIndex("Standard")));
+                    o.setDivision(c.getString(c.getColumnIndex("Division")));
+                    o.setGivenBy(c.getString(c.getColumnIndex("GivenBy")));
+                    o.setHwdate(c.getString(c.getColumnIndex("HomeworkDate")));
+                    o.setWork(c.getString(c.getColumnIndex("Work")));
+                    result.add(o);
+                    cnt = cnt + 1;
+                }
+                while (c.moveToNext());
+            }
+        } /*else {
+            mToast("Table Has No contain");
+        }*/
+        c.close();
+        return result;
+    }
+
     public ArrayList<ParentHomeworkListModel> GetHomeworkInfoData(String date,String work) {
 
         Cursor c = db.rawQuery("SELECT * FROM HomeworkInfo where HomeworkDate = "+"'"+date+"' AND Work='"+work+"' ", null);

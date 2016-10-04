@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="11"
-    android:background="@drawable/bgimg">
+    android:background="@drawable/regbggradient">
     <FrameLayout
         android:layout_weight="1"
         android:layout_width="match_parent"
@@ -75,6 +75,8 @@
                 android:layout_above="@+id/edtAddress"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:spinnerMode="dropdown"
+                android:dropDownVerticalOffset="40dp"
                 />
 
         <EditText
@@ -111,6 +113,8 @@
                 android:layout_above="@+id/spDivision"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:spinnerMode="dropdown"
+                android:dropDownVerticalOffset="40dp"
                 />
 
             <Spinner
@@ -127,6 +131,8 @@
                 android:layout_above="@+id/btnContinue"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:spinnerMode="dropdown"
+                android:dropDownVerticalOffset="40dp"
                 />
 
             <Button style="@style/LoginButton"

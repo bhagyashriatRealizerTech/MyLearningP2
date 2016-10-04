@@ -3,7 +3,7 @@
 // Original Author: Shrey Sharma
 // Original Date: 22 July 2015
 //===============================================================================
-package realizer.com.schoolgenieparent;
+package realizer.com.schoolgenieparent.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -20,6 +20,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 
+import realizer.com.schoolgenieparent.R;
 
 /**
  * progress wheel same as material design provided by android

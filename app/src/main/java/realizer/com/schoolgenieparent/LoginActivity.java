@@ -315,9 +315,9 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
             };
 
     public boolean parsData(String json) {
-        DALMyPupilInfo qr = new DALMyPupilInfo(getApplicationContext());
-        DatabaseQueries dr=new DatabaseQueries(getApplicationContext());
-        DALQueris Qdal = new DALQueris(getApplicationContext());
+        DALMyPupilInfo qr = new DALMyPupilInfo(LoginActivity.this);
+        DatabaseQueries dr=new DatabaseQueries(LoginActivity.this);
+        DALQueris Qdal = new DALQueris(LoginActivity.this);
 //        DALHoliday Hdal = new DALHoliday(getApplicationContext());
 //        DALGeneralCommunication dla = new DALGeneralCommunication(getApplicationContext());
 
@@ -366,7 +366,7 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
             edit.putString("SyncAyear", acdyear);
             edit.putString("DisplayName",fname+" "+lname);
             edit.putString("ThumbnailID", thumbnailurl);
-
+            edit.putString("StudentUserID", userId);
             edit.putString("Firstname",fname);
             edit.putString("STANDARD",std);
             edit.putString("DIVISION",division);
@@ -375,7 +375,7 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
 
 
             long n =qr.insertStudInfo(userId, pwd, std, division, classrollno, rollno, fname, mname, lname, dob, bldgrp, fathername, mothername, contactno,
-                    emergencycontactno, address, hobbies, comment, isactive, Activetill,registrationcode,acdyear,schoolcode);
+                    emergencycontactno, address, hobbies, comment, isactive, Activetill,registrationcode,acdyear,schoolcode,thumbnailurl);
             if(n>=0)
             {
                 Log.d("Student", " Done!!!");

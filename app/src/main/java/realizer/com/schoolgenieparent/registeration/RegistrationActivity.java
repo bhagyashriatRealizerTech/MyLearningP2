@@ -54,7 +54,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registration_activity);
+        setContentView(R.layout.registarion_activity_new);
 
 
         String[] array = getResources().getStringArray(R.array.WheelArrayDefault);
@@ -217,6 +217,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
         jsonString=s;
         getSchoolName(jsonString);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, schoolName);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_layout);
         spnSchoolName.setAdapter(adapter);
         //autoCompleteTextView.setAdapter(adapter);
 
@@ -238,7 +239,9 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
             }
         });
         ArrayAdapter<String> adapterdiv = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, div);
+        adapterdiv.setDropDownViewResource(R.layout.spinner_dropdown_layout);
         ArrayAdapter<String> adapterstd = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, std);
+        adapterstd.setDropDownViewResource(R.layout.spinner_dropdown_layout);
         spnDivision.setAdapter(adapterdiv);
         spnStd.setAdapter(adapterstd);
 
