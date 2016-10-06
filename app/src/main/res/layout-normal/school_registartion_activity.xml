@@ -81,8 +81,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:padding="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
                 android:lines="2"
+                android:inputType="number"
                 android:textColorHint="@color/darkgreycolor"
                 android:hint="School Contact number"
                 android:id="@+id/edt_contact_number"
@@ -102,6 +106,7 @@
                 android:id="@+id/edt_std"
                 android:textSize="16sp"
                 android:textColor="@color/darkgrey"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:background="@drawable/square_registarion"
                 />
             <EditText
@@ -115,6 +120,7 @@
                 android:id="@+id/edt_div"
                 android:textSize="16sp"
                 android:textColor="@color/darkgrey"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:background="@drawable/square_registarion"
                 />
 
@@ -125,7 +131,7 @@
                 android:layout_height="50dp"
                 android:gravity="center"
                 android:textSize="22sp"
-                android:id="@+id/btnContinue"
+                android:id="@+id/btnRegister"
                 android:text="Register"
                 android:onClick="ContinueClick"
                 android:layout_marginTop="0dp"

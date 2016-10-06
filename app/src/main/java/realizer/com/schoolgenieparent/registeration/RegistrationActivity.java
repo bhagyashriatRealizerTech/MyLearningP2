@@ -194,6 +194,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
                     if(!standard.isEmpty())
                     std.add((i + 1), standard);
                 }
+                std.add("Add New Standard");
             }
             adapterStd = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, std);
             adapterStd.setDropDownViewResource(R.layout.spinner_dropdown_layout);
@@ -239,7 +240,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
                 }
 
 
-                if (div.size() > 1 || stdposition == (-10)) {
+                if (div.size() > 2 || stdposition == (-10)) {
                     adapterDiv = new ArrayAdapter<String>(RegistrationActivity.this, R.layout.spinner_selected_text__layout, div);
                     adapterDiv.setDropDownViewResource(R.layout.spinner_dropdown_layout);
                     edtDivision.setVisibility(View.GONE);
@@ -282,8 +283,10 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
 
                 if (spnSchoolName.getSelectedItem().toString().equalsIgnoreCase("Add New School")) {
 
-                    Intent i = new Intent(RegistrationActivity.this,SchoolRegistrationActivity.class);
+                    Intent i = new Intent(RegistrationActivity.this, SchoolRegistrationActivity.class);
                     startActivity(i);
+
+
                 } else {
                     if (position != 0) {
                         schoolpos = position - 1;
@@ -316,18 +319,60 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if (position != 0) {
-                    stdpos = position - 1;
-                    getDivision(schoolpos, position - 1, jsonString);
+
+                if (spnStd.getSelectedItem().toString().equalsIgnoreCase("Add New Standard")) {
+
+                    final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+
+                    LayoutInflater inflater = getLayoutInflater();
+                    View dialoglayout = inflater.inflate(R.layout.insert_div_layout, null);
+                    Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
+                    Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
+                    final EditText standardedt = (EditText) dialoglayout.findViewById(R.id.edtstd1);
+                    final EditText divisionedt = (EditText) dialoglayout.findViewById(R.id.edtdiv1);
+                    submit.setTypeface(face);
+                    cancel.setTypeface(face);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
+                    builder.setView(dialoglayout);
+
+                    final AlertDialog alertDialog = builder.create();
+
+                    submit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            if(divisionedt.getText().toString().trim().length()>0)
+                            {
+                                newDivAdded = divisionedt.getText().toString().trim();
+                                getDivision(schoolpos,stdpos,jsonString);
+                                alertDialog.dismiss();
+                            }
+
+                        }
+                    });
+
+                    cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                        }
+                    });
+
+                    alertDialog.show();
+
                 } else {
-                    stdpos = position;
-                    getDivision(position - 1, -10, jsonString);
+                    if (position != 0) {
+                        stdpos = position - 1;
+                        getDivision(schoolpos, position - 1, jsonString);
+                    } else {
+                        stdpos = position;
+                        getDivision(position - 1, -10, jsonString);
+                    }
+
+                    spnDivision.setSelection(0);
+
                 }
-
-                spnDivision.setSelection(0);
-
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
