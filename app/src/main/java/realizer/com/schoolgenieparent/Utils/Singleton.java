@@ -24,7 +24,7 @@ public class Singleton {
     public static Fragment fragment;
     public static Fragment mainFragment;
     public static ProgressWheel messageCenter = null;
-    public static ArrayList<String> imageList;
+    public static ArrayList<String> imageList = new ArrayList<>();
 
     private Singleton()
     {

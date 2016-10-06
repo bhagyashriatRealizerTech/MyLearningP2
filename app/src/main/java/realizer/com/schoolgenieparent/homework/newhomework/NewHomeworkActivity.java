@@ -158,5 +158,10 @@ public class NewHomeworkActivity extends Fragment {
         {
             new GetImagesForEvent().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
+        else
+        {
+            addImage.setVisibility(View.VISIBLE);
+            gridView.setVisibility(View.VISIBLE);
+        }
     }
 }
