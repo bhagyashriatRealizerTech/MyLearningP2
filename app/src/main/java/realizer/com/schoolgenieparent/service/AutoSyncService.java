@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -22,8 +23,10 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
+import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.Utils.StoreBitmapImages;
 import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
@@ -82,7 +85,7 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
         int total_min=3600000+roll_min;
         Timer timer = new Timer();
 
-        timer.scheduleAtFixedRate(new AutoSyncServerDataTrack(), 1200000, total_min);
+        timer.scheduleAtFixedRate(new AutoSyncServerDataTrack(), 10000, total_min);
 
         return START_NOT_STICKY;
     }
@@ -212,26 +215,17 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                 if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
                 {
                     String[] IMG=new String[img.length()];
-                    //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
                     String[] dateArr=hwdate.split("/");
                     String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-                    ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(newDate, onTaskString[1], std, division);
+                    //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
+                    ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
                     boolean isPresent=false;
 
                     for (int j=0;j<results.size();j++)
                     {
-                        if (img.toString().equals("[]") && !text.toString().equals("") )
+                        if (!text.toString().equals("") )
                         {
                             if (results.get(j).getHwTxtLst().equalsIgnoreCase(text.toString()))
-                            {
-                                isPresent=true;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (results.get(j).getHwImage64Lst().equalsIgnoreCase(img.toString()) &&
-                                    results.get(j).getHwTxtLst().equalsIgnoreCase(text.toString()))
                             {
                                 isPresent=true;
                                 break;
@@ -256,7 +250,20 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                         if (n>0)
                         {
                             Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                            String date = df.format(calendar.getTime());
 
+                            NotificationModel notification1 = new NotificationModel();
+                            notification1.setNotificationId(2);
+                            notification1.setNotificationDate(date);
+                            notification1.setNotificationtype("Homework");
+                            notification1.setMessage(subject);
+                            notification1.setIsRead("false");
+                            notification1.setAdditionalData1(givenby);
+                            qr.InsertNotification(notification1);
+                            if(Singleton.getResultReceiver() != null)
+                                Singleton.getResultReceiver().send(1,null);
                         }
                     }
                 }
@@ -286,23 +293,14 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                     //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
                     String[] dateArr=hwdate.split("/");
                     String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-                    ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(newDate, onTaskString[1], std, division);
+                    ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
                     boolean isPresent=false;
 
                     for (int j=0;j<results.size();j++)
                     {
-                        if (img.toString().equals("[]") && !text.toString().equals("") )
+                        if (!text.toString().equals("") )
                         {
                             if (results.get(j).getHwTxtLst().equalsIgnoreCase(text.toString()))
-                            {
-                                isPresent=true;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (results.get(j).getHwImage64Lst().equalsIgnoreCase(img.toString()) &&
-                                    results.get(j).getHwTxtLst().equalsIgnoreCase(text.toString()))
                             {
                                 isPresent=true;
                                 break;
@@ -323,11 +321,27 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                             }
                         }
 
+                        //long n=0;
+                        //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, onTaskString[1], student);
+
                         long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
                         if (n>0)
                         {
                             Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                            String date = df.format(calendar.getTime());
 
+                            NotificationModel notification1 = new NotificationModel();
+                            notification1.setNotificationId(3);
+                            notification1.setNotificationDate(date);
+                            notification1.setNotificationtype("Classwork");
+                            notification1.setMessage(subject);
+                            notification1.setIsRead("false");
+                            notification1.setAdditionalData1(givenby);
+                            qr.InsertNotification(notification1);
+                            if(Singleton.getResultReceiver() != null)
+                                Singleton.getResultReceiver().send(1,null);
                         }
                     }
                 }
@@ -337,15 +351,37 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                 e.printStackTrace();
             }
         }
-        else
-        {
-            s =s.replace("\"","");
-            if(onTaskString[0].equals("success"))
-            {
-                long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[1]),onTaskString[2]);
-                if(n>0) {
-                    n = -1;
-                    n = qr.updateHomeworkSyncFlag(qr.GetHomework(Integer.valueOf(onTaskString[1])));
+        else {
+            s = s.replace("\"", "");
+            if (onTaskString[0].equals("success")) {
+                long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]), onTaskString[3]);
+                TeacherHomeworkModel homeworkObj = new TeacherHomeworkModel();
+                if (n > 0) {
+                    n = 0;
+                    homeworkObj = qr.GetHomework(Integer.valueOf(onTaskString[2]));
+                    n = qr.updateHomeworkSyncFlag(homeworkObj);
+                    NotificationModel obj = new NotificationModel();
+                    obj.setNotificationId(homeworkObj.getHid());
+                    obj.setNotificationDate(homeworkObj.getHwDate()+"Upload");
+                    obj.setNotificationtype(homeworkObj.getWork());
+                    obj.setMessage("Uploaded Successfully for");
+                    obj.setIsRead("false");
+                    obj.setAdditionalData2("");
+                    obj.setAdditionalData1(homeworkObj.getStd() + "@@@" + homeworkObj.getDiv() + "@@@" +
+                            homeworkObj.getSubject());
+                    qr.InsertNotification(obj);
+                    Bundle b = new Bundle();
+                    b.putInt("NotificationId", homeworkObj.getHid());
+                    b.putString("NotificationDate", homeworkObj.getHwDate());
+                    b.putString("NotificationType", homeworkObj.getWork()+"Upload");
+                    b.putString("NotificationMessage", "Uploaded Successfully for");
+                    b.putString("IsNotificationread", "false");
+                    b.putString("AdditionalData1", homeworkObj.getStd() + "@@@" + homeworkObj.getDiv() + "@@@" +
+                            homeworkObj.getSubject());
+                    b.putString("AdditionalData2", "");
+
+                    if (Singleton.getResultReceiver() != null)
+                        Singleton.getResultReceiver().send(1, null);
                 }
             }
         }

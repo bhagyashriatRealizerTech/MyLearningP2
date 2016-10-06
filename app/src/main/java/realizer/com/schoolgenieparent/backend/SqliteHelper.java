@@ -12,7 +12,7 @@ import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
  */
 public class SqliteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SchoolGeniePToP";
-    private static final int DATABASE_VERSION =23;
+    private static final int DATABASE_VERSION =24;
     Context mycontext;
     private static final String STUDINFO =
             "CREATE TABLE StudentInfo(  UserId TEXT," +
@@ -65,6 +65,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
 //    private static final String FunCenter ="CREATE TABLE EventMaster(Class TEXT,Div TEXT,Event_Id INTEGER PRIMARY KEY   AUTOINCREMENT,Event TEXT,Date TEXT,Thumbnail TEXT,Create_Date TEXT,HasSyncedUp TEXT,AcademicYear INTEGER,EvntuuId TEXT,FileName TEXT)";
 //    private static final String FunCenter1 ="CREATE TABLE EventImages(Image_id INTEGER PRIMARY KEY   AUTOINCREMENT,Eventid INTEGER ,Image TEXT,Upload_Date  TEXT,Is_Uploaded TEXT,HasSyncedUp TEXT,AcademicYear INTEGER,SrNo INTEGER,ImageCaption TEXT,Imguuid TEXT,File_Name TEXT)";
 //    private static final String TEACHERFULLINFO ="CREATE TABLE TeacherFullInfo(ActiveDate TEXT,ClassTeacherOn TEXT,Name TEXT,Qualification TEXT,ThumbnailURL TEXT,UserId TEXT,ContactNo TEXT,DOB TEXT,EmailId TEXT,IsActive TEXT)";
+private static final String Notification ="CREATE TABLE Notification(ID INTEGER PRIMARY KEY   AUTOINCREMENT,NotificationId INTEGER,Type TEXT,Message TEXT,Date TEXT,AdditionalData1 TEXT,AdditionalData2 TEXT,IsRead TEXT)";
 
     public SqliteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -96,6 +97,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
 //        db.execSQL(FunCenter1);
 //        db.execSQL(TIMETABLE);
 //        db.execSQL(TEACHERFULLINFO);
+        db.execSQL(Notification);
     }
 
     @Override
@@ -123,6 +125,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
         db.execSQL("DROP TABLE if exists " + "TeacherFullInfo");
         db.execSQL("DROP TABLE if exists " + "HomeworkInfo");
         db.execSQL("DROP TABLE if exists " + "Exception");
+        db.execSQL("DROP TABLE if exists " + "Notification");
         onCreate(db);
     }
 }

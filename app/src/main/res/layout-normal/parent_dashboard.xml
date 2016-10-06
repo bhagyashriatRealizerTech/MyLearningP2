@@ -1,314 +1,325 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:background="#ffffff"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="13"
+    android:orientation="vertical"
     >
 
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1.5"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <FrameLayout
+        android:layout_height="match_parent">
+
+        <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginTop="20dp">
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:divider="@color/white"
+            android:layout_alignParentTop="true"
+            android:focusable="false"
+            android:fadeScrollbars="false"
+            android:smoothScrollbar="true"
+            android:visibility="gone"
+            android:layout_above="@+id/linlayout"
+            android:scrollbarStyle="outsideInset"
+            android:id="@+id/lst_notification"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+        <LinearLayout
+
+            android:id="@+id/linuserlayout"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical"
+            android:layout_above="@+id/linlayout"
+            android:layout_margin="10dp"
+            android:orientation="vertical">
+
+            <realizer.com.schoolgenieparent.view.RoundedImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:background="#ffffff"
-                android:orientation="vertical">
+                android:visibility="visible"
+                android:id="@+id/iv_uImage" />
+
+            <TextView android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:background="@drawable/profilepic_circle"
+                android:id="@+id/img_user_text_image" />
+
+            <TextView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal|bottom"
+                android:id="@+id/txtuName"
+                android:textColor="#696969"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:layout_marginBottom="0dp"
+                android:text=""
+                android:layout_marginTop="10dp"
+                android:textSize="18sp"/>
+
+            <TextView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal|bottom"
+                android:id="@+id/txtStdDiv"
+                android:textColor="#696969"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:layout_marginBottom="0dp"
+                android:text=""
+                android:layout_marginTop="10dp"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_margin="3dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:layout_height="fill_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarStyle="outsideInset">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="3dp"
+                >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#d3d3d3"
-                    android:orientation="horizontal">
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:orientation="vertical">
 
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashinviteother"
-                        android:background="#ffffff"
-                        android:layout_margin="2dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:drawablePadding="5dip"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/mypupil_icon"
-                        android:text="Invite to Other"/>
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashstudentlist"
-                        android:layout_marginTop="2dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:background="#ffffff"
-                        android:drawablePadding="5dip"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/myclass_icon"
-                        android:text="Student List"/>
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginRight="2dp"
-                        android:id="@+id/txtpdashpupilinfo"
-                        android:background="#ffffff"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:drawableTop="@drawable/mypupil_icon"
-                        android:text="My Pupil"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#d3d3d3"
+                        android:orientation="horizontal">
+
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashinviteother"
+                            android:background="#ffffff"
+                            android:layout_margin="2dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:drawablePadding="5dip"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/mypupil_icon"
+                            android:text="Invite to Other"/>
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashstudentlist"
+                            android:layout_marginTop="2dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:background="#ffffff"
+                            android:drawablePadding="5dip"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/myclass_icon"
+                            android:text="Student List"/>
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:layout_marginLeft="2dp"
+                            android:layout_marginRight="2dp"
+                            android:id="@+id/txtpdashpupilinfo"
+                            android:background="#ffffff"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:drawableTop="@drawable/mypupil_icon"
+                            android:text="My Pupil"/>
 
 
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#d3d3d3"
+                        android:orientation="horizontal">
+
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashtrack"
+                            android:background="#ffffff"
+                            android:layout_marginLeft="2dp"
+                            android:layout_marginBottom="2dp"
+                            android:layout_marginRight="2dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:drawablePadding="5dip"
+                            android:layout_weight="1"
+                            android:enabled="false"
+                            android:drawableTop="@drawable/tracking3d"
+                            android:text="Tracking"/>
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashhomework"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:background="#ffffff"
+                            android:drawablePadding="5dip"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/homework_icon"
+                            android:text="Homework"/>
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashclasswork"
+                            android:paddingTop="5dp"
+                            android:drawablePadding="5dip"
+                            android:paddingBottom="5dp"
+                            android:layout_marginRight="2dp"
+                            android:layout_marginLeft="2dp"
+                            android:background="#ffffff"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/classwork3d"
+                            android:text="Classwork"/>
+
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#d3d3d3"
+                        android:orientation="horizontal">
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashtimetable"
+                            android:layout_marginLeft="2dp"
+                            android:layout_marginBottom="2dp"
+                            android:layout_marginRight="2dp"
+                            android:paddingTop="5dp"
+                            android:enabled="false"
+                            android:paddingBottom="5dp"
+                            android:background="#ffffff"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/timetable_icon"
+                            android:text="TimeTable"/>
+
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:id="@+id/txtpdashcommunication"
+                            android:background="#ffffff"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:drawableTop="@drawable/chat_icon"
+                            android:text="Communication"/>
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashfuncenter"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:layout_marginLeft="2dp"
+                            android:layout_marginRight="2dp"
+                            android:enabled="false"
+                            android:background="#ffffff"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/funcenter_icon"
+                            android:text="FunCenter"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#d3d3d3"
+                        android:orientation="horizontal">
+
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashalert"
+                            android:drawablePadding="5dip"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:layout_marginLeft="2dp"
+                            android:layout_marginBottom="2dp"
+                            android:layout_marginRight="2dp"
+                            android:enabled="false"
+                            android:background="#ffffff"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/annoucement_icon"
+                            android:text="Alerts"/>
+
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:enabled="false"
+                            android:id="@+id/txtpdashviewstar"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:background="#ffffff"
+                            android:drawablePadding="5dip"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/viewstar_icon"
+                            android:text="View Star"/>
+
+                        <Button
+                            style="@style/TextFont"
+                            android:layout_width="90dp"
+                            android:layout_height="150dp"
+                            android:id="@+id/txtpdashpublicholiday"
+                            android:paddingTop="5dp"
+                            android:drawablePadding="5dip"
+                            android:paddingBottom="5dp"
+                            android:layout_marginRight="2dp"
+                            android:layout_marginLeft="2dp"
+                            android:background="#ffffff"
+                            android:enabled="false"
+                            android:layout_weight="1"
+                            android:drawableTop="@drawable/holiday_icon"
+                            android:text="Holiday"/>
+
+                    </LinearLayout>
                 </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#d3d3d3"
-                    android:orientation="horizontal">
 
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashtrack"
-                        android:background="#ffffff"
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginBottom="2dp"
-                        android:layout_marginRight="2dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:drawablePadding="5dip"
-                        android:layout_weight="1"
-                        android:enabled="false"
-                        android:drawableTop="@drawable/tracking3d"
-                        android:text="Tracking"/>
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashhomework"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:background="#ffffff"
-                        android:drawablePadding="5dip"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/homework_icon"
-                        android:text="Homework"/>
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashclasswork"
-                        android:paddingTop="5dp"
-                        android:drawablePadding="5dip"
-                        android:paddingBottom="5dp"
-                        android:layout_marginRight="2dp"
-                        android:layout_marginLeft="2dp"
-                        android:background="#ffffff"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/classwork3d"
-                        android:text="Classwork"/>
+            </FrameLayout>
 
+        </ScrollView>
 
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#d3d3d3"
-                    android:orientation="horizontal">
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashtimetable"
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginBottom="2dp"
-                        android:layout_marginRight="2dp"
-                        android:paddingTop="5dp"
-                        android:enabled="false"
-                        android:paddingBottom="5dp"
-                        android:background="#ffffff"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/timetable_icon"
-                        android:text="TimeTable"/>
-
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:id="@+id/txtpdashcommunication"
-                        android:background="#ffffff"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:drawableTop="@drawable/chat_icon"
-                        android:text="Communication"/>
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashfuncenter"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginRight="2dp"
-                        android:enabled="false"
-                        android:background="#ffffff"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/funcenter_icon"
-                        android:text="FunCenter"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#d3d3d3"
-                    android:orientation="horizontal">
-
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashalert"
-                        android:drawablePadding="5dip"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginBottom="2dp"
-                        android:layout_marginRight="2dp"
-                        android:enabled="false"
-                        android:background="#ffffff"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/annoucement_icon"
-                        android:text="Alerts"/>
-
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:enabled="false"
-                        android:id="@+id/txtpdashviewstar"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:background="#ffffff"
-                        android:drawablePadding="5dip"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/viewstar_icon"
-                        android:text="View Star"/>
-
-                    <Button
-                        style="@style/TextFont"
-                        android:layout_width="90dp"
-                        android:layout_height="150dp"
-                        android:id="@+id/txtpdashpublicholiday"
-                        android:paddingTop="5dp"
-                        android:drawablePadding="5dip"
-                        android:paddingBottom="5dp"
-                        android:layout_marginRight="2dp"
-                        android:layout_marginLeft="2dp"
-                        android:background="#ffffff"
-                        android:enabled="false"
-                        android:layout_weight="1"
-                        android:drawableTop="@drawable/holiday_icon"
-                        android:text="Holiday"/>
-
-                </LinearLayout>
-
-
-                <!--<LinearLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="center_horizontal"-->
-                    <!--android:background="#d3d3d3"-->
-                    <!--android:orientation="horizontal">-->
-                    <!--<Button-->
-                        <!--style="@style/TextFont"-->
-                        <!--android:layout_width="90dp"-->
-                        <!--android:layout_height="150dp"-->
-                        <!--android:id="@+id/txtpdashReport"-->
-                        <!--android:layout_marginLeft="2dp"-->
-                        <!--android:layout_marginBottom="2dp"-->
-                        <!--android:layout_marginRight="2dp"-->
-                        <!--android:paddingTop="5dp"-->
-                        <!--android:paddingBottom="5dp"-->
-                        <!--android:background="#ffffff"-->
-                        <!--android:layout_weight="1"-->
-                        <!--android:drawableTop="@drawable/timetable3d"-->
-                        <!--android:text="Pay Fees"/>-->
-
-                    <!--<Button-->
-                        <!--style="@style/TextFont"-->
-                        <!--android:layout_width="90dp"-->
-                        <!--android:layout_height="150dp"-->
-                        <!--android:paddingTop="5dp"-->
-                        <!--android:paddingBottom="5dp"-->
-                        <!--android:id="@+id/txtpdashtrackpupil"-->
-                        <!--android:background="#ffffff"-->
-                        <!--android:layout_weight="1"-->
-                        <!--android:gravity="center"-->
-                        <!--android:drawableTop="@drawable/tracking3d"-->
-                        <!--android:text="Track Pupil"/>-->
-                    <!--<Button-->
-                        <!--style="@style/TextFont"-->
-                        <!--android:layout_width="90dp"-->
-                        <!--android:layout_height="150dp"-->
-                        <!--android:id="@+id/txtpdashtemp"-->
-                        <!--android:paddingTop="5dp"-->
-                        <!--android:paddingBottom="5dp"-->
-                        <!--android:layout_marginRight="2dp"-->
-                        <!--android:layout_marginLeft="2dp"-->
-                        <!--android:background="#ffffff"-->
-                        <!--android:layout_weight="1"-->
-                        <!--android:drawableTop="@drawable/holiday3d"-->
-                        <!--android:text="About"/>-->
-
-                <!--</LinearLayout>-->
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="0dp"-->
-                    <!--android:layout_weight="0.3"-->
-                    <!--android:layout_marginLeft="10dp"-->
-                    <!--android:layout_marginRight="10dp"-->
-                    <!--android:layout_marginTop="10dp"-->
-                    <!--android:background="@drawable/border_white"/>-->
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_weight="1">
-                    <TextView style="@style/TextViewsBold15"
-                        android:layout_gravity="center_horizontal"
-                        android:textColor="#000000"
-                        android:text="© 2015 RealizerTech"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                </FrameLayout>
-
-
-            </LinearLayout>
-
-        </FrameLayout>
-
-    </ScrollView>
-
-
-
+    </LinearLayout>
 
 </LinearLayout>

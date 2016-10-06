@@ -185,7 +185,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         }
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
                         long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
-                       /* if (n>0)
+                        if (n>0)
                         {
                             Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
                             Calendar calendar = Calendar.getInstance();
@@ -202,7 +202,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                             qr.InsertNotification(notification1);
                             if(Singleton.getResultReceiver() != null)
                                 Singleton.getResultReceiver().send(1,null);
-                        }*/
+                        }
                     }
                 }
 
@@ -263,7 +263,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, onTaskString[1], student);
 
                         long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
-                        /*if (n>0)
+                        if (n>0)
                         {
                             Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
                             Calendar calendar = Calendar.getInstance();
@@ -280,7 +280,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                             qr.InsertNotification(notification1);
                             if(Singleton.getResultReceiver() != null)
                                 Singleton.getResultReceiver().send(1,null);
-                        }*/
+                        }
                     }
                 }
             }
@@ -295,33 +295,33 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
             {
                 long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]),onTaskString[3]);
                 TeacherHomeworkModel homeworkObj = new TeacherHomeworkModel();
-                /*if(n>0) {
+                if(n>0) {
                     n =0;
-                    n = qr.updateHomeworkSyncFlag(qr.GetHomework(Integer.valueOf(onTaskString[2])));
+                    homeworkObj = qr.GetHomework(Integer.valueOf(onTaskString[2]));
+                    n = qr.updateHomeworkSyncFlag(homeworkObj);
                     NotificationModel obj = new NotificationModel();
                     obj.setNotificationId(homeworkObj.getHid());
                     obj.setNotificationDate(homeworkObj.getHwDate());
-                    obj.setNotificationtype(homeworkObj.getWork());
+                    obj.setNotificationtype(homeworkObj.getWork()+"Upload");
                     obj.setMessage("Uploaded Successfully for");
                     obj.setIsRead("false");
                     obj.setAdditionalData2("");
                     obj.setAdditionalData1(homeworkObj.getStd()+"@@@"+homeworkObj.getDiv()+"@@@"+
                             homeworkObj.getSubject());
-                    n = qr.InsertNotification(obj);
+                    qr.InsertNotification(obj);
                     Bundle b = new Bundle();
                     b.putInt("NotificationId", homeworkObj.getHid());
                     b.putString("NotificationDate", homeworkObj.getHwDate());
-                    b.putString("NotificationType", homeworkObj.getWork());
+                    b.putString("NotificationType", homeworkObj.getWork()+"Upload");
                     b.putString("NotificationMessage", "Uploaded Successfully for");
                     b.putString("IsNotificationread", "false");
                     b.putString("AdditionalData1", homeworkObj.getStd()+"@@@"+homeworkObj.getDiv()+"@@@"+
                             homeworkObj.getSubject());
                     b.putString("AdditionalData2","");
 
-
                     if(Singleton.getResultReceiver() != null)
                         Singleton.getResultReceiver().send(1,null);
-                }*/
+                }
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -348,7 +348,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                 if (counter==0)
                 {
                     counter++;
-                    Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Downloaded Successfully");
+                    Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Completed Successfully");
                 }
                /* if (onTaskString[1].equalsIgnoreCase("Homework"))
                     Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Downloaded Successfully");*/
