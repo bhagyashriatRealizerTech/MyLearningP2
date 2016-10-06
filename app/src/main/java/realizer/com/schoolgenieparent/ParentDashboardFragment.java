@@ -20,7 +20,6 @@ import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
-import realizer.com.schoolgenieparent.homework.TeacherHomeworkFragment;
 import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
 import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
 import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
@@ -198,27 +197,15 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
     public Fragment MyClassList() {
         // Get Output as
         MyClassStudentFragment fragment = new MyClassStudentFragment();
+        Singleton.setMainFragment(fragment);
+        Singleton.setSelectedFragment(fragment);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.frame_container, fragment);
         fragmentTransaction.commit();
         return fragment;
     }
-    // For Homework
-    public Fragment Homework(String res) {
-        // Get Output as
-        String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";
-        TeacherHomeworkFragment fragment = new TeacherHomeworkFragment();
-        Bundle bundle = new Bundle();
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        bundle.putString("HomeworkList", homewrklist);
-        bundle.putString("HEADERTEXT", res);
-        fragment.setArguments(bundle);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.replace(R.id.frame_container, fragment);
-        fragmentTransaction.commit();
-        return fragment;
-    }
+
     public Fragment GetHomework(String res) {
         // Get Output as
         String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";

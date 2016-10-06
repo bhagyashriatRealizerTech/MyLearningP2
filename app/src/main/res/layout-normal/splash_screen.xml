@@ -21,7 +21,6 @@
         android:id="@+id/textView"
         android:layout_marginLeft="7dp"
         android:layout_marginRight="7dp"
-
         android:background="@drawable/tag_line"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"

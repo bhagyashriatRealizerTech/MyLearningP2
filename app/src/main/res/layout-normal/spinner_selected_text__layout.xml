@@ -1,0 +1,13 @@
+<realizer.com.schoolgenieparent.view.TextViewCustom xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="50dp"
+    android:id="@+id/txtSpinnerItem"
+    android:background="#00ffffff"
+    android:textSize="18sp"
+    android:fontFamily="sans-serif-condensed"
+    android:paddingLeft="5dp"
+    android:text="hello all"
+    android:textColor="@color/darkgreycolor"
+    android:gravity="left|center_vertical">
+
+</realizer.com.schoolgenieparent.view.TextViewCustom>

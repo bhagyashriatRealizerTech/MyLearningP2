@@ -82,22 +82,16 @@
             android:noHistory="true"
             android:theme="@style/AppTheme1"
             />
-        <activity android:name=".registeration.RegistrationActivity"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="realizer.com.schoolgenieparent.registeration.RegistrationActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
         <activity android:name="realizer.com.schoolgenieparent.registeration.Registration2Activity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".ParentActivity"
             android:screenOrientation="portrait"
             />
         <activity android:name=".RegisterMainActivity"
             android:screenOrientation="portrait"
             />
+        <activity android:name=".registeration.RegistrationActivity"
+            android:screenOrientation="portrait"
+            />
+
         <activity
             android:name=".view.FullImageViewActivity"
             android:screenOrientation="portrait"
@@ -127,8 +121,18 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".service.AutoSyncService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <service
+            android:name=".service.ManualSyncupService"
+            android:enabled="true" />
 
         <service android:name=".GCMIntentService" />
+
     </application>
 
 </manifest>

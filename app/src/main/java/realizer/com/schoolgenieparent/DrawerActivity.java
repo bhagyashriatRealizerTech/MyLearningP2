@@ -34,31 +34,6 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import realizer.com.schoolgenieparent.Utils.GetImages;
-import realizer.com.schoolgenieparent.Utils.ImageStorage;
-import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
-import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
-import realizer.com.schoolgenieparent.Utils.Singleton;
-import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
-import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
-import realizer.com.schoolgenieparent.homework.TeacherHomeworkFragment;
-import realizer.com.schoolgenieparent.Utils.Config;
-import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
-import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
-import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
-
-//import com.realizer.schoolgenie.chat.TeacherQueryFragment1;
-//import com.realizer.schoolgenie.funcenter.TeacherFunCenterFolderFragment;
-//import com.realizer.schoolgenie.generalcommunication.TeacherGeneralCommunicationFragment;
-//import com.realizer.schoolgenie.holiday.TeacherPublicHolidayFragment;
-//import com.realizer.schoolgenie.homework.TeacherHomeworkFragment;
-//import com.realizer.schoolgenie.myclass.TeacherMyClassStudentFragment;
-//import com.realizer.schoolgenie.star.TeacherGiveStarFragment;
-//import com.realizer.schoolgenie.timetable.TeacherTimeTableFragment;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -69,6 +44,28 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import realizer.com.schoolgenieparent.Utils.Config;
+import realizer.com.schoolgenieparent.Utils.GetImages;
+import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
+import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
+import realizer.com.schoolgenieparent.Utils.Singleton;
+import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
+import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
+import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
+import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
+import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
+import realizer.com.schoolgenieparent.service.ManualSyncupService;
+
+//import com.realizer.schoolgenie.chat.TeacherQueryFragment1;
+//import com.realizer.schoolgenie.funcenter.TeacherFunCenterFolderFragment;
+//import com.realizer.schoolgenie.generalcommunication.TeacherGeneralCommunicationFragment;
+//import com.realizer.schoolgenie.holiday.TeacherPublicHolidayFragment;
+//import com.realizer.schoolgenie.homework.TeacherHomeworkFragment;
+//import com.realizer.schoolgenie.myclass.TeacherMyClassStudentFragment;
+//import com.realizer.schoolgenie.star.TeacherGiveStarFragment;
+//import com.realizer.schoolgenie.timetable.TeacherTimeTableFragment;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnTaskCompleted {
@@ -126,15 +123,16 @@ public class DrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        View header = navigationView;
-        userName = (TextView) header.findViewById(R.id.txt_user_name);
+        View header=navigationView;
+        //userName = (TextView) header.findViewById(R.id.txt_user_name);
+        userName=(TextView) header.findViewById(R.id.txt_user_name);
         userImage = (ImageView) header.findViewById(R.id.img_user_image);
         userInitials = (TextView) header.findViewById(R.id.img_user_text_image);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         userName.setText(preferences.getString("DisplayName",""));
 
-        String urlString = preferences.getString("ThumbnailID", "");
+        final String urlString = preferences.getString("ThumbnailID", "");
         Log.d("Image URL", urlString);
 
         if(urlString.equals("") || urlString.equalsIgnoreCase("null"))
@@ -170,16 +168,15 @@ public class DrawerActivity extends AppCompatActivity
                     sb.append(urlString.charAt(i));
                 }
             }
-
             String newURL=sb.toString();
             if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
                 new GetImages(newURL,userImage,userInitials,userName.getText().toString(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
             else
             {
-                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length-1]);
+                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
-               //bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                //bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
                 userImage.setImageBitmap(bitmap);
             }
 
@@ -190,8 +187,6 @@ public class DrawerActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 getOption();
-                userInitials.setVisibility(View.GONE);
-                userImage.setVisibility(View.VISIBLE);
             }
         });
         userImage.setOnClickListener(new View.OnClickListener() {
@@ -281,7 +276,7 @@ public class DrawerActivity extends AppCompatActivity
             fragment = HomeworkList("Classwork");
         } else if (id == R.id.nav_communication) {
             fragment = Communication("Communication");
- //           Toast.makeText(DrawerActivity.this, "In Progress..!", Toast.LENGTH_SHORT).show();
+            //           Toast.makeText(DrawerActivity.this, "In Progress..!", Toast.LENGTH_SHORT).show();
         }
         else if (id == R.id.nav_mypupil) {
             fragment = MyPupil();
@@ -289,10 +284,14 @@ public class DrawerActivity extends AppCompatActivity
             fragment = MyClassList();
             //           Toast.makeText(DrawerActivity.this, "In Progress..!", Toast.LENGTH_SHORT).show();
         }
-//        else if (id == R.id.nav_chat)
-//        {
-//            fragment = Quries();
-//        }
+        else if (id == R.id.nav_manual_sync)
+        {
+            Singleton.setContext(DrawerActivity.this);
+            fragment = Singleton.getSelectedFragment();
+            Intent service = new Intent(DrawerActivity.this,ManualSyncupService.class);
+            Singleton.setManualserviceIntent(service);
+            startService(service);
+        }
 //        else if (id == R.id.nav_alert)
 //        {
 //            fragment = GeneralCommunicationList();
@@ -325,6 +324,16 @@ public class DrawerActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public Fragment MyPupil() {
+        fragment = new MyPupilInfoFragment();
+        return fragment;
+    }
+
+    public Fragment MyClassList() {
+        fragment = new MyClassStudentFragment();
+        return fragment;
     }
 
 
@@ -394,20 +403,28 @@ public class DrawerActivity extends AppCompatActivity
         return fragment;
     }
 
-    public Fragment MyPupil() {
-        fragment = new MyPupilInfoFragment();
-        return fragment;
-    }
-
-    public Fragment MyClassList() {
-        fragment = new MyClassStudentFragment();
-        return fragment;
-    }
-
     public Fragment InviteTojoin(String name) {
-
+       /* String year =String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+        HolidayListAsyncTaskGet obj = new HolidayListAsyncTaskGet(UserGlobalData.getInstance().geCompanyLocation(),UserGlobalData.getInstance().getCompanyCode(),year, MainActivity.this,this);
+        try{
+            result= obj.execute().get();
+            String holidayList =result.toString();
+            fragment = new HolidayFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("AnswerHolidayList", holidayList);
+            fragment.setArguments(bundle);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return fragment;*/
+        // getSupportActionBar().setTitle(Config.actionBarTitle("DashBoard",DrawerActivity.this));
+        //String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";
         fragment = new InviteToJoinActivity();
         Bundle bundle = new Bundle();
+        //bundle.putString("HomeworkList", homewrklist);
         bundle.putString("HEADERTEXT", name);
         fragment.setArguments(bundle);
         return fragment;
@@ -664,6 +681,7 @@ public class DrawerActivity extends AppCompatActivity
                     editor.putString("ProfilePicPath", path);
                     editor.commit();
                     launchUploadActivity(data);
+
                 } else
                     launchUploadActivity(data);
 
@@ -712,6 +730,8 @@ public class DrawerActivity extends AppCompatActivity
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("ProfilePicPath", path);
                 editor.commit();
+                userInitials.setVisibility(View.GONE);
+                userImage.setVisibility(View.VISIBLE);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -864,16 +884,16 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onTaskCompleted(String s) {
 
-        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor edit = sharedpreferences.edit();
-        try{
-            JSONObject rootobj=new JSONObject(s);
-            JSONObject emp=rootobj.getJSONObject("StudentloginResult");
-            JSONObject sdlist = emp.getJSONObject("studentDtls");
-            String thumbnailurl= sdlist.getString("ThumbnailURL");
-            edit.putString("ThumbnailID", thumbnailurl);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor edit = sharedpreferences.edit();
+//        try{
+//            JSONObject rootobj=new JSONObject(s);
+//            JSONObject emp=rootobj.getJSONObject("StudentloginResult");
+//            JSONObject sdlist = emp.getJSONObject("studentDtls");
+//            String thumbnailurl= sdlist.getString("ThumbnailURL");
+//            edit.putString("ThumbnailID", thumbnailurl);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 }

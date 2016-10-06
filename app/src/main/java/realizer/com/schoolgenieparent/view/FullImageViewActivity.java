@@ -27,6 +27,7 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.GetImages;
@@ -34,6 +35,7 @@ import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
 
 /**
  * Created by Win on 11/25/2015.
@@ -44,7 +46,7 @@ public class FullImageViewActivity extends FragmentActivity {
     ViewPager viewPager;
     static ProgressWheel loading;
     static String[] IMG;
-    static String[] TEXT;
+    //static String[] TEXT;
     static ImageView imageView;
     static ActionBar bar;
     static Bitmap decodedByte;
@@ -67,45 +69,40 @@ public class FullImageViewActivity extends FragmentActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String path = preferences.getString("HomeworkImage", "");
         String hwtext = preferences.getString("HomeworkText", "");
+
+        ArrayList<TeacherHomeworkListModel> allImages=Singleton.getAllImages();
         try {
+            if (path.equals("http://farmaciileremedia.ro/image/cache/data/Produse/cosmetice/No_available_image-500x505.gif"))
+            {
+                //IMG[0]=path;
+                JSONArray jarr = new JSONArray(path);
+                NUM_ITEMS = jarr.length();
+                IMG = new String[NUM_ITEMS];
 
-            try {
-                if (headertext.equalsIgnoreCase("Homework") || headertext.equalsIgnoreCase("Classwork"))
+                barr = new Bitmap[NUM_ITEMS];
+                imgv = new ImageView[NUM_ITEMS];
+
+                for(int i=0;i<NUM_ITEMS;i++)
                 {
-                    JSONArray jarr = new JSONArray(path);
-                    NUM_ITEMS = jarr.length();
-                    IMG = new String[NUM_ITEMS];
-
-                    barr = new Bitmap[NUM_ITEMS];
-                    imgv = new ImageView[NUM_ITEMS];
-
-                    for(int i=0;i<NUM_ITEMS;i++)
-                    {
-                        IMG[i] = jarr.getString(i);
-                    }
-
-                    JSONArray jarrtext = new JSONArray(hwtext);
-                    TEXT = new String[jarrtext.length()];
-                    for(int i=0;i<jarrtext.length();i++)
-                    {
-                        TEXT[i] = jarrtext.getString(i);
-                    }
+                    IMG[i] = jarr.getString(i);
                 }
-                else
+            }
+            else
+            {
+                JSONArray jarr = new JSONArray(path);
+                NUM_ITEMS = jarr.length();
+                IMG = new String[NUM_ITEMS];
+
+                barr = new Bitmap[NUM_ITEMS];
+                imgv = new ImageView[NUM_ITEMS];
+
+                for(int i=0;i<NUM_ITEMS;i++)
                 {
-                    IMG=path.split("@@@");
-                    NUM_ITEMS = IMG.length;
-                    //IMG = new String[NUM_ITEMS];
-                    barr = new Bitmap[NUM_ITEMS];
-                    imgv = new ImageView[NUM_ITEMS];
+                    IMG[i] = jarr.getString(i);
                 }
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
 
-        } catch (Exception e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -167,29 +164,28 @@ public class FullImageViewActivity extends FragmentActivity {
             Bundle bundle = getArguments();
             int position = bundle.getInt("position");
             Log.d("FILENAME", "" + IMG[position]);
-
             String filePath = IMG[position];
-
-            String newURL=new Utility().getURLImage(filePath);
-            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                new GetImages(newURL,imageView,null,null,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+            if (filePath.contains("http"))
+            {
+                String newURL=new Utility().getURLImage(filePath);
+                if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                    new GetImages(newURL,imageView,null,null,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+                else
+                {
+                    File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length-1]);
+                    BitmapFactory.Options bmOptions1 = new BitmapFactory.Options();
+                    decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions1);
+                    imageView.setImageBitmap(decodedByte);
+                }
+            }
             else
             {
-                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length-1]);
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
-                //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                decodedByte = BitmapFactory.decodeFile(filePath, bmOptions);
                 imageView.setImageBitmap(decodedByte);
             }
 
-           /* File image = ImageStorage.getImage(newPath.split("/")[newPath.split("/").length - 1]);
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);*/
-
-            barr[position] = decodedByte;
-            //imageView.setImageBitmap(decodedByte);
-            txtcnt.setText(TEXT[position]);
-
+            txtcnt.setText("" + (position + 1) + " / " + NUM_ITEMS);
             imgv[position] = imageView;
             loading.setVisibility(View.GONE);
             return swipeView;
@@ -219,12 +215,10 @@ public class FullImageViewActivity extends FragmentActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     public void RotateImg()
     {
-
         Bitmap bitmap = barr[viewPager.getCurrentItem()];
         Matrix matrix = new Matrix();
         matrix.postRotate(90);

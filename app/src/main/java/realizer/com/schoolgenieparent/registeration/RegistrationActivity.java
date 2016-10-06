@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,13 +24,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import realizer.com.schoolgenieparent.R;
+import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
-import realizer.com.schoolgenieparent.wheelpicker.WheelPicker;
 import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncTaskGet;
 
 /**
@@ -36,7 +36,7 @@ import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncT
 public class RegistrationActivity extends Activity implements OnTaskCompleted {
     Spinner spnSchoolName, spnDivision, spnStd;
     Button btnContinue;
-    EditText edtSchoolCode, edtAddress;
+    EditText edtDivision, edtAddress;
     TextView txtSchoolCode, txtAddress, txtRegistration;
     String standard, division,Schoolnm;
     final String[] array = {"Select School", "JSPM", "Other"};
@@ -49,37 +49,33 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     StringBuilder builder;
     Context mycontext;
     ArrayList<String> schoolName,std,div;
-
+    TextView temp;
+    ArrayAdapter<String> adapterSchool;
+    ArrayAdapter<String> adapterStd;
+    ArrayAdapter<String> adapterDiv;
+    String jsonString;
+    int schoolpos;
+    int stdpos;
+    String newDivAdded;
+    boolean isNewDivAdded=  false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registarion_activity_new);
 
-
-        String[] array = getResources().getStringArray(R.array.WheelArrayDefault);
-        List<String> list = new ArrayList<String>();
-        list = Arrays.asList(array);
-        ArrayList<String> arrayList = new ArrayList<String>(list);
-        arrayList.add("TTS");
-        array = arrayList.toArray(new String[list.size()]);
-//        R.array.WheelArrayDefault=array;
-//        WheelPicker wheelLeft = (WheelPicker) findViewById(R.id.main_wheel_center);
-//        wheelLeft.setOnItemSelectedListener(this);
         btnContinue = (Button) findViewById(R.id.btnContinue);
         spnDivision = (Spinner) findViewById(R.id.spDivision);
         spnStd = (Spinner) findViewById(R.id.spStandard);
         spnSchoolName = (Spinner) findViewById(R.id.spSchoolName);
-        //edtSchoolCode = (EditText) findViewById(R.id.edtSchoolCode);
-        //txtSchoolCode = (TextView) findViewById(R.id.txtSchoolCode);
         txtRegistration = (TextView) findViewById(R.id.txtRegistration);
         edtAddress = (EditText) findViewById(R.id.edtAddress);
-        //txtAddress = (TextView) findViewById(R.id.txtAddress);
+        edtDivision = (EditText) findViewById(R.id.edtDiv);
         Typeface face = Typeface.createFromAsset(RegistrationActivity.this.getAssets(), "fonts/font.ttf");
+        Typeface face1 = Typeface.createFromAsset(RegistrationActivity.this.getAssets(), "fonts/A Bug s Life.ttf");
         btnContinue.setTypeface(face);
         txtRegistration.setTypeface(face);
-        //autoCompleteTextView= (AutoCompleteTextView) findViewById(R.id.actv_reg_schoolname);
-
+        edtAddress.setTypeface(face1);
         schoolName=new ArrayList<String>();
         schoolName.add("Select School Name");
         std=new ArrayList<String>();
@@ -87,30 +83,42 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
         div=new ArrayList<String>();
         div.add("Select Division");
 
+        newDivAdded = "";
+
+        adapterSchool = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, schoolName);
+        adapterSchool.setDropDownViewResource(R.layout.spinner_dropdown_layout);
+        spnSchoolName.setAdapter(adapterSchool);
+
+        adapterStd = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, std);
+        adapterStd.setDropDownViewResource(R.layout.spinner_dropdown_layout);
+        spnStd.setAdapter(adapterStd);
+
+        adapterDiv = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, div);
+        adapterDiv.setDropDownViewResource(R.layout.spinner_dropdown_layout);
+        spnDivision.setAdapter(adapterDiv);
+
         RegistrationAsyncTaskGet asyntaskGet=new RegistrationAsyncTaskGet(RegistrationActivity.this,RegistrationActivity.this,"getschoollist");
         asyntaskGet.execute();
-//        try {
-//            builder = asyntaskGet.execute().get();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        }
+
+
     }
     public void ContinueClick(View view) {
         Schoolnm = spnSchoolName.getSelectedItem().toString();
+        if(div.size()>0)
         division=spnDivision.getSelectedItem().toString();
+        else
+        division = edtDivision.getText().toString().trim();
         standard=spnStd.getSelectedItem().toString();
         if (Schoolnm.equals("Select School Name")) {
-            Toast.makeText(RegistrationActivity.this, "Select School Name", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistrationActivity.this, "Please Select School Name", Toast.LENGTH_SHORT).show();
         }
         else if(standard.equals("Select Standard"))
         {
-            Toast.makeText(RegistrationActivity.this, "Select Standard", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistrationActivity.this, "Please Select Standard", Toast.LENGTH_SHORT).show();
         }
-        else if(division.equals("Select Division"))
+        else if(division.equals("Select Division") || division.length()<=0)
         {
-            Toast.makeText(RegistrationActivity.this, "Select Division", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistrationActivity.this, "Please Select Division", Toast.LENGTH_SHORT).show();
         }
         else {
 
@@ -124,7 +132,6 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
             Intent intent = new Intent(RegistrationActivity.this, Registration2Activity.class);
             intent.putExtras(bundle);
             startActivity(intent);
-            finish();
         }
     }
     public void getSchoolName(String s)
@@ -147,19 +154,16 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     }
     public void getAddress(int position,String s)
     {
-        position--;
         try
         {
-            JSONArray jsonArray=new JSONArray(s);
-            for (int k=0;k<jsonArray.length();k++)
-            {
+                JSONArray jsonArray=new JSONArray(s);
+
                 JSONObject jsonObject=jsonArray.getJSONObject(position);
                 JSONObject main=jsonObject.getJSONObject("school");
-                 sadd=main.getString("Address");
-                 scode=main.getString("Code");
-                edtAddress.setText(scode+","+sadd);
-                //txtSchoolCode.setText();
-            }
+                sadd=main.getString("Address");
+                scode=main.getString("Code");
+                edtAddress.setText(sadd);
+
         }
         catch (JSONException e)
         {
@@ -168,18 +172,26 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     }
     public void getStandard(int position,String s)
     {
-        position--;
+        std = new ArrayList<String>();
+        std.add(0,"Select Standard");
         try
         {
             JSONArray jsonArray=new JSONArray(s);
-                JSONObject jsonObject=jsonArray.getJSONObject(position);
-                JSONArray stdlistArray=jsonObject.getJSONArray("stdLst");
-                for (int i=0;i<stdlistArray.length();i++)
-                {
-                    JSONObject stdlistObject=stdlistArray.getJSONObject(i);
-                    String standard=stdlistObject.getString("std");
-                    std.add(standard);
+            if(position < jsonArray.length() && position != (-10)) {
+                JSONObject jsonObject = jsonArray.getJSONObject(position);
+                JSONArray stdlistArray = jsonObject.getJSONArray("stdLst");
+
+                for (int i = 0; i < stdlistArray.length(); i++) {
+                    JSONObject stdlistObject = stdlistArray.getJSONObject(i);
+                    String standard = stdlistObject.getString("std");
+                    if(!standard.isEmpty())
+                    std.add((i + 1), standard);
                 }
+            }
+            adapterStd = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, std);
+            adapterStd.setDropDownViewResource(R.layout.spinner_dropdown_layout);
+            spnStd.setAdapter(adapterStd);
+
         }
         catch (JSONException e)
         {
@@ -188,49 +200,96 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     }
     public void getDivision(int position,int stdposition,String s)
     {
-        position--;
-        stdposition--;
-        try
-        {
-            JSONArray jsonArray=new JSONArray(s);
-            JSONObject jsonObject=jsonArray.getJSONObject(position);
-            JSONArray stdlistArray=jsonObject.getJSONArray("stdLst");
-            JSONObject stdlistObject=stdlistArray.getJSONObject(stdposition);
-            JSONArray divArray=stdlistObject.getJSONArray("DivisionLst");
-            for (int i=0;i<divArray.length();i++)
-            {
-                div.add(divArray.getString(i));
-            }
-            //std.add(standard);
+        div = new ArrayList<String>();
+        div.add(0,"Select Division");
+        try {
+            //if (position == (-10) && stdposition == (-10)) {
 
+            //}
+          //  else {
+                JSONArray jsonArray = new JSONArray(s);
+                if (position < jsonArray.length() && stdposition != (-10)) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(position);
+                    JSONArray stdlistArray = jsonObject.getJSONArray("stdLst");
+                    if (stdposition < stdlistArray.length() && stdposition != (-10)) {
+                        JSONObject stdlistObject = stdlistArray.getJSONObject(stdposition);
+                        JSONArray divArray = stdlistObject.getJSONArray("DivisionLst");
+
+                        for (int i = 0; i < divArray.length(); i++) {
+                            div.add((i + 1), divArray.getString(i));
+                        }
+                        if(!newDivAdded.isEmpty()) {
+                            div.add(divArray.length() + 1,newDivAdded);
+                            div.add(divArray.length() + 2, "Other");
+                            newDivAdded = "";
+                            isNewDivAdded = true;
+                        }
+                        else
+                        {
+                            div.add(divArray.length() + 1, "Other");
+                        }
+                    }
+                }
+
+
+                if (div.size() > 1 || stdposition == (-10)) {
+                    adapterDiv = new ArrayAdapter<String>(RegistrationActivity.this, R.layout.spinner_selected_text__layout, div);
+                    adapterDiv.setDropDownViewResource(R.layout.spinner_dropdown_layout);
+                    edtDivision.setVisibility(View.GONE);
+                    spnDivision.setVisibility(View.VISIBLE);
+                    spnDivision.setAdapter(adapterDiv);
+                    if(isNewDivAdded) {
+                        isNewDivAdded = false;
+                        spnDivision.setSelection(adapterDiv.getCount() - 2);
+                    }
+                } else {
+                    spnDivision.setVisibility(View.GONE);
+                    edtDivision.setVisibility(View.VISIBLE);
+                }
+
+           // }
         }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
+            catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
     }
 
-    String jsonString;
+
     @Override
     public void onTaskCompleted(String s) {
 
         jsonString=s;
-        getSchoolName(jsonString);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, schoolName);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_layout);
-        spnSchoolName.setAdapter(adapter);
-        //autoCompleteTextView.setAdapter(adapter);
 
+        getSchoolName(jsonString);
+        adapterSchool = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, schoolName);
+        adapterSchool.setDropDownViewResource(R.layout.spinner_dropdown_layout);
+        spnSchoolName.setAdapter(adapterSchool);
 
         spnSchoolName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                schoolnamepos = position;
-                std.removeAll(std);
-                std.add("Select Standard");
-                getAddress(position,jsonString);
-                getStandard(position,jsonString);
-                std.removeAll(Arrays.asList(null, ""));
+
+
+                if (position != 0) {
+                    schoolpos = position - 1;
+                    getAddress(position - 1, jsonString);
+                    getStandard(position - 1, jsonString);
+                    spnStd.setSelection(0);
+                    getDivision(position - 1, -10, jsonString);
+                    spnDivision.setSelection(0);
+
+                } else {
+                    schoolpos = position;
+                    edtAddress.setText("");
+                    edtAddress.setHint(Config.actionBarTitle("School Address", RegistrationActivity.this));
+                    edtAddress.setHintTextColor(getResources().getColor(R.color.greycolor));
+                    getDivision(position - 1, -10, jsonString);
+                    spnDivision.setSelection(0);
+                    getStandard(-10, jsonString);
+                    spnStd.setSelection(0);
+                }
             }
 
             @Override
@@ -238,22 +297,22 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
 
             }
         });
-        ArrayAdapter<String> adapterdiv = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, div);
-        adapterdiv.setDropDownViewResource(R.layout.spinner_dropdown_layout);
-        ArrayAdapter<String> adapterstd = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, std);
-        adapterstd.setDropDownViewResource(R.layout.spinner_dropdown_layout);
-        spnDivision.setAdapter(adapterdiv);
-        spnStd.setAdapter(adapterstd);
-
-
 
         spnStd.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                div.removeAll(div);
-                div.add("Select Division");
-                getDivision(schoolnamepos, position,jsonString);
-                div.removeAll(Arrays.asList(null, ""));
+
+                if (position != 0) {
+                    stdpos = position-1;
+                    getDivision(schoolpos, position - 1, jsonString);
+                }
+                else {
+                    stdpos = position;
+                    getDivision(position - 1, -10, jsonString);
+                }
+
+                    spnDivision.setSelection(0);
+
             }
 
             @Override
@@ -261,5 +320,59 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
 
             }
         });
+
+        spnDivision.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (spnDivision.getSelectedItem().toString().equalsIgnoreCase("Other")) {
+                    final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+
+                    LayoutInflater inflater = getLayoutInflater();
+                    View dialoglayout = inflater.inflate(R.layout.insert_div_layout, null);
+                    Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
+                    Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
+                    final EditText divisionedt = (EditText) dialoglayout.findViewById(R.id.edtdiv1);
+                    submit.setTypeface(face);
+                    cancel.setTypeface(face);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
+                    builder.setView(dialoglayout);
+
+                    final AlertDialog alertDialog = builder.create();
+
+                    submit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            if(divisionedt.getText().toString().trim().length()>0)
+                            {
+                                newDivAdded = divisionedt.getText().toString().trim();
+                                getDivision(schoolpos,stdpos,jsonString);
+                                alertDialog.dismiss();
+                            }
+
+                        }
+                    });
+
+                    cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                        }
+                    });
+
+                    alertDialog.show();
+                }
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
     }
 }

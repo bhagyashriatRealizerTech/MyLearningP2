@@ -14,6 +14,15 @@ public class ParentHomeworkListModel {
     private String standard="";
     private String division="";
     private String work;
+    public String isSync="";
+
+    public String getIsSync() {
+        return isSync;
+    }
+
+    public void setIsSync(String isSync) {
+        this.isSync = isSync;
+    }
 
     public int getImgId() {
         return imgId;

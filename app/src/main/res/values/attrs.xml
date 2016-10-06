@@ -56,4 +56,8 @@
         </attr>
         <attr name="clickToClose" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="TextViewCustom">
+        <attr name="customFont" format="string"/>
+    </declare-styleable>
 </resources>

@@ -43,7 +43,7 @@ public class StudentListAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPreExecute() {
        // super.onPreExecute();
-      dialog= ProgressDialog.show(myContext, "", "Downloading Student List...");
+     // dialog= ProgressDialog.show(myContext, "", "Downloading Student List...");
 
     }
 
@@ -96,7 +96,7 @@ public class StudentListAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
-        dialog.dismiss();
+      //  dialog.dismiss();
         //Pass here result of async task
          callback.onTaskCompleted(stringBuilder.toString());
     }

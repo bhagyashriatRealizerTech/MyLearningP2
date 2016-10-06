@@ -22,9 +22,10 @@ import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.StoreBitmapImages;
 import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
 
 public class ParentHomeworkListAdapter extends BaseAdapter {
-    private static ArrayList<ParentHomeworkListModel> hList;
+    private static ArrayList<TeacherHomeworkListModel> hList;
     private LayoutInflater mhomeworkdetails;
     private Context context1;
     boolean isImageFitToScreen;
@@ -32,7 +33,7 @@ public class ParentHomeworkListAdapter extends BaseAdapter {
 
 
 
-    public ParentHomeworkListAdapter(Context context, ArrayList<ParentHomeworkListModel> homeworklist) {
+    public ParentHomeworkListAdapter(Context context, ArrayList<TeacherHomeworkListModel> homeworklist) {
         hList = homeworklist;
         mhomeworkdetails = LayoutInflater.from(context);
         context1 = context;
@@ -79,13 +80,13 @@ public class ParentHomeworkListAdapter extends BaseAdapter {
         }
         else
         {
-            try{
+            holder.homework.setText(hList.get(position).getHomework());
+            /*try{
                 JSONArray arr = new JSONArray(hList.get(position).getHomework());
-                holder.homework.setText(arr.getString(0));
+                holder.homework.setText(hList.get(position).getHomework());
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
-
+            }*/
         }
 
 
@@ -96,10 +97,10 @@ public class ParentHomeworkListAdapter extends BaseAdapter {
         else {
 
             holder.image.setVisibility(View.VISIBLE);
-            String newPath = new Utility().getURLImage(hList.get(position).getImage());
+           /* String newPath = new Utility().getURLImage(hList.get(position).getImage());
             if(!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
                 new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
-            }
+            }*/
         }
 
         return convertView;

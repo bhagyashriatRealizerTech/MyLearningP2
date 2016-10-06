@@ -10,10 +10,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
-
-import java.util.ArrayList;
 
 public class TeacherHomeworkListAdapter extends BaseAdapter {
 

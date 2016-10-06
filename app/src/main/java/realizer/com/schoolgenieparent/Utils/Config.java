@@ -1,8 +1,10 @@
 package realizer.com.schoolgenieparent.Utils;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.view.View;
@@ -52,6 +54,74 @@ public class Config {
 
     }
 
+
+    /**
+     * @param context
+     * @param title
+     * @param message
+     */
+    public static void alertDialog(final Context context, String title, String message) {
+        AlertDialog.Builder adbdialog;
+        adbdialog = new AlertDialog.Builder(context);
+        adbdialog.setTitle(title);
+        adbdialog.setMessage(message);
+        //adbdialog.setIcon(android.R.drawable.ic_dialog_info);
+        adbdialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        adbdialog.show();
+
+    }
+
+    public static String getMonth(int month)
+    {
+        String mon = "";
+
+        switch (month) {
+            case 1:
+                mon = "Jan";
+                break;
+            case 2:
+                mon = "Feb";
+                break;
+            case 3:
+                mon = "Mar";
+                break;
+            case 4:
+                mon = "Apr";
+                break;
+            case 5:
+                mon = "May";
+                break;
+            case 6:
+                mon = "Jun";
+                break;
+            case 7:
+                mon = "Jul";
+                break;
+            case 8:
+                mon = "Aug";
+                break;
+            case 9:
+                mon = "Sep";
+                break;
+            case 10:
+                mon = "Oct";
+                break;
+            case 11:
+                mon = "Nov";
+                break;
+            case 12:
+                mon = "Dec";
+                break;
+        }
+
+        return mon;
+
+    }
+
     /**
      * @param title to set
      * @return title SpannableString
@@ -59,6 +129,13 @@ public class Config {
     public static SpannableString actionBarTitle(String title,Context context) {
         SpannableString s = new SpannableString(title);
         Typeface face= Typeface.createFromAsset(context.getAssets(), "fonts/font.ttf");
+        s.setSpan(new CustomTypefaceSpan("", face), 0, s.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        return s;
+    }
+
+    public static SpannableString editTextHint(String title,Context context) {
+        SpannableString s = new SpannableString(title);
+        Typeface face= Typeface.createFromAsset(context.getAssets(), "fonts/A Bug s Life.ttf");
         s.setSpan(new CustomTypefaceSpan("", face), 0, s.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
         return s;
     }

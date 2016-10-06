@@ -2,8 +2,12 @@ package realizer.com.schoolgenieparent.Utils;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.ResultReceiver;
 
+import java.util.ArrayList;
+
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
@@ -11,8 +15,47 @@ import realizer.com.schoolgenieparent.view.ProgressWheel;
  */
 public class Singleton {
 
+
+    public static ArrayList<TeacherHomeworkListModel> getAllImages() {
+        return allImages;
+    }
+
+    public static void setAllImages(ArrayList<TeacherHomeworkListModel> allImages) {
+        Singleton.allImages = allImages;
+    }
+
+    public  static ArrayList<TeacherHomeworkListModel> allImages;
+
+    public static Intent getManualserviceIntent() {
+        return manualserviceIntent;
+    }
+
+    public static void setManualserviceIntent(Intent manualserviceIntent) {
+        Singleton.manualserviceIntent = manualserviceIntent;
+    }
+
+    public static Intent manualserviceIntent = null;
+    public static Intent autoserviceIntent = null;
+
+    public static Intent getAutoserviceIntent() {
+        return autoserviceIntent;
+    }
+
+    public static void setAutoserviceIntent(Intent autoserviceIntent) {
+        Singleton.autoserviceIntent = autoserviceIntent;
+    }
+
     private static Singleton _instance;
     public static ResultReceiver resultReceiver;
+
+    public static Context getContext() {
+        return context;
+    }
+
+    public static void setContext(Context context) {
+        Singleton.context = context;
+    }
+
     public static Context context;
     public static Fragment fragment;
     public static Fragment mainFragment;

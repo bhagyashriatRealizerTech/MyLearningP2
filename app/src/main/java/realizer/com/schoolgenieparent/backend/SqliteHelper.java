@@ -12,7 +12,7 @@ import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
  */
 public class SqliteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SchoolGeniePToP";
-    private static final int DATABASE_VERSION =21;
+    private static final int DATABASE_VERSION =22;
     Context mycontext;
     private static final String STUDINFO =
             "CREATE TABLE StudentInfo(  UserId TEXT," +
@@ -54,7 +54,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
 //    private static final String Holiday ="CREATE TABLE Holiday(Id INTEGER PRIMARY KEY   AUTOINCREMENT,holiday TEXT,hsdate TEXT,hedate TEXT)";
 //    private static final String GiveStar ="CREATE TABLE GiveStar(GiveStarId INTEGER PRIMARY KEY   AUTOINCREMENT,TeacherLoginId TEXT,StudentLoginId TEXT,Comment TEXT,star TEXT,StarDate TEXT,Subject TEXT,Std TEXT,Div TEXT,StarTime TEXT,HasSyncedUp TEXT)";
     private static final String Homework ="CREATE TABLE Homework(HomeworkId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,subject TEXT,textlst TEXT,Imglst TEXT,Givenby TEXT,hwDate TEXT,HasSyncedUp TEXT,Work TEXT)";
-
+    private static final String ExceptionHandler = "CREATE TABLE Exception(ExceptionId INTEGER PRIMARY KEY   AUTOINCREMENT,UserId TEXT,ExceptionDetails TEXT,DeviceModel TEXT,AndroidVersion TEXT,ApplicationSource TEXT,DeviceBrand TEXT,HasSyncedUp TEXT)";
     private static final String HOMEWORKINFO = "CREATE TABLE HomeworkInfo(SchoolCode TEXT,Standard TEXT,Division TEXT,GivenBy TEXT,HomeworkDate TEXT,HwImage64Lst TEXT,HwTxtLst TEXT,Subject TEXT,Work TEXT)";
 
     //private static final String Classwork ="CREATE TABLE Classwork(ClassworkId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,subject TEXT,textlst TEXT,Imglst TEXT,Givenby TEXT,hwDate TEXT,HasSyncedUp TEXT)";
@@ -77,6 +77,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
         db.execSQL(STUDINFO);
           db.execSQL(STDSUBALLOCATE);
           db.execSQL(STUDLIST);
+        db.execSQL(ExceptionHandler);
 //        db.execSQL(STDSUBJECT);
 //        db.execSQL(Announcement);
 //        db.execSQL(Chatting);
@@ -119,6 +120,7 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
         db.execSQL("DROP TABLE if exists " + "TimeTable");
         db.execSQL("DROP TABLE if exists " + "TeacherFullInfo");
         db.execSQL("DROP TABLE if exists " + "HomeworkInfo");
+        db.execSQL("DROP TABLE if exists " + "Exception");
         onCreate(db);
     }
 }
