@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,6 +55,24 @@ public class Config {
         context.sendBroadcast(intent);
 
 
+    }
+
+    public static boolean isConnectingToInternet(Context context){
+
+        ConnectivityManager connectivity =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                    {
+                        return true;
+                    }
+
+        }
+        return false;
     }
 
 
@@ -238,6 +259,23 @@ public class Config {
 
         return datetimevalue;
     }
+
+    public static String getserverDate(String date)
+    {
+        String outdate=date;
+        SimpleDateFormat ip = new SimpleDateFormat("dd MMM yyyy");
+        SimpleDateFormat op = new SimpleDateFormat("MM/dd/yyyy");
+
+        try {
+            Date inputdate = ip.parse(date);
+            outdate = op.format(inputdate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return outdate;
+    }
+
     public static String getDayOfWeek(int day) {
         String dayOfWeek = "";
 

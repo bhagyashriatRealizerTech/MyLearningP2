@@ -29,6 +29,7 @@ import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncTaskGet;
+import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
  * Created by Win on 22/08/2016.
@@ -37,19 +38,10 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     Spinner spnSchoolName, spnDivision, spnStd;
     Button btnContinue;
     EditText edtDivision, edtAddress;
-    TextView txtSchoolCode, txtAddress, txtRegistration;
+    TextView txtRegistration;
     String standard, division,Schoolnm;
-    final String[] array = {"Select School", "JSPM", "Other"};
-    String[] arraydiv = {"Select Division", "A", "B", "Other"};
-    String[] arraystd = {"Select Standard"};
-    static int schoolnamepos;
     String sadd,scode;
-    AutoCompleteTextView autoCompleteTextView;
-    ProgressDialog dialog;
-    StringBuilder builder;
-    Context mycontext;
     ArrayList<String> schoolName,std,div;
-    TextView temp;
     ArrayAdapter<String> adapterSchool;
     ArrayAdapter<String> adapterStd;
     ArrayAdapter<String> adapterDiv;
@@ -58,6 +50,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     int stdpos;
     String newDivAdded;
     boolean isNewDivAdded=  false;
+    ProgressWheel loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +64,11 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
         txtRegistration = (TextView) findViewById(R.id.txtRegistration);
         edtAddress = (EditText) findViewById(R.id.edtAddress);
         edtDivision = (EditText) findViewById(R.id.edtDiv);
+        loading = (ProgressWheel) findViewById(R.id.loading);
+
         Typeface face = Typeface.createFromAsset(RegistrationActivity.this.getAssets(), "fonts/font.ttf");
         Typeface face1 = Typeface.createFromAsset(RegistrationActivity.this.getAssets(), "fonts/A Bug s Life.ttf");
+
         btnContinue.setTypeface(face);
         txtRegistration.setTypeface(face);
         edtAddress.setTypeface(face1);
@@ -97,9 +93,15 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
         adapterDiv.setDropDownViewResource(R.layout.spinner_dropdown_layout);
         spnDivision.setAdapter(adapterDiv);
 
-        RegistrationAsyncTaskGet asyntaskGet=new RegistrationAsyncTaskGet(RegistrationActivity.this,RegistrationActivity.this,"getschoollist");
-        asyntaskGet.execute();
-
+        if(Config.isConnectingToInternet(RegistrationActivity.this)) {
+            loading.setVisibility(View.VISIBLE);
+            RegistrationAsyncTaskGet asyntaskGet = new RegistrationAsyncTaskGet(RegistrationActivity.this, RegistrationActivity.this, "getschoollist");
+            asyntaskGet.execute();
+        }
+        else
+        {
+            Config.alertDialog(RegistrationActivity.this,"Network Error","Please check your internet connection");
+        }
 
     }
     public void ContinueClick(View view) {
@@ -110,15 +112,18 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
         division = edtDivision.getText().toString().trim();
         standard=spnStd.getSelectedItem().toString();
         if (Schoolnm.equals("Select School Name")) {
-            Toast.makeText(RegistrationActivity.this, "Please Select School Name", Toast.LENGTH_SHORT).show();
+            Config.alertDialog(RegistrationActivity.this,"Error","Please select School Name");
+            //Toast.makeText(RegistrationActivity.this, "Please Select School Name", Toast.LENGTH_SHORT).show();
         }
         else if(standard.equals("Select Standard"))
         {
-            Toast.makeText(RegistrationActivity.this, "Please Select Standard", Toast.LENGTH_SHORT).show();
+            Config.alertDialog(RegistrationActivity.this,"Error","Please select Standard");
+           // Toast.makeText(RegistrationActivity.this, "Please Select Standard", Toast.LENGTH_SHORT).show();
         }
         else if(division.equals("Select Division") || division.length()<=0)
         {
-            Toast.makeText(RegistrationActivity.this, "Please Select Division", Toast.LENGTH_SHORT).show();
+            Config.alertDialog(RegistrationActivity.this,"Error","Please select Division");
+            //Toast.makeText(RegistrationActivity.this, "Please Select Division", Toast.LENGTH_SHORT).show();
         }
         else {
 
@@ -260,6 +265,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     @Override
     public void onTaskCompleted(String s) {
 
+        loading.setVisibility(View.GONE);
         jsonString=s;
 
         getSchoolName(jsonString);

@@ -3,11 +3,13 @@ package realizer.com.schoolgenieparent.registeration;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TypefaceSpan;
@@ -30,6 +32,7 @@ import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncTaskPost;
 import realizer.com.schoolgenieparent.registeration.model.RegistrationModel;
+import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
  * Created by Win on 22/08/2016.
@@ -39,6 +42,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
     Calendar myCalendar;
     DatePickerDialog.OnDateSetListener date;
     Button btnRegister;
+    ProgressWheel loading;
     TextView txtStandard,txtDivision,txtRegistration,txtAddress,txtSchoolname,txtRegDob;
 
     EditText edtPassword,edtConfirmPass,edtStdFname,edtStdLname,edtEmailId,edtPhoneno,edtUserid;
@@ -63,6 +67,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         edtEmailId= (EditText) findViewById(R.id.edt_reg_emailid);
         edtPhoneno= (EditText) findViewById(R.id.edt_reg_phoneno);
         txtRegDob= (TextView) findViewById(R.id.txt_reg_dob);
+        loading = (ProgressWheel) findViewById(R.id.loading);
 
         final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
@@ -149,31 +154,38 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
                 GetAllData();
                 if (studFname.equals(""))
                 {
-                    Toast.makeText(Registration2Activity.this, "Enter First Name", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Please enter first Name");
+                    //Toast.makeText(Registration2Activity.this, "Enter First Name", Toast.LENGTH_SHORT).show();
                 }
                 else if (studLname.equals(""))
                 {
-                    Toast.makeText(Registration2Activity.this, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Please enter last Name");
+                   // Toast.makeText(Registration2Activity.this, "Enter Last Name", Toast.LENGTH_SHORT).show();
                 }
                 else if (emailid.equals(""))
                 {
-                    Toast.makeText(Registration2Activity.this, "Enter Email Id", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Please enter Email ID");
+                    //Toast.makeText(Registration2Activity.this, "Enter Email Id", Toast.LENGTH_SHORT).show();
                 }
                 else if (!emailid.matches(emailPattern))
                 {
-                    Toast.makeText(Registration2Activity.this, "Enter Valid Emailid", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Please snter valid Email ID");
+                    //Toast.makeText(Registration2Activity.this, "Enter Valid Emailid", Toast.LENGTH_SHORT).show();
                 }
                 else if (phoneno.equals(""))
                 {
-                    Toast.makeText(Registration2Activity.this, "Enter Phone Number", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Please enter contact number");
+                    //Toast.makeText(Registration2Activity.this, "Enter Phone Number", Toast.LENGTH_SHORT).show();
                 }
                 else if(pass.equals(""))
                 {
-                    Toast.makeText(Registration2Activity.this, "Enter Password", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Please enter password");
+                   // Toast.makeText(Registration2Activity.this, "Enter Password", Toast.LENGTH_SHORT).show();
                 }
                 else if (conpass.equals(""))
                 {
-                    Toast.makeText(Registration2Activity.this, "Enter Confirm Password", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Please enter confirm password");
+                    //Toast.makeText(Registration2Activity.this, "Enter Confirm Password", Toast.LENGTH_SHORT).show();
                 }
                 else if (pass.equals(conpass))
                 {
@@ -190,21 +202,23 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
                     rgm.setPassword(pass);
                     rgm.setUserId(userId);
                     rgm.setContactNo(phoneno);
-                    Boolean connect=isConnectingToInternet();
-                    if (connect) {
-
+                 //   Boolean connect=;
+                    if (Config.isConnectingToInternet(Registration2Activity.this)) {
+                        loading.setVisibility(View.VISIBLE);
                         RegistrationAsyncTaskPost asyncTaskPost = new RegistrationAsyncTaskPost(rgm, Registration2Activity.this, Registration2Activity.this);
                         asyncTaskPost.execute();
                     }
                     else
                     {
-                        Toast.makeText(Registration2Activity.this, "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+                        Config.alertDialog(Registration2Activity.this,"Network Error","Please check your internet connection");
+                       // Toast.makeText(Registration2Activity.this, "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
                     }
 
                 }
                 else
                 {
-                    Toast.makeText(Registration2Activity.this, "Password not match..!", Toast.LENGTH_SHORT).show();
+                    Config.alertDialog(Registration2Activity.this,"Error","Password mismatch");
+                    //Toast.makeText(Registration2Activity.this, "Password not match..!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -231,11 +245,31 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
     @Override
     public void onTaskCompleted(String s) {
 
+        loading.setVisibility(View.GONE);
 
         if (s.equals("true")) {
-            Intent intent = new Intent(Registration2Activity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            AlertDialog.Builder adbdialog = new AlertDialog.Builder(Registration2Activity.this);
+            adbdialog.setTitle("Success");
+            adbdialog.setMessage("Congratulations, you have registered successfully.");
+            adbdialog.setIcon(android.R.drawable.ic_dialog_info);
+            adbdialog.setCancelable(false);
+            adbdialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    Intent intent = new Intent(Registration2Activity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+
+            adbdialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            adbdialog.show();
+
         }
         else if(s.equals("400"))
         {
@@ -244,7 +278,8 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         }
         else
         {
-            Toast.makeText(Registration2Activity.this, "Registration Not done.", Toast.LENGTH_SHORT).show();
+            Config.alertDialog(Registration2Activity.this,"Error","Registration failed. Please try again after some time");
+            //Toast.makeText(Registration2Activity.this, "Registration Not done.", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -286,23 +321,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         txtRegDob.setText(sdf.format(myCalendar.getTime()));
         dob=txtRegDob.getText().toString();
     }
-    public boolean isConnectingToInternet(){
 
-        ConnectivityManager connectivity =
-                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null)
-        {
-            NetworkInfo[] info = connectivity.getAllNetworkInfo();
-            if (info != null)
-                for (int i = 0; i < info.length; i++)
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
-                    {
-                        return true;
-                    }
-
-        }
-        return false;
-    }
 
     @Override
     public void onBackPressed() {
