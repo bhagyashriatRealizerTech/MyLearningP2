@@ -13,10 +13,12 @@ import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TypefaceSpan;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -248,7 +250,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         loading.setVisibility(View.GONE);
 
         if (s.equals("true")) {
-            AlertDialog.Builder adbdialog = new AlertDialog.Builder(Registration2Activity.this);
+            /*AlertDialog.Builder adbdialog = new AlertDialog.Builder(Registration2Activity.this);
             adbdialog.setTitle("Success");
             adbdialog.setMessage("Congratulations, you have registered successfully.");
             adbdialog.setIcon(android.R.drawable.ic_dialog_info);
@@ -268,7 +270,34 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
                     dialog.dismiss();
                 }
             });
-            adbdialog.show();
+            adbdialog.show();*/
+
+            final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+
+            LayoutInflater inflater = getLayoutInflater();
+            View dialoglayout = inflater.inflate(R.layout.successfull_reg_layout, null);
+            Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
+
+            submit.setTypeface(face);
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(Registration2Activity.this);
+            builder.setView(dialoglayout);
+            builder.setCancelable(false);
+
+            final AlertDialog alertDialog = builder.create();
+
+            submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                    Intent intent = new Intent(Registration2Activity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+
+            alertDialog.show();
 
         }
         else if(s.equals("400"))
