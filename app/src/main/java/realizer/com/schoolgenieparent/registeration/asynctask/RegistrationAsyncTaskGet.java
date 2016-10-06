@@ -45,7 +45,7 @@ public class RegistrationAsyncTaskGet extends AsyncTask<Void,Void,StringBuilder>
     @Override
     protected void onPreExecute() {
         //super.onPreExecute();
-         dialog=ProgressDialog.show(mycontext,"","Loading Data...");
+       //  dialog=ProgressDialog.show(mycontext,"","Loading Data...");
     }
 
     @Override
@@ -89,7 +89,7 @@ public class RegistrationAsyncTaskGet extends AsyncTask<Void,Void,StringBuilder>
     @Override
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
-        dialog.dismiss();
+       // dialog.dismiss();
 
         callback.onTaskCompleted(stringBuilder.toString());
 

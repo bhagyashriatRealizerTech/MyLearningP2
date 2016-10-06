@@ -43,7 +43,7 @@ public class LoginAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPreExecute() {
        // super.onPreExecute();
-      dialog= ProgressDialog.show(myContext, "", "Authenticating credentials...");
+     // dialog= ProgressDialog.show(myContext, "", "Authenticating credentials...");
 
     }
 
@@ -97,8 +97,9 @@ public class LoginAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
-        dialog.dismiss();
+      //  dialog.dismiss();
         //Pass here result of async task
+         stringBuilder.append("@@@LoginIN");
          callback.onTaskCompleted(stringBuilder.toString());
     }
 

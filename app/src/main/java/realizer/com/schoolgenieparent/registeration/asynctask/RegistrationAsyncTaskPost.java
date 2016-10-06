@@ -45,7 +45,7 @@ public class RegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringBuilder
     @Override
     protected void onPreExecute() {
         //super.onPreExecute();
-        dialog=ProgressDialog.show(mycontext,"","Inserting Data...!");
+       // dialog=ProgressDialog.show(mycontext,"","Inserting Data...!");
     }
 
     @Override
@@ -67,10 +67,8 @@ public class RegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringBuilder
             jsonObject.put("division",rgm.getDivision());
             jsonObject.put("fName",rgm.getFname());
             jsonObject.put("lName",rgm.getLname());
-            jsonObject.put("contactNo",rgm.getContactNo());
-            String date = rgm.getDob();
-            String date1[] = date.split("/");
-            String resdate = date1[0] + "/" + date1[1] + "/" + date1[2];
+            jsonObject.put("contactNo", rgm.getContactNo());
+            String resdate = Config.getserverDate(rgm.getDob());
             jsonObject.put("Dob",resdate);
 
             json=jsonObject.toString();
@@ -111,7 +109,7 @@ public class RegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringBuilder
     @Override
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
-        dialog.dismiss();
+      //  dialog.dismiss();
 
         callback.onTaskCompleted(stringBuilder.toString());
     }

@@ -233,9 +233,15 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
 
                     }
                     else {
-                        loading.setVisibility(View.VISIBLE);
-                        LoginAsyncTaskGet obj = new LoginAsyncTaskGet(userName.getText().toString(), password.getText().toString(), sharedpreferences.getString("DWEVICEID",""),LoginActivity.this, LoginActivity.this);
-                        obj.execute();
+                        if(Config.isConnectingToInternet(LoginActivity.this)) {
+                            loading.setVisibility(View.VISIBLE);
+                            LoginAsyncTaskGet obj = new LoginAsyncTaskGet(userName.getText().toString(), password.getText().toString(), sharedpreferences.getString("DWEVICEID", ""), LoginActivity.this, LoginActivity.this);
+                            obj.execute();
+                        }
+                        else
+                        {
+                            Config.alertDialog(LoginActivity.this,"Network Error","Please check your internet connection");
+                        }
                     }
                 }
             }
@@ -416,8 +422,9 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
 
     @Override
     public void onTaskCompleted(String s)  {
-        boolean b = false;
 
+        loading.setVisibility(View.GONE);
+        boolean b = false;
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = sharedpreferences.edit();
         edit.putString("UidName", userName.getText().toString());
