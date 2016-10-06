@@ -111,6 +111,21 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCJpf4AV7DiZR44IjWI2HD4wB3zraP1Gow" />
+
+        <activity android:name=".trackpupil.TrackShowMap"
+            android:theme="@style/AppTheme"
+            android:label="Map"
+            android:screenOrientation="portrait">
+        </activity>
+
+      <!--  <activity
+            android:name=".trackpupil.MapsActivity"
+            android:label="Map"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>-->
 
         <receiver
             android:name="com.google.android.gcm.GCMBroadcastReceiver"

@@ -29,7 +29,7 @@
             android:textSize="20sp"
             android:visibility="gone"
             android:text="SD"/>
-        <com.realizer.schoolgenie.parent.view.RoundedImageView
+        <realizer.com.schoolgenieparent.view.RoundedImageView
             android:layout_width="10dp"
             android:layout_height="55dp"
             android:layout_weight="0.6"

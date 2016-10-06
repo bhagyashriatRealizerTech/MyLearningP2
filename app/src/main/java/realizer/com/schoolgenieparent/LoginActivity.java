@@ -423,34 +423,33 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
     public void onTaskCompleted(String s)  {
 
         loading.setVisibility(View.GONE);
-        boolean b = false;
-        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor edit = sharedpreferences.edit();
-        edit.putString("UidName", userName.getText().toString());
-        edit.putString("UserName", userName.getText().toString().trim());
-        edit.putString("Password", password.getText().toString().trim());
-        edit.putString("FragName", "Dashboard");
-        edit.commit();
-
-        String logchk = sharedpreferences.getString("LogChk","");
-        String mWord = "";
-        String validate = "";
-        JSONObject emp=null;
-        JSONObject studentInfo=null;
-        try {
-            JSONObject rootObj = new JSONObject(s);
-            emp=rootObj.getJSONObject("StudentloginResult");
-            validate  = emp.getString("loginResult");
-            studentInfo  = emp.getJSONObject("studentDtls");
-            mWord =studentInfo.getString("magicWord");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         String onTaskResult[]=s.split("@@@");
         if (onTaskResult[1].contains("LoginIN"))
         {
+            boolean b = false;
+            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor edit = sharedpreferences.edit();
+            edit.putString("UidName", userName.getText().toString());
+            edit.putString("UserName", userName.getText().toString().trim());
+            edit.putString("Password", password.getText().toString().trim());
+            edit.putString("FragName", "Dashboard");
+            edit.commit();
+
+            String logchk = sharedpreferences.getString("LogChk","");
+            String mWord = "";
+            String validate = "";
+            JSONObject emp=null;
+            JSONObject studentInfo=null;
+            try {
+                JSONObject rootObj = new JSONObject(s);
+                emp=rootObj.getJSONObject("StudentloginResult");
+                validate  = emp.getString("loginResult");
+                studentInfo  = emp.getJSONObject("studentDtls");
+                mWord =studentInfo.getString("magicWord");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if(logchk.equals("true"))
             {
                 try {
@@ -459,7 +458,7 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                         b = true;
                     } else {
                         String Schoolcode = studentInfo.getString("schoolCode");
-                        if (Schoolcode.length() == 0) {
+                        if (Schoolcode.equals("null")) {
                             num = 1;
                         }
                         b = false;
@@ -501,7 +500,20 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
             }
             else
             {
-                if(mWord.trim().length()>0) {
+                if(mWord.trim().length()>0 && !mWord.equalsIgnoreCase("null")) {
+                    try {
+
+                        if (validate.equals("valid")) {
+                        } else {
+                            String Schoolcode = studentInfo.getString("schoolCode");
+                            if (Schoolcode.equals("null")) {
+                                num = 1;
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     b = parsData(onTaskResult[0]);
                     if (b == true) {
                         loading.setVisibility(View.GONE);
@@ -511,8 +523,7 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                         Intent ser = new Intent(LoginActivity.this, AutoSyncService.class);
                         Singleton.setAutoserviceIntent(ser);
                         startService(ser);
-                       /* Intent i2 = new Intent(getApplicationContext(), BackgroundSyncupService.class);
-                        startService(i2);*/
+
                         Intent i = new Intent(LoginActivity.this, DrawerActivity.class);
                         i.putExtra("FragName", "NoValue");
                         startActivity(i);
@@ -529,8 +540,7 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                     recoverPasswordByMagicWord("FirstLogin", b, s);
             }
         }
-        if (onTaskResult[1].contains("SetMagicWord")) {
-            //String magic[]=onTaskResult[2].split("@@@");
+        else if (onTaskResult[1].contains("SetMagicWord")) {
             if(onTaskResult[0].equalsIgnoreCase("true"))
             {
 
