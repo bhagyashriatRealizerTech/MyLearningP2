@@ -15,15 +15,11 @@
  */
 package realizer.com.schoolgenieparent;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -203,10 +199,9 @@ public class GCMIntentService extends GCMBaseIntentService {
                         break;
                     }
                 }
-
+                int unread = qr1.GetUnreadCount(msg[2]);
                 if (isPresent)
                 {
-                    int unread = qr1.GetUnreadCount(msg[2]);
                     qr1.updateInitiatechat(std,div,msg[3],"true",msg[2],unread+1,msg[5]);
                 }
                 else
@@ -219,46 +214,46 @@ public class GCMIntentService extends GCMBaseIntentService {
                         Log.d("Group Conversation", "Not Done!!!");
                 }
 
-//                if(n>0)
-//                {
-//                    NotificationModel obj = qr.GetNotificationByUserId(msg[3]);
-//                    if(obj.getId() == 0)
-//                    {
-//                        n =0;
-//                        NotificationModel notification1 = new NotificationModel();
-//                        notification1.setNotificationId(9);
-//                        notification1.setNotificationDate(date);
-//                        notification1.setNotificationtype("Message");
-//                        notification1.setMessage(msg[4]);
-//                        notification1.setIsRead("false");
-//                        notification1.setAdditionalData2(msg[2]);
-//                        notification1.setAdditionalData1(msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
-//                        n = qr.InsertNotification(notification1);
-//                        if(Singleton.getResultReceiver() != null)
-//                            Singleton.getResultReceiver().send(1,null);
-//                    }
-//                    else
-//                    {
-//                        n =0;
-//                        obj.setMessage(msg[4]);
-//                        obj.setNotificationDate(date);
-//                        obj.setAdditionalData1(msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
-//
-//                        n = qr.UpdateNotification(obj);
-//
-//                        Bundle b = new Bundle();
-//                        b.putInt("NotificationId",1);
-//                        b.putString("NotificationDate", date);
-//                        b.putString("NotificationType", "Query");
-//                        b.putString("NotificationMessage", msg[4]);
-//                        b.putString("IsNotificationread", "false");
-//                        b.putString("AdditionalData1",msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
-//                        b.putString("AdditionalData2",msg[2]);
-//
-//                        if(Singleton.getResultReceiver() != null)
-//                            Singleton.getResultReceiver().send(1,b);
-//                    }
-//                }
+                if(n>0)
+                {
+                    NotificationModel obj = qr.GetNotificationByUserId(msg[3]);
+                    if(obj.getId() == 0)
+                    {
+                        n =0;
+                        NotificationModel notification1 = new NotificationModel();
+                        notification1.setNotificationId(9);
+                        notification1.setNotificationDate(date);
+                        notification1.setNotificationtype("Message");
+                        notification1.setMessage(msg[4]);
+                        notification1.setIsRead("false");
+                        notification1.setAdditionalData2(msg[2]);
+                        notification1.setAdditionalData1(msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
+                        n = qr.InsertNotification(notification1);
+                        if(Singleton.getResultReceiver() != null)
+                            Singleton.getResultReceiver().send(1,null);
+                    }
+                    else
+                    {
+                        n =0;
+                        obj.setMessage(msg[4]);
+                        obj.setNotificationDate(date);
+                        obj.setAdditionalData1(msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
+
+                        n = qr.UpdateNotification(obj);
+
+                        Bundle b1 = new Bundle();
+                        b1.putInt("NotificationId",1);
+                        b1.putString("NotificationDate", date);
+                        b1.putString("NotificationType", "Query");
+                        b1.putString("NotificationMessage", msg[4]);
+                        b1.putString("IsNotificationread", "false");
+                        b1.putString("AdditionalData1",msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
+                        b1.putString("AdditionalData2",msg[2]);
+
+                        if(Singleton.getResultReceiver() != null)
+                            Singleton.getResultReceiver().send(1,b);
+                    }
+                }
                 Log.d("Conversation", " Done!!!");
             } else {
                 Log.d("Conversation", " Not Done!!!");

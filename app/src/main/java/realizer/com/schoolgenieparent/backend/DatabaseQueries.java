@@ -27,6 +27,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 
+import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.communication.model.TeacherQuery1model;
 import realizer.com.schoolgenieparent.communication.model.TeacherQuerySendModel;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionModel;
@@ -50,9 +51,9 @@ public class DatabaseQueries {
         this.db = myHelper.getWritableDatabase();
 
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(context);
-         scode= sharedpreferences.getString("SchoolCode", "");
-         std= sharedpreferences.getString("SyncStd", "");
-         div= sharedpreferences.getString("SyncDiv", "");
+        scode= sharedpreferences.getString("SchoolCode", "");
+        std= sharedpreferences.getString("SyncStd", "");
+        div= sharedpreferences.getString("SyncDiv", "");
     }
 
     public void deleteAllData()
@@ -70,7 +71,7 @@ public class DatabaseQueries {
         deleterow = db.delete("StdDivSub", null, null);
     }
 
-//Insert Student Information
+    //Insert Student Information
     public long insertStudInfo(String standard,String division,String Studarr,String UserId)
     {
         //deleteTable();
@@ -159,12 +160,12 @@ public class DatabaseQueries {
             if (c.moveToFirst()) {
                 System.out.print("while moving  - C != null");
                 do {
-                        Stud = c.getString(c.getColumnIndex("StudArr"));
+                    Stud = c.getString(c.getColumnIndex("StudArr"));
                 }
                 while (c.moveToNext());
             }
         } else {
-           // mToast("Table Has No contain");
+            // mToast("Table Has No contain");
         }
         c.close();
         //dbClose(db);
@@ -228,7 +229,7 @@ public class DatabaseQueries {
     }
 
 
-//     Insert Subject Allocation Information
+    //     Insert Subject Allocation Information
     public long insertSubInfo(String standard,String division,String sub)
     {
         ContentValues conV = new ContentValues();
@@ -241,7 +242,7 @@ public class DatabaseQueries {
         return newRowInserted;
     }
 
-     //Select Allocated Std And Div from  STDDivSub
+    //Select Allocated Std And Div from  STDDivSub
     public ArrayList<String> GetSub(String std,String div) {
         Cursor c = db.rawQuery("SELECT Sub FROM StdDivSub WHERE Std='"+std+"' and Div='"+div+"' ", null);
         ArrayList<String> result = new ArrayList<>();
@@ -440,7 +441,7 @@ public class DatabaseQueries {
 
         return newRowUpdate;
     }
-//Insert Homework data
+    //Insert Homework data
     public long insertHomework(String givenby,String subject,String hdate,String txtlst,String imglst,String std,String div,String work)
     {
 
@@ -576,7 +577,7 @@ public class DatabaseQueries {
     }
 
     //Insert Homework data
- public long insertInitiatechat(String uname,String initiated,String uid,int unreadcount,String url)
+    public long insertInitiatechat(String uname,String initiated,String uid,int unreadcount,String url)
     {
 
         ContentValues conV = new ContentValues();
@@ -856,6 +857,149 @@ public class DatabaseQueries {
         db.delete("EventMaster",null,null);
     }
 
+//==================================================  Notification ======================================================== //
 
+    //Insert Event Image info
+    public long InsertNotification(NotificationModel obj)
+    {
+        //  delete();
+        ContentValues conV = new ContentValues();
+
+        conV.put("NotificationId", obj.getNotificationId());
+        conV.put("Type", obj.getNotificationtype());
+        conV.put("Message",obj.getMessage());
+        conV.put("Date", obj.getNotificationDate());
+        conV.put("AdditionalData1", obj.getAdditionalData1());
+        conV.put("AdditionalData2",obj.getAdditionalData2());
+        conV.put("IsRead", obj.isRead());
+        long newRow1 = db.insert("Notification", null, conV);
+
+        return newRow1;
+    }
+
+    //Update Images
+    public long UpdateNotification(NotificationModel obj)
+    {
+        ContentValues conV = new ContentValues();
+        conV.put("ID", obj.getId());
+        conV.put("NotificationId", obj.getNotificationId());
+        conV.put("Type", obj.getNotificationtype());
+        conV.put("Message",obj.getMessage());
+        conV.put("Date", obj.getNotificationDate());
+        conV.put("AdditionalData1", obj.getAdditionalData1());
+        conV.put("AdditionalData2",obj.getAdditionalData2());
+        conV.put("IsRead", obj.isRead());
+
+        long newRowUpdate = db.update("Notification", conV, "ID=" + obj.getId(), null);
+        return newRowUpdate;
+    }
+
+    //Delete Row from Queue
+
+    public long deleteNotificationRow(int id)
+    {
+        long deleterow = db.delete("Notification", "ID=" + id, null);
+        return deleterow;
+    }
+
+    // Select queue Information
+    public ArrayList<NotificationModel> GetNotificationsData() {
+        Cursor c = db.rawQuery("SELECT * FROM Notification ORDER BY ID DESC ", null);
+        ArrayList<NotificationModel> result = new ArrayList<>();
+
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    NotificationModel o = new NotificationModel();
+                    o.setId(c.getInt(c.getColumnIndex("ID")));
+                    o.setNotificationId(c.getInt(c.getColumnIndex("NotificationId")));
+                    o.setNotificationDate(c.getString(c.getColumnIndex("Date")));
+                    o.setNotificationtype(c.getString(c.getColumnIndex("Type")));
+                    o.setMessage(c.getString(c.getColumnIndex("Message")));
+                    o.setIsRead(c.getString(c.getColumnIndex("IsRead")));
+                    o.setAdditionalData1(c.getString(c.getColumnIndex("AdditionalData1")));
+                    o.setAdditionalData2(c.getString(c.getColumnIndex("AdditionalData2")));
+
+                    result.add(o);
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }
+
+    // Select queue Information
+    public NotificationModel GetNotificationById(int id) {
+        Cursor c = db.rawQuery("SELECT * FROM Notification WHERE ID ="+id, null);
+        int cnt = 1;
+        NotificationModel result = new NotificationModel();
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    NotificationModel o = new NotificationModel();
+                    o.setId(c.getInt(c.getColumnIndex("ID")));
+                    o.setNotificationId(c.getInt(c.getColumnIndex("NotificationId")));
+                    o.setNotificationDate(c.getString(c.getColumnIndex("Date")));
+                    o.setNotificationtype(c.getString(c.getColumnIndex("Type")));
+                    o.setMessage(c.getString(c.getColumnIndex("Message")));
+                    o.setIsRead(c.getString(c.getColumnIndex("IsRead")));
+                    o.setAdditionalData1(c.getString(c.getColumnIndex("AdditionalData1")));
+                    o.setAdditionalData2(c.getString(c.getColumnIndex("AdditionalData2")));
+
+                    result = o;
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }
+    // Select queue Information
+    public NotificationModel GetNotificationByUserId(String Uid) {
+        Cursor c = db.rawQuery("SELECT * FROM Notification WHERE AdditionalData2 = '"+Uid+"'", null);
+        int cnt = 1;
+        NotificationModel result = new NotificationModel();
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    NotificationModel o = new NotificationModel();
+                    o.setId(c.getInt(c.getColumnIndex("ID")));
+                    o.setNotificationId(c.getInt(c.getColumnIndex("NotificationId")));
+                    o.setNotificationDate(c.getString(c.getColumnIndex("Date")));
+                    o.setNotificationtype(c.getString(c.getColumnIndex("Type")));
+                    o.setMessage(c.getString(c.getColumnIndex("Message")));
+                    o.setIsRead(c.getString(c.getColumnIndex("IsRead")));
+                    o.setAdditionalData1(c.getString(c.getColumnIndex("AdditionalData1")));
+                    o.setAdditionalData2(c.getString(c.getColumnIndex("AdditionalData2")));
+
+                    result = o;
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            result.setNotificationId(-1);
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }
 
 }

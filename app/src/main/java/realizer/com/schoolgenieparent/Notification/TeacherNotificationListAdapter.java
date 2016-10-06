@@ -81,59 +81,12 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
             holder.type = (TextView) convertView.findViewById(R.id.txtnotificationtype);
             holder.unreadCount = (TextView) convertView.findViewById(R.id.txtunreadcount);
             holder.notificationImage = (ImageView) convertView.findViewById(R.id.img_user_image);
-           /* holder.swipeLayout = (SwipeLayout) convertView.findViewById(R.id.swipeLayout);
-            holder.swipeLayout.setTag(position);*/
+            holder.txtinitial = (TextView) convertView.findViewById(R.id.txtinitial);
 
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-       /* holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
-        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, holder.swipeLayout.findViewById(R.id.tvNoDataMsg));
-        holder.swipeLayout.setLeftSwipeEnabled(false);
-        holder.swipeLayout.setRightSwipeEnabled(true);
-        holder.swipeLayout.mViewBoundCache.clear();
-        holder.swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
-            @Override
-            public void onClose(SwipeLayout layout) {
-                //when the SurfaceView totally cover the BottomView.
-                Log.d("Swipe","Close");
-            }
-
-            @Override
-            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-                //you are swiping.
-                Log.d("Swipe","swiping");
-            }
-
-            @Override
-            public void onStartOpen(SwipeLayout layout) {
-                Log.d("Swipe","startopen");
-            }
-
-            @Override
-            public void onOpen(SwipeLayout layout) {
-                //when the BottomView totally show.
-                if (prevSwipedLayout != null && layout != prevSwipedLayout) {
-                    prevSwipedLayout.close();
-                }
-                prevSwipedLayout = layout;
-                Log.d("Swipe","open");
-            }
-
-            @Override
-            public void onStartClose(SwipeLayout layout) {
-            }
-
-            @Override
-            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-                //when user's hand released.
-                Log.d("Swipe","release");
-            }
-
-        });
-*/
 
         String notificationData = "";
         String date = notifications.get(position).getNotificationDate();
@@ -153,53 +106,15 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
 
             holder.notificationImage.setImageResource(R.drawable.homework_icon);*/
         }
-        else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("TimeTable"))
+        else  if(notifications.get(position).getNotificationtype().equalsIgnoreCase("HomeworkUpload") || notifications.get(position).getNotificationtype().equalsIgnoreCase("ClassworkUpload"))
         {
-            DALQueris dbQ=new DALQueris(context1);
-            ParentQueriesTeacherNameListModel result=dbQ.GetQueryTableData(notifications.get(position).getAdditionalData1());
-            notificationData = "Downloaded Timetable For "+
-                    notifications.get(position).getMessage()+" From "+result.getName();
-            holder.notificationImage.setImageResource(R.drawable.timetable_icon);
-        }
-        else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Star"))
-        {
-            notificationData = "Received Star From "+notifications.get(position).getAdditionalData1().split("@@@")[0]+" For "+
-                    notifications.get(position).getAdditionalData2()+" '"+notifications.get(position).getMessage()+"'.";
-            holder.notificationImage.setImageResource(R.drawable.viewstar_icon);
-        }
-        else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Alerts"))
-        {
-            notificationData = "Received Alert For "+
-                    notifications.get(position).getAdditionalData2()+" '"+notifications.get(position).getMessage()+"'.";
-            holder.notificationImage.setImageResource(R.drawable.annoucement_icon);
-        }
-        else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Attendance"))
-        {
-            notificationData =notifications.get(position).getMessage();
-            holder.notificationImage.setImageResource(R.drawable.annoucement_icon);
-        }
-        else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Holiday"))
-        {
-            notificationData ="Tomorrow Is Holiday For "+notifications.get(position).getMessage();
-            holder.notificationImage.setImageResource(R.drawable.holiday_icon);
-        }
-        else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Fun Center"))
-        {
-            String Img[]=notifications.get(position).getMessage().split("@@");
-            if (notifications.get(position).getAdditionalData1().equals("Events"))
-            {
-                notificationData = "Downloaded Event '"+
-                        Img[0]+"'.";
-            }
-            else
-            {
-                if(Integer.valueOf(Img[1])==1)
-                    notificationData = "Downloaded "+Img[1]+" Image for '"+Img[0]+"' Event";
-                else
-                    notificationData = "Downloaded "+Img[1]+" Images for '"+Img[0]+"' Event";
-            }
 
-            holder.notificationImage.setImageResource(R.drawable.funcenter_icon);
+            notificationData = notifications.get(position).getAdditionalData1().split("@@@")[2]+" "+
+                    notifications.get(position).getNotificationtype()+" "+notifications.get(position).getMessage()
+                    +" "+notifications.get(position).getAdditionalData1().split("@@@")[0]+" "+
+                    notifications.get(position).getAdditionalData1().split("@@@")[1];
+
+            holder.notificationImage.setImageResource(R.drawable.homework_icon);
         }
         else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
         {
@@ -223,7 +138,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
                     String newURL = sb.toString();
                     holder.notificationImage.setVisibility(View.VISIBLE);
                     if (!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                        new GetImages(newURL, holder.notificationImage,null,null,newURL.split("/")[newURL.split("/").length - 1]).execute(newURL);
+                        new GetImages(newURL, holder.notificationImage,holder.txtinitial,notifications.get(position).getMessage(), newURL.split("/")[newURL.split("/").length - 1]).execute(newURL);
                     else {
                         File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
                         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -258,9 +173,9 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    static class ViewHolder
+        static class ViewHolder
         {
-            TextView notificationText,notificationDate,unreadCount,type;
+            TextView notificationText,notificationDate,unreadCount,type,txtinitial;
             ImageView notificationImage;
             SwipeLayout swipeLayout;
         }
