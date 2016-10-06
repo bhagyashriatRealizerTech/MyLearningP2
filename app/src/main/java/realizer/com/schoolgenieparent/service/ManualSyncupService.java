@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -24,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
@@ -66,9 +68,6 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
     Context mContext;
     static int count=0;
     static int counter=0;
-    static int getClasswork=0;
-    static int getHomework=0;
-
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -113,12 +112,10 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
         background.start();
         count=0;
         counter=0;
-        getClasswork =0;
-        getHomework=0;
         return START_NOT_STICKY;
     }
 
-    private class BackgroundThread extends Thread {
+    private class BackgroundThread extends Thread{
         @Override
         public void run() {
             super.run();
@@ -188,18 +185,30 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         }
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
                         long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
-                        if (n>0)
+                       /* if (n>0)
                         {
-                            //Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                            String date = df.format(calendar.getTime());
 
-                        }
+                            NotificationModel notification1 = new NotificationModel();
+                            notification1.setNotificationId(2);
+                            notification1.setNotificationDate(date);
+                            notification1.setNotificationtype("Homework");
+                            notification1.setMessage(subject);
+                            notification1.setIsRead("false");
+                            notification1.setAdditionalData1(givenby);
+                            qr.InsertNotification(notification1);
+                            if(Singleton.getResultReceiver() != null)
+                                Singleton.getResultReceiver().send(1,null);
+                        }*/
                     }
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            getHomework =1;
         }
         else if (onTaskString[1].equalsIgnoreCase("Classwork"))
         {
@@ -254,11 +263,24 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, onTaskString[1], student);
 
                         long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
-                        if (n>0)
+                        /*if (n>0)
                         {
-                          //  Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                            String date = df.format(calendar.getTime());
 
-                        }
+                            NotificationModel notification1 = new NotificationModel();
+                            notification1.setNotificationId(3);
+                            notification1.setNotificationDate(date);
+                            notification1.setNotificationtype("Classwork");
+                            notification1.setMessage(subject);
+                            notification1.setIsRead("false");
+                            notification1.setAdditionalData1(givenby);
+                            qr.InsertNotification(notification1);
+                            if(Singleton.getResultReceiver() != null)
+                                Singleton.getResultReceiver().send(1,null);
+                        }*/
                     }
                 }
             }
@@ -266,20 +288,53 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
             {
                 e.printStackTrace();
             }
-
-            getClasswork =1;
         }
         else
         {
             if(onTaskString[0].replace("\"","").equals("success"))
             {
                 long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]),onTaskString[3]);
-                if(n>0) {
-                    n = -1;
+                TeacherHomeworkModel homeworkObj = new TeacherHomeworkModel();
+                /*if(n>0) {
+                    n =0;
                     n = qr.updateHomeworkSyncFlag(qr.GetHomework(Integer.valueOf(onTaskString[2])));
-                }
-                    count =1;
+                    NotificationModel obj = new NotificationModel();
+                    obj.setNotificationId(homeworkObj.getHid());
+                    obj.setNotificationDate(homeworkObj.getHwDate());
+                    obj.setNotificationtype(homeworkObj.getWork());
+                    obj.setMessage("Uploaded Successfully for");
+                    obj.setIsRead("false");
+                    obj.setAdditionalData2("");
+                    obj.setAdditionalData1(homeworkObj.getStd()+"@@@"+homeworkObj.getDiv()+"@@@"+
+                            homeworkObj.getSubject());
+                    n = qr.InsertNotification(obj);
+                    Bundle b = new Bundle();
+                    b.putInt("NotificationId", homeworkObj.getHid());
+                    b.putString("NotificationDate", homeworkObj.getHwDate());
+                    b.putString("NotificationType", homeworkObj.getWork());
+                    b.putString("NotificationMessage", "Uploaded Successfully for");
+                    b.putString("IsNotificationread", "false");
+                    b.putString("AdditionalData1", homeworkObj.getStd()+"@@@"+homeworkObj.getDiv()+"@@@"+
+                            homeworkObj.getSubject());
+                    b.putString("AdditionalData2","");
 
+
+                    if(Singleton.getResultReceiver() != null)
+                        Singleton.getResultReceiver().send(1,null);
+                }*/
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (id == Integer.valueOf(onTaskString[2])) {
+                            if (count==0)
+                            {
+                                count++;
+                                Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Uploaded Successfully");
+                            }
+                        }
+                    }
+                });
             }
             else {
                 Config.alertDialog(Singleton.getContext(), "Network Error", "Server Not Responding");
@@ -290,15 +345,10 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (counter==quelist.size() && getHomework==1 && getClasswork==1)
+                if (counter==0)
                 {
-
-                    Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Completed Successfully");
-                }
-                else if(count==1)
-                {
-                    count=1;
                     counter++;
+                    Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Downloaded Successfully");
                 }
                /* if (onTaskString[1].equalsIgnoreCase("Homework"))
                     Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Downloaded Successfully");*/
@@ -341,6 +391,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         dialog.dismiss();
                         final ArrayList<QueueListModel> lst = qr.GetQueueData();
                         Log.d("TIMER", " " + Calendar.getInstance().getTime() + ": " + lst.size());
+
                         for(int i=0;i<lst.size();i++)
                         {
                             id = lst.get(i).getId();
@@ -378,6 +429,79 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
 
             }
         });
+
+
+       /*
+
+       *//* if(lst.size()>0)
+        {*//*
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    adbdialog = new AlertDialog.Builder(Singleton.getContext());
+                    adbdialog.setTitle("Manual Sync");
+                    adbdialog.setMessage("Sync will be Performed in Background, you will be Notified once sync is Completed.");
+                    //adbdialog.setIcon(android.R.drawable.ic_dialog_info);
+                    adbdialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            final ArrayList<QueueListModel> lst = qr.GetQueueData();
+                            Log.d("TIMER", " " + Calendar.getInstance().getTime() + ": " + lst.size());
+                            for(int i=0;i<lst.size();i++)
+                            {
+                                id = lst.get(i).getId();
+                                type = lst.get(i).getType();
+                                if(type.equals("Homework"))
+                                {
+
+                                    TeacherHomeworkModel o = qr.GetHomework(id);
+                                    if(o.getWork().equalsIgnoreCase("Homework")) {
+                                        TeacherHomeworkAsyncTaskPost obj = new TeacherHomeworkAsyncTaskPost(o, ManualSyncupService.this, ManualSyncupService.this, "false");
+                                        obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                    }
+
+                                }
+                                else  if(type.equals("Classwork"))
+                                {
+                                    TeacherHomeworkModel o = qr.GetHomework(id);
+                                    if(o.getWork().equalsIgnoreCase("Classwork"))
+                                    {
+                                        TeacherClassworkAsyncTaskPost obj = new TeacherClassworkAsyncTaskPost(o, ManualSyncupService.this, ManualSyncupService.this, "false");
+                                        obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                    }
+                                }
+                            }
+
+                            downloadData();
+
+                        } });
+
+
+                    adbdialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            stopService(Singleton.getManualserviceIntent());
+                        } });
+                    adbdialog.show();
+                }
+            });
+            //Toast.makeText(this,"Sync Start...",Toast.LENGTH_SHORT).show();
+
+       *//* }
+        else
+        {
+            *//**//*runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Config.alertDialog(Singleton.getContext(), "Manual Sync", "There is No Data to Sync");
+                    //Toast.makeText(Singlton.getContext(), "No Data to Sync", Toast.LENGTH_SHORT).show();
+
+                }
+            });*//**//*
+            downloadData();
+
+        }*/
     }
 
     public boolean isConnectingToInternet(){

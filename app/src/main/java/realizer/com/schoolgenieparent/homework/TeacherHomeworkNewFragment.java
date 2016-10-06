@@ -226,38 +226,14 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
             for (int i=0;i<BitmapImages.size();i++)
             {
                encodedImage = ImageStorage.saveEventToSdCard(BitmapImages.get(i), "P2P", getActivity());
-               /* String getimg="";
-                if(encodedImage != null) {
-                    String f2[] = encodedImage.split(File.separator);
-                    getimg = f2[f2.length - 1];
-                }*/
 
-                for (int k = 0; k< imglst.size(); k++) {
-                    try {
-                        imglstbase64.put(k,encodedImage);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-
-           /* String grid="";
-            String image1="";
-            for (int i = 0; i < imglst.size(); i++) {
-
-                grid = String.valueOf(imglst.get(i));
-                File f=new File(grid);
-                String imageName = f.getName();
-                Bitmap bitmap = BitmapFactory.decodeFile(grid);
-                image1 = ImageStorage.saveEventToSdCard(bitmap, imageName, getActivity());
                 try {
-                    imglstbase64.put(i,image1);
+                    imglstbase64.put(i,encodedImage);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
 
-            }*/
             String[] dateArr=date.split("/");
             String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
             long n = qr.insertHomework(givenby, sub, newDate, txtlst, imglstbase64.toString(), txtstd.getText().toString(), txtclss.getText().toString(), htext);

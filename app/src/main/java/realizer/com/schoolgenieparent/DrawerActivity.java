@@ -52,6 +52,8 @@ import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.Utils.Singleton;
+import realizer.com.schoolgenieparent.Utils.Utility;
+import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
 import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
@@ -75,7 +77,7 @@ public class DrawerActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
-
+    String localPath="";
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     Bitmap bitmap;
@@ -130,7 +132,7 @@ public class DrawerActivity extends AppCompatActivity
         userImage = (ImageView) header.findViewById(R.id.img_user_image);
         userInitials = (TextView) header.findViewById(R.id.img_user_text_image);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(DrawerActivity.this);
         userName.setText(preferences.getString("DisplayName",""));
 
         final String urlString = preferences.getString("ThumbnailID", "");
@@ -155,33 +157,26 @@ public class DrawerActivity extends AppCompatActivity
         {
             userImage.setVisibility(View.VISIBLE);
             userInitials.setVisibility(View.GONE);
-            StringBuilder sb=new StringBuilder();
-            for(int i=0;i<urlString.length();i++)
+            if (urlString.contains("http"))
             {
-                char c='\\';
-                if (urlString.charAt(i) =='\\')
-                {
-                    urlString.replace("\"","");
-                    sb.append("/");
-                }
+                String newURL=new Utility().getURLImage(urlString);
+                if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                    new GetImages(newURL,userImage,userInitials,userName.getText().toString(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
                 else
                 {
-                    sb.append(urlString.charAt(i));
+                    File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length-1]);
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
+                    //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                    userImage.setImageBitmap(bitmap);
                 }
             }
-            String newURL=sb.toString();
-            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                new GetImages(newURL,userImage,userInitials,userName.getText().toString(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
             else
             {
-                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                //bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                Bitmap bitmap = BitmapFactory.decodeFile(urlString, bmOptions);
                 userImage.setImageBitmap(bitmap);
             }
-
-
         }
 
         userInitials.setOnClickListener(new View.OnClickListener() {
@@ -727,6 +722,7 @@ public class DrawerActivity extends AppCompatActivity
                 InputStream stream = getContentResolver().openInputStream(data.getData());
                 bitmap = BitmapFactory.decodeStream(stream);
                 stream.close();
+                localPath = ImageStorage.saveEventToSdCard(bitmap, "P2PDP",DrawerActivity.this);
                 userImage.setImageBitmap(bitmap);
                 String path = encodephoto(bitmap);
 
@@ -749,7 +745,22 @@ public class DrawerActivity extends AppCompatActivity
             }
         } else {
             bitmap = (Bitmap) data.getExtras().get("data");
+            localPath = ImageStorage.saveEventToSdCard(bitmap, "P2PDP",DrawerActivity.this);
             userImage.setImageBitmap(bitmap);
+            String path = encodephoto(bitmap);
+
+            Boolean result=isConnectingToInternet();
+            if (result)
+            {
+                ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(this,this,userid,path);
+                uploadimage.execute();
+            }
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("ProfilePicPath", path);
+            editor.commit();
+            userInitials.setVisibility(View.GONE);
+            userImage.setVisibility(View.VISIBLE);
         }
     }
 
@@ -893,17 +904,21 @@ public class DrawerActivity extends AppCompatActivity
 
     @Override
     public void onTaskCompleted(String s) {
-
-//        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor edit = sharedpreferences.edit();
-//        try{
-//            JSONObject rootobj=new JSONObject(s);
-//            JSONObject emp=rootobj.getJSONObject("StudentloginResult");
-//            JSONObject sdlist = emp.getJSONObject("studentDtls");
-//            String thumbnailurl= sdlist.getString("ThumbnailURL");
-//            edit.putString("ThumbnailID", thumbnailurl);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        if(s.equalsIgnoreCase("true"))
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(DrawerActivity.this);
+            DALMyPupilInfo dp=new DALMyPupilInfo(DrawerActivity.this);
+            String[] student=dp.GetAllTableData(preferences.getString("StudentUserID",""));
+            long n=0;
+            n=dp.updateStudentInfo(student[15], student[16], student[3], student[4], student[17], student[5], student[0], student[1], student[2], student[6], student[8], student[9], student[18], student[10],
+                    student[19], student[11], student[7], student[20], student[21], student[22],student[23],student[13],student[12],localPath,student[24]);
+           if (n>0)
+           {
+               SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(DrawerActivity.this);
+               SharedPreferences.Editor edit = sharedpreferences.edit();
+               edit.putString("ThumbnailID", localPath);
+               edit.commit();
+           }
+        }
     }
 }
