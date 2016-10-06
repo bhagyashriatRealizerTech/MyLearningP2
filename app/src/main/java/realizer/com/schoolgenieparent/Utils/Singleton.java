@@ -24,6 +24,7 @@ public class Singleton {
     public static Fragment fragment;
     public static Fragment mainFragment;
     public static ProgressWheel messageCenter = null;
+    public static ArrayList<String> imageList;
 
     private Singleton()
     {
@@ -112,6 +113,14 @@ public class Singleton {
 
     public static void setIsShowMap(boolean isShowMap) {
         Singleton.isShowMap = isShowMap;
+    }
+
+    public static ArrayList<String> getImageList() {
+        return imageList;
+    }
+
+    public static void setImageList(ArrayList<String> imageList) {
+        Singleton.imageList = imageList;
     }
 }
 
