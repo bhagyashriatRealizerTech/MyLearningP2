@@ -325,7 +325,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
                     final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
 
                     LayoutInflater inflater = getLayoutInflater();
-                    View dialoglayout = inflater.inflate(R.layout.insert_div_layout, null);
+                    View dialoglayout = inflater.inflate(R.layout.insert_std_layout, null);
                     Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
                     Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
                     final EditText standardedt = (EditText) dialoglayout.findViewById(R.id.edtstd1);
@@ -341,10 +341,13 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
                         @Override
                         public void onClick(View v) {
 
-                            if(divisionedt.getText().toString().trim().length()>0)
+                            if(divisionedt.getText().toString().trim().length()>0 && standardedt.getText().toString().trim().length()>0)
                             {
-                                newDivAdded = divisionedt.getText().toString().trim();
-                                getDivision(schoolpos,stdpos,jsonString);
+                               if(Config.isConnectingToInternet(RegistrationActivity.this))
+                               {
+                                   //loading.setVisibility(View.GONE);
+
+                               }
                                 alertDialog.dismiss();
                             }
 
