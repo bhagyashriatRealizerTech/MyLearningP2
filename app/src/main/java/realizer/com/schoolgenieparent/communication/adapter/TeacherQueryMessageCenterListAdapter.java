@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -169,19 +170,31 @@ public class TeacherQueryMessageCenterListAdapter extends BaseAdapter {
                 urlString = messageList.get(position).getProfileImage();
             }
 
-            String newURL= Utility.getURLImage(urlString);
             holder.initial.setVisibility(View.GONE);
             holder.profilepic.setVisibility(View.VISIBLE);
-            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                new GetImages(newURL,holder.profilepic,holder.initial,messageList.get(position).getTname(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+
+            if (urlString.contains("http"))
+            {
+                String newURL=new Utility().getURLImage(urlString);
+                if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                    new GetImages(newURL,holder.profilepic,holder.initial,messageList.get(position).getTname(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+                else
+                {
+                    File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                    holder.initial.setVisibility(View.GONE);
+                    holder.profilepic.setVisibility(View.VISIBLE);
+                    holder.profilepic.setImageBitmap(bitmap);
+                }
+            }
             else
             {
-                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                Bitmap bitmap = BitmapFactory.decodeFile(urlString, bmOptions);
+                holder.profilepic.setImageBitmap(bitmap);
                 holder.initial.setVisibility(View.GONE);
                 holder.profilepic.setVisibility(View.VISIBLE);
-                holder.profilepic.setImageBitmap(bitmap);
             }
         }
         else {
