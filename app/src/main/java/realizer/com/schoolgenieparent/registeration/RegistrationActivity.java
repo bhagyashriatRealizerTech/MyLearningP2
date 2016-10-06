@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -30,6 +32,8 @@ import realizer.com.schoolgenieparent.SchoolRegistrationActivity;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncTaskGet;
+import realizer.com.schoolgenieparent.registeration.asynctask.StandardRegistrationAsyncTaskPost;
+import realizer.com.schoolgenieparent.registeration.model.SchoolRegistrationModel;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
@@ -52,6 +56,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     String newDivAdded;
     boolean isNewDivAdded=  false;
     ProgressWheel loading;
+    String sode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -269,171 +274,188 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     public void onTaskCompleted(String s) {
 
         loading.setVisibility(View.GONE);
-        jsonString=s;
 
-        getSchoolName(jsonString);
-        adapterSchool = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, schoolName);
-        adapterSchool.setDropDownViewResource(R.layout.spinner_dropdown_layout);
-        spnSchoolName.setAdapter(adapterSchool);
+     if(s.split("@@@").length>1) {
+    if (s.split("@@@")[1].equalsIgnoreCase("STDREG")) {
+        if (Config.isConnectingToInternet(RegistrationActivity.this)) {
+            loading.setVisibility(View.VISIBLE);
+            RegistrationAsyncTaskGet asyntaskGet = new RegistrationAsyncTaskGet(RegistrationActivity.this, RegistrationActivity.this, "getschoollist");
+            asyntaskGet.execute();
+        } else {
+            Config.alertDialog(RegistrationActivity.this, "Network Error", "Please check your internet connection");
+        }
 
-        spnSchoolName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    }
+  }
+        else {
+            jsonString = s;
+
+            getSchoolName(jsonString);
+            adapterSchool = new ArrayAdapter<String>(this, R.layout.spinner_selected_text__layout, schoolName);
+            adapterSchool.setDropDownViewResource(R.layout.spinner_dropdown_layout);
+            spnSchoolName.setAdapter(adapterSchool);
+
+            spnSchoolName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
 
-                if (spnSchoolName.getSelectedItem().toString().equalsIgnoreCase("Add New School")) {
+                    if (spnSchoolName.getSelectedItem().toString().equalsIgnoreCase("Add New School")) {
 
-                    Intent i = new Intent(RegistrationActivity.this, SchoolRegistrationActivity.class);
-                    startActivity(i);
+                        Intent i = new Intent(RegistrationActivity.this, SchoolRegistrationActivity.class);
+                        startActivity(i);
 
-
-                } else {
-                    if (position != 0) {
-                        schoolpos = position - 1;
-                        getAddress(position - 1, jsonString);
-                        getStandard(position - 1, jsonString);
-                        spnStd.setSelection(0);
-                        getDivision(position - 1, -10, jsonString);
-                        spnDivision.setSelection(0);
 
                     } else {
-                        schoolpos = position;
-                        edtAddress.setText("");
-                        edtAddress.setHint(Config.actionBarTitle("School Address", RegistrationActivity.this));
-                        edtAddress.setHintTextColor(getResources().getColor(R.color.greycolor));
-                        getDivision(position - 1, -10, jsonString);
-                        spnDivision.setSelection(0);
-                        getStandard(-10, jsonString);
-                        spnStd.setSelection(0);
+                        if (position != 0) {
+                            schoolpos = position - 1;
+                            getAddress(position - 1, jsonString);
+                            getStandard(position - 1, jsonString);
+                            spnStd.setSelection(0);
+                            getDivision(position - 1, -10, jsonString);
+                            spnDivision.setSelection(0);
+
+                        } else {
+                            schoolpos = position;
+                            edtAddress.setText("");
+                            edtAddress.setHint(Config.actionBarTitle("School Address", RegistrationActivity.this));
+                            edtAddress.setHintTextColor(getResources().getColor(R.color.greycolor));
+                            getDivision(position - 1, -10, jsonString);
+                            spnDivision.setSelection(0);
+                            getStandard(-10, jsonString);
+                            spnStd.setSelection(0);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
-            }
-        });
+                }
+            });
 
-        spnStd.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            spnStd.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
 
-                if (spnStd.getSelectedItem().toString().equalsIgnoreCase("Add New Standard")) {
+                    if (spnStd.getSelectedItem().toString().equalsIgnoreCase("Add New Standard")) {
 
-                    final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+                        final Typeface face = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
 
-                    LayoutInflater inflater = getLayoutInflater();
-                    View dialoglayout = inflater.inflate(R.layout.insert_std_layout, null);
-                    Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
-                    Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
-                    final EditText standardedt = (EditText) dialoglayout.findViewById(R.id.edtstd1);
-                    final EditText divisionedt = (EditText) dialoglayout.findViewById(R.id.edtdiv1);
-                    submit.setTypeface(face);
-                    cancel.setTypeface(face);
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
-                    builder.setView(dialoglayout);
+                        LayoutInflater inflater = getLayoutInflater();
+                        View dialoglayout = inflater.inflate(R.layout.insert_std_layout, null);
+                        Button submit = (Button) dialoglayout.findViewById(R.id.btn_submit);
+                        Button cancel = (Button) dialoglayout.findViewById(R.id.btn_cancel);
+                        final EditText standardedt = (EditText) dialoglayout.findViewById(R.id.edtstd1);
+                        final EditText divisionedt = (EditText) dialoglayout.findViewById(R.id.edtdiv1);
+                        submit.setTypeface(face);
+                        cancel.setTypeface(face);
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
+                        builder.setView(dialoglayout);
 
-                    final AlertDialog alertDialog = builder.create();
+                        final AlertDialog alertDialog = builder.create();
+                        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                    submit.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        submit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                            if(divisionedt.getText().toString().trim().length()>0 && standardedt.getText().toString().trim().length()>0)
-                            {
-                               if(Config.isConnectingToInternet(RegistrationActivity.this))
-                               {
-                                   //loading.setVisibility(View.GONE);
+                                if (divisionedt.getText().toString().trim().length() > 0 && standardedt.getText().toString().trim().length() > 0) {
+                                    if (Config.isConnectingToInternet(RegistrationActivity.this)) {
+                                        loading.setVisibility(View.GONE);
+                                        SchoolRegistrationModel obj = new SchoolRegistrationModel();
+                                        obj.setCode(scode);
+                                        obj.setStd(standardedt.getText().toString().trim());
+                                        obj.setDiv(divisionedt.getText().toString().trim());
+                                        new StandardRegistrationAsyncTaskPost(obj,RegistrationActivity.this,RegistrationActivity.this).execute();
+                                    }
+                                    alertDialog.dismiss();
+                                }
 
-                               }
+                            }
+                        });
+
+                        cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
                                 alertDialog.dismiss();
                             }
+                        });
 
-                        }
-                    });
+                        alertDialog.show();
 
-                    cancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            alertDialog.dismiss();
-                        }
-                    });
-
-                    alertDialog.show();
-
-                } else {
-                    if (position != 0) {
-                        stdpos = position - 1;
-                        getDivision(schoolpos, position - 1, jsonString);
                     } else {
-                        stdpos = position;
-                        getDivision(position - 1, -10, jsonString);
-                    }
+                        if (position != 0) {
+                            stdpos = position - 1;
+                            getDivision(schoolpos, position - 1, jsonString);
+                        } else {
+                            stdpos = position;
+                            getDivision(position - 1, -10, jsonString);
+                        }
 
-                    spnDivision.setSelection(0);
+                        spnDivision.setSelection(0);
+
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
                 }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            });
 
-            }
-        });
+            spnDivision.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        spnDivision.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (spnDivision.getSelectedItem().toString().equalsIgnoreCase("Other")) {
+                        final Typeface face = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
 
-                if (spnDivision.getSelectedItem().toString().equalsIgnoreCase("Other")) {
-                    final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+                        LayoutInflater inflater = getLayoutInflater();
+                        View dialoglayout = inflater.inflate(R.layout.insert_div_layout, null);
+                        Button submit = (Button) dialoglayout.findViewById(R.id.btn_submit);
+                        Button cancel = (Button) dialoglayout.findViewById(R.id.btn_cancel);
+                        final EditText divisionedt = (EditText) dialoglayout.findViewById(R.id.edtdiv1);
+                        submit.setTypeface(face);
+                        cancel.setTypeface(face);
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
+                        builder.setView(dialoglayout);
 
-                    LayoutInflater inflater = getLayoutInflater();
-                    View dialoglayout = inflater.inflate(R.layout.insert_div_layout, null);
-                    Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
-                    Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
-                    final EditText divisionedt = (EditText) dialoglayout.findViewById(R.id.edtdiv1);
-                    submit.setTypeface(face);
-                    cancel.setTypeface(face);
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
-                    builder.setView(dialoglayout);
+                        final AlertDialog alertDialog = builder.create();
+                        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        submit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                    final AlertDialog alertDialog = builder.create();
+                                if (divisionedt.getText().toString().trim().length() > 0) {
+                                    newDivAdded = divisionedt.getText().toString().trim();
+                                    getDivision(schoolpos, stdpos, jsonString);
+                                    alertDialog.dismiss();
+                                }
 
-                    submit.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                            }
+                        });
 
-                            if(divisionedt.getText().toString().trim().length()>0)
-                            {
-                                newDivAdded = divisionedt.getText().toString().trim();
-                                getDivision(schoolpos,stdpos,jsonString);
+                        cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
                                 alertDialog.dismiss();
                             }
+                        });
 
-                        }
-                    });
+                        alertDialog.show();
+                    }
 
-                    cancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            alertDialog.dismiss();
-                        }
-                    });
 
-                    alertDialog.show();
                 }
 
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
-            }
+                }
+            });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
+        }
     }
 }

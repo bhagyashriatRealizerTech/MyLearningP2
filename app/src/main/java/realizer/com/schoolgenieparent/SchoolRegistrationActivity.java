@@ -19,6 +19,9 @@ import org.w3c.dom.Text;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.registeration.RegistrationActivity;
+import realizer.com.schoolgenieparent.registeration.asynctask.SchoolRegistrationAsyncTaskPost;
+import realizer.com.schoolgenieparent.registeration.asynctask.StandardRegistrationAsyncTaskPost;
+import realizer.com.schoolgenieparent.registeration.model.SchoolRegistrationModel;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
@@ -122,7 +125,20 @@ public class SchoolRegistrationActivity extends AppCompatActivity implements OnT
                 }
                 else
                 {
-
+                    if (Config.isConnectingToInternet(SchoolRegistrationActivity.this)) {
+                       /* loading.setVisibility(View.GONE);
+                        SchoolRegistrationModel obj = new SchoolRegistrationModel();
+                        obj.setName(edtSchoolName.getText().toString().trim());
+                        obj.setAddress(edtSchoolAddress.getText().toString().trim());
+                        obj.setContactNo(edtContactNumber.getText().toString().trim());
+                        obj.setStd(edtStd.getText().toString().trim());
+                        obj.setDiv(edtDiv.getText().toString().trim());
+                        obj.setCode("");
+                        obj.setCommentsForCommunication("");
+                        obj.setContactPerson("");
+                        obj.setEmailId("");
+                        new SchoolRegistrationAsyncTaskPost(obj,SchoolRegistrationActivity.this,SchoolRegistrationActivity.this).execute();*/
+                    }
                 }
             }
         });
