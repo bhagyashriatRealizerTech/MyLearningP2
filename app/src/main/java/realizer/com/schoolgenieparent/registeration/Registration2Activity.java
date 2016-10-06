@@ -239,7 +239,8 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         }
         else if(s.equals("400"))
         {
-            Toast.makeText(Registration2Activity.this, "Username Already Exist.", Toast.LENGTH_SHORT).show();
+            Config.alertDialog(Registration2Activity.this,"Error","Username already exists");
+            //Toast.makeText(Registration2Activity.this, "Username Already Exist.", Toast.LENGTH_SHORT).show();
         }
         else
         {
@@ -280,7 +281,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
     }
     public void upDateLable()
     {
-        String myFormat = "d/M/yyyy"; //In which you need put here
+        String myFormat = "dd MMM yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         txtRegDob.setText(sdf.format(myCalendar.getTime()));
         dob=txtRegDob.getText().toString();
