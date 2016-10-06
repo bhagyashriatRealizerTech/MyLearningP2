@@ -21,13 +21,12 @@ import java.io.InputStreamReader;
 
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
-import realizer.com.schoolgenieparent.registeration.model.RegistrationModel;
 import realizer.com.schoolgenieparent.registeration.model.SchoolRegistrationModel;
 
 /**
  * Created by Win on 07/09/2016.
  */
-public class SchoolRegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringBuilder> {
+public class StandardRegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringBuilder> {
 
     StringBuilder resultbuilder;
     SchoolRegistrationModel rgm;
@@ -35,7 +34,7 @@ public class SchoolRegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringB
     Context mycontext;
     private OnTaskCompleted callback;
 
-    public SchoolRegistrationAsyncTaskPost(SchoolRegistrationModel rgm, Context mycontext, OnTaskCompleted cb) {
+    public StandardRegistrationAsyncTaskPost(SchoolRegistrationModel rgm, Context mycontext, OnTaskCompleted cb) {
         this.rgm = rgm;
         this.mycontext=mycontext;
         this.callback=cb;
@@ -51,23 +50,17 @@ public class SchoolRegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringB
     protected StringBuilder doInBackground(Void... params) {
         resultbuilder =new StringBuilder();
         HttpClient httpClient=new DefaultHttpClient();
-        String url= Config.URL+"RegisterSchool";
+        String url= Config.URL+"AddStdAndDiv";
         HttpPost httpPost=new HttpPost(url);
         String json="";
         StringEntity se=null;
         JSONObject jsonObject=new JSONObject();
         try
         {
-            jsonObject.put("Code",rgm.getCode());
-            jsonObject.put("name",rgm.getName());
-            jsonObject.put("Address",rgm.getAddress());
-            jsonObject.put("ContactNo",rgm.getContactNo());
-            jsonObject.put("EmailId",rgm.getEmailId());
-            jsonObject.put("ContactPerson",rgm.getContactPerson());
-            jsonObject.put("CommentsForCommunication",rgm.getCommentsForCommunication());
-            jsonObject.put("Std",rgm.getStd());
-            jsonObject.put("Div", rgm.getDiv());
-
+            jsonObject.put("schoolCode",rgm.getCode());
+            jsonObject.put("std",rgm.getStd());
+            jsonObject.put("div", rgm.getDiv());
+           
 
             json=jsonObject.toString();
 
@@ -108,9 +101,8 @@ public class SchoolRegistrationAsyncTaskPost extends AsyncTask<Void,Void,StringB
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
       //  dialog.dismiss();
-
-
-        callback.onTaskCompleted(stringBuilder.toString());
+        String res= stringBuilder.toString()+"@@@STDREG";
+        callback.onTaskCompleted(res);
     }
 
 }

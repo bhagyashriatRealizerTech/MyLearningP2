@@ -538,7 +538,7 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
             boolean b1 = parsData(onTaskResult[2]);
             if (b1 == true) {
                 loading.setVisibility(View.GONE);
-                GCMReg();
+                //GCMReg();
                 SharedPreferences sharedpreferences1 = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
                 SharedPreferences.Editor edit1 = sharedpreferences1.edit();
                 edit1.putString("Login", "true");
