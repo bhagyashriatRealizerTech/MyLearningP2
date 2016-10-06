@@ -178,7 +178,6 @@
                             android:paddingBottom="5dp"
                             android:drawablePadding="5dip"
                             android:layout_weight="1"
-                            android:enabled="false"
                             android:drawableTop="@drawable/tracking3d"
                             android:text="Tracking"/>
                         <Button

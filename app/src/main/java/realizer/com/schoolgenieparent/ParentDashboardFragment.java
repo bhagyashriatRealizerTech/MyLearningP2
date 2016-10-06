@@ -2,7 +2,9 @@ package realizer.com.schoolgenieparent;
 
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,8 +29,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.Notification.TeacherNotificationListAdapter;
@@ -44,6 +51,9 @@ import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
 import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
 import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
+import realizer.com.schoolgenieparent.trackpupil.TrackShowMap;
+import realizer.com.schoolgenieparent.trackpupil.TrackingDialogBoxActivity;
+import realizer.com.schoolgenieparent.trackpupil.asynctask.TrackingAsyckTaskGet;
 import realizer.com.schoolgenieparent.view.Action;
 import realizer.com.schoolgenieparent.view.SwipeDetector;
 
@@ -79,7 +89,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         homework.setOnClickListener(this);
         viewStar.setOnClickListener(this);
         timeTable.setOnClickListener(this);
-        //queries.setOnClickListener(this);
+        trackPupil.setOnClickListener(this);
         funCenter.setOnClickListener(this);
         communication.setOnClickListener(this);
         alert.setOnClickListener(this);
@@ -336,8 +346,53 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     break;
 
                 case R.id.txtpdashtrack:
-                    //frag = Homework("Classwork");
-                    Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
+
+                    SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    SharedPreferences.Editor edit = sharedpreferences.edit();
+
+                    String isfirsttime = sharedpreferences.getString("Tracking","");
+                    if (isfirsttime.equals("true") || isfirsttime.equals(""))
+                    {
+                        TrackPupil("b");
+                    }
+                    else
+                    {
+
+                        String drivername = sharedpreferences.getString("USERNAME","");
+                        String driverid = sharedpreferences.getString("USERID","");
+                        TrackingAsyckTaskGet obj = new TrackingAsyckTaskGet(drivername,driverid, getActivity());
+                        try {
+                            StringBuilder result1;
+                            result1 = obj.execute().get();
+                            String dailyDriverList = result1.toString();
+                            try {
+                                //JSONObject obj = new JSONObject(s);
+                                JSONArray locList = new JSONArray(dailyDriverList);
+                                //  for(int i=0;i<locList.length();i++) {
+                                JSONObject obj1 = locList.getJSONObject(locList.length()-1);
+
+                                Intent intent = new Intent(getActivity(), TrackShowMap.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putString("USERNAME", driverid);
+                                bundle.putString("LATITUDE", obj1.getString("latitude"));
+                                bundle.putString("LONGITUDE", obj1.getString("longitude"));
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            edit.putString("Tracking", "false");
+                            edit.commit();
+
+                        }catch(InterruptedException e){
+                            e.printStackTrace();
+                        }catch(ExecutionException e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     break;
 
                 case R.id.txtpdashclasswork:
@@ -362,7 +417,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         funCenter = (TextView) v.findViewById(R.id.txtpdashfuncenter);
         communication = (TextView) v.findViewById(R.id.txtpdashcommunication);
         alert= (TextView) v.findViewById(R.id.txtpdashalert);
-        //trackPupil = (TextView) v.findViewById(R.id.txtpdashtrackpupil);
+        trackPupil = (TextView) v.findViewById(R.id.txtpdashtrack);
         publicHoliday = (TextView) v.findViewById(R.id.txtpdashpublicholiday);
         classwork = (TextView) v.findViewById(R.id.txtpdashclasswork);
         mypupil = (TextView) v.findViewById(R.id.txtpdashpupilinfo);
@@ -402,6 +457,14 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 
     public Fragment GetHomework(String res) {
         // Get Output as
+        if(res.equalsIgnoreCase("HomeworkUpload"))
+        {
+            res="Homework";
+        }
+        else if(res.equalsIgnoreCase("ClassworkUpload"))
+        {
+            res="Classwork";
+        }
         String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";
         ParentHomeWorkFragment fragment = new ParentHomeWorkFragment();
         Bundle bundle = new Bundle();
@@ -449,6 +512,15 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         fragmentTransaction.commit();
         return fragment;
     }
+
+    // For Track My Pupil
+    public void TrackPupil(String res) {
+        FragmentManager fragmentManager = getFragmentManager();
+        TrackingDialogBoxActivity fragment = new TrackingDialogBoxActivity();
+        fragment.setCancelable(false);
+        fragment.show(fragmentManager, "Dialog!");
+    }
+
 
     //Recive the result when new Message Arrives
     class MessageResultReceiver extends ResultReceiver

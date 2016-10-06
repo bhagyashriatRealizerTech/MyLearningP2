@@ -15,6 +15,20 @@ import realizer.com.schoolgenieparent.view.ProgressWheel;
  */
 public class Singleton {
 
+    public static boolean isShowMap=false;
+    public static Intent manualserviceIntent = null;
+    public static Intent autoserviceIntent = null;
+    private static Singleton _instance;
+    public static ResultReceiver resultReceiver;
+    public static Context context;
+    public static Fragment fragment;
+    public static Fragment mainFragment;
+    public static ProgressWheel messageCenter = null;
+
+    private Singleton()
+    {
+
+    }
 
     public static ArrayList<TeacherHomeworkListModel> getAllImages() {
         return allImages;
@@ -34,9 +48,6 @@ public class Singleton {
         Singleton.manualserviceIntent = manualserviceIntent;
     }
 
-    public static Intent manualserviceIntent = null;
-    public static Intent autoserviceIntent = null;
-
     public static Intent getAutoserviceIntent() {
         return autoserviceIntent;
     }
@@ -44,9 +55,6 @@ public class Singleton {
     public static void setAutoserviceIntent(Intent autoserviceIntent) {
         Singleton.autoserviceIntent = autoserviceIntent;
     }
-
-    private static Singleton _instance;
-    public static ResultReceiver resultReceiver;
 
     public static Context getContext() {
         return context;
@@ -56,14 +64,6 @@ public class Singleton {
         Singleton.context = context;
     }
 
-    public static Context context;
-    public static Fragment fragment;
-    public static Fragment mainFragment;
-
-    private Singleton()
-    {
-
-    }
 
     public static Singleton getInstance()
     {
@@ -77,13 +77,15 @@ public class Singleton {
     public static ResultReceiver getResultReceiver() {
         return resultReceiver;
     }
+
     public static ProgressWheel getMessageCenter() {
         return messageCenter;
     }
+
     public static void setMessageCenter(ProgressWheel messageCenter) {
         Singleton.messageCenter = messageCenter;
     }
-    public static ProgressWheel messageCenter = null;
+
     public static void setResultReceiver(ResultReceiver resultReceiver) {
         Singleton.resultReceiver = resultReceiver;
     }
@@ -102,6 +104,14 @@ public class Singleton {
 
     public static void setMainFragment(Fragment mainFragment) {
         Singleton.mainFragment = mainFragment;
+    }
+
+    public static boolean isIsShowMap() {
+        return isShowMap;
+    }
+
+    public static void setIsShowMap(boolean isShowMap) {
+        Singleton.isShowMap = isShowMap;
     }
 }
 

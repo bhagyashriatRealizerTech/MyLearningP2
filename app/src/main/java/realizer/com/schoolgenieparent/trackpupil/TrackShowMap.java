@@ -1,0 +1,267 @@
+package realizer.com.schoolgenieparent.trackpupil;
+
+import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import realizer.com.schoolgenieparent.R;
+import realizer.com.schoolgenieparent.Utils.Config;
+import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
+import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
+import realizer.com.schoolgenieparent.trackpupil.asynctask.TrackingAsyncTaskAuto;
+
+/**
+ * Created by shree on 10/29/2015.
+ */
+public class TrackShowMap extends AppCompatActivity implements OnTaskCompleted {
+    private GoogleMap mMap;
+    String Latitude;
+    String Longitude;
+    Marker mMarker;
+    private PolylineOptions mPolylineOptions;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+        setContentView(R.layout.activity_maps_activity1);
+        //getActionBar().setTitle(Config.actionBarTitle("Map", TrackShowMap.this));
+        getSupportActionBar().setTitle(Config.actionBarTitle("Map", TrackShowMap.this));
+        getSupportActionBar().show();
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new AutoSyncServerDataTrack(), 1000, 1000*120);
+
+        setUpMapIfNeeded();
+    }
+
+    private void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+            // Check if we were successful in obtaining the map.
+            if (mMap != null) {
+                Bundle bundle = getIntent().getExtras();
+                setUpMap(bundle.getString("LATITUDE", ""), bundle.getString("LONGITUDE", ""));
+            }
+        }
+    }
+
+    private void setUpMap(String lati, String longi) {
+        mMap.setMyLocationEnabled(true);
+       // mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        // mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID );
+        // mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN );
+        // mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        Bundle bundle=getIntent().getExtras();
+        String userName=bundle.getString("USERNAME");
+        String currentLatitude =lati;
+        String currentLongitude =longi;
+
+        LatLng latLng = new LatLng(Double.parseDouble(currentLatitude), Double.parseDouble(currentLongitude));
+
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title(userName + " is here!")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        mMarker = mMap.addMarker(options);
+        mMarker.setPosition(latLng);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18.0f));
+       // mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mPolylineOptions = new PolylineOptions();
+        mPolylineOptions.color(Color.RED).width(7);
+    }
+
+    private static final CharSequence[] MAP_TYPE_ITEMS =
+            {"Road Map", "Hybrid", "Satellite", "Terrain"};
+
+    private void showMapTypeSelectorDialog() {
+        // Prepare the dialog by setting up a Builder.
+        final String fDialogTitle = "Select Map Type";
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(fDialogTitle);
+
+        // Find the current map type to pre-check the item representing the current state.
+        int checkItem = mMap.getMapType() - 1;
+
+        // Add an OnClickListener to the dialog, so that the selection will be handled.
+        builder.setSingleChoiceItems(
+                MAP_TYPE_ITEMS,
+                checkItem,
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int item) {
+                        // Locally create a finalised object.
+
+                        // Perform an action depending on which item was selected.
+                        switch (item) {
+                            case 1:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                                break;
+                            case 2:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                                break;
+                            case 3:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                                break;
+                            default:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        }
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+        // Build the dialog and show it.
+        AlertDialog fMapTypeDialog = builder.create();
+        fMapTypeDialog.setCanceledOnTouchOutside(true);
+        fMapTypeDialog.show();
+    }
+
+    @Override
+    public void onTaskCompleted(String s) {
+
+        String dailyDriverList = s;
+        if(s.equals(","))
+        {
+            Toast.makeText(getApplicationContext(), "Server Not Responding ", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            try {
+                JSONArray locList = new JSONArray(s);
+                for(int i=locList.length()-1;i>=0;i--) {
+                    JSONObject obj = locList.getJSONObject(i);
+                    LatLng latLng = new LatLng(Double.parseDouble(obj.getString("latitude")), Double.parseDouble(obj.getString("longitude")));
+                    animateMarker(mMarker, latLng, false);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+    }
+
+    public void animateMarker(final Marker marker, final LatLng toPosition,
+                              final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+
+        final Interpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed
+                        / duration);
+                double lng = t * toPosition.longitude + (1 - t)
+                        * startLatLng.longitude;
+                double lat = t * toPosition.latitude + (1 - t)
+                        * startLatLng.latitude;
+
+               // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng),16.0f));
+                marker.setPosition(new LatLng(lat, lng));
+                mMap.addPolyline(mPolylineOptions.add(new LatLng(lat, lng)));
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 16);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
+    }
+    class AutoSyncServerDataTrack extends TimerTask
+    {
+        @Override
+        public void run() {
+
+            TrackAsync();
+        }
+    }
+    public void TrackAsync()
+    {
+        StringBuilder result;
+        Bundle bundle=getIntent().getExtras();
+        String userName=bundle.getString("USERNAME");
+
+        TrackingAsyncTaskAuto obj = new TrackingAsyncTaskAuto(TrackShowMap.this,userName, TrackShowMap.this);
+        obj.execute();
+
+    }
+
+
+   /* @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_item, menu);
+        return true;
+    }*/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_item, menu);
+        //done = menu.findItem(R.id.add_contact_done);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item1 :
+                showMapTypeSelectorDialog();
+
+            case R.id.item_switch:
+                TrackingDialogBoxActivity fragment = new TrackingDialogBoxActivity();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragment.setCancelable(false);
+                fragment.show(fragmentManager, "Dialog!");
+
+            default :
+                return super.onOptionsItemSelected(item);
+        }
+    }
+}
