@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import realizer.com.schoolgenieparent.R;
+import realizer.com.schoolgenieparent.SchoolRegistrationActivity;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncTaskGet;
@@ -151,6 +152,7 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
                 String str=main.getString("name");
                 schoolName.add(str);
             }
+            schoolName.add("Add New School");
         }
         catch (JSONException e)
         {
@@ -278,23 +280,29 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
 
-                if (position != 0) {
-                    schoolpos = position - 1;
-                    getAddress(position - 1, jsonString);
-                    getStandard(position - 1, jsonString);
-                    spnStd.setSelection(0);
-                    getDivision(position - 1, -10, jsonString);
-                    spnDivision.setSelection(0);
+                if (spnSchoolName.getSelectedItem().toString().equalsIgnoreCase("Add New School")) {
 
+                    Intent i = new Intent(RegistrationActivity.this,SchoolRegistrationActivity.class);
+                    startActivity(i);
                 } else {
-                    schoolpos = position;
-                    edtAddress.setText("");
-                    edtAddress.setHint(Config.actionBarTitle("School Address", RegistrationActivity.this));
-                    edtAddress.setHintTextColor(getResources().getColor(R.color.greycolor));
-                    getDivision(position - 1, -10, jsonString);
-                    spnDivision.setSelection(0);
-                    getStandard(-10, jsonString);
-                    spnStd.setSelection(0);
+                    if (position != 0) {
+                        schoolpos = position - 1;
+                        getAddress(position - 1, jsonString);
+                        getStandard(position - 1, jsonString);
+                        spnStd.setSelection(0);
+                        getDivision(position - 1, -10, jsonString);
+                        spnDivision.setSelection(0);
+
+                    } else {
+                        schoolpos = position;
+                        edtAddress.setText("");
+                        edtAddress.setHint(Config.actionBarTitle("School Address", RegistrationActivity.this));
+                        edtAddress.setHintTextColor(getResources().getColor(R.color.greycolor));
+                        getDivision(position - 1, -10, jsonString);
+                        spnDivision.setSelection(0);
+                        getStandard(-10, jsonString);
+                        spnStd.setSelection(0);
+                    }
                 }
             }
 
@@ -309,15 +317,14 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if (position != 0) {
-                    stdpos = position-1;
+                    stdpos = position - 1;
                     getDivision(schoolpos, position - 1, jsonString);
-                }
-                else {
+                } else {
                     stdpos = position;
                     getDivision(position - 1, -10, jsonString);
                 }
 
-                    spnDivision.setSelection(0);
+                spnDivision.setSelection(0);
 
             }
 

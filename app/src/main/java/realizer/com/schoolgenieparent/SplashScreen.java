@@ -33,8 +33,8 @@ public class SplashScreen extends Activity {
                     }
                     else
                     {
-                        Intent i = new Intent(SplashScreen.this,DrawerActivity.class);
-                        startActivity(i);
+                        Intent intent = new Intent(SplashScreen.this,DrawerActivity.class);
+                        startActivity(intent);
                     }
 
                 }
