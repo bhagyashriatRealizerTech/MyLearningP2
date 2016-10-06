@@ -1,7 +1,6 @@
 package realizer.com.schoolgenieparent.registeration;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,9 @@ import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -17,18 +18,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
 import realizer.com.schoolgenieparent.MainActivity;
 import realizer.com.schoolgenieparent.R;
+import realizer.com.schoolgenieparent.Utils.Config;
+import realizer.com.schoolgenieparent.Utils.CustomTypefaceSpan;
+import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
-import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncTaskGet;
 import realizer.com.schoolgenieparent.registeration.asynctask.RegistrationAsyncTaskPost;
 import realizer.com.schoolgenieparent.registeration.model.RegistrationModel;
 
@@ -48,7 +47,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registration2_activity);
+        setContentView(R.layout.registration2_activity_new);
 
         btnRegister= (Button) findViewById(R.id.btnRegister);
         edtPassword= (EditText) findViewById(R.id.edt_reg_pass);
@@ -68,6 +67,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
         Typeface face= Typeface.createFromAsset(Registration2Activity.this.getAssets(), "fonts/font.ttf");
+        Typeface face1 = Typeface.createFromAsset(Registration2Activity.this.getAssets(), "fonts/A Bug s Life.ttf");
         btnRegister.setTypeface(face);
         txtRegistration.setTypeface(face);
         Bundle bundle=getIntent().getExtras();
@@ -82,6 +82,40 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         txtDivision.setText(division);
 
          myCalendar = Calendar.getInstance();
+
+
+        edtStdFname.setHint(Config.editTextHint("First Name", Registration2Activity.this));
+        edtStdFname.setHintTextColor(getResources().getColor(R.color.greycolor));
+        edtStdFname.setTypeface(face1);
+
+        edtStdLname.setHint(Config.editTextHint("Last Name", Registration2Activity.this));
+        edtStdLname.setHintTextColor(getResources().getColor(R.color.greycolor));
+        edtStdLname.setTypeface(face1);
+
+
+        edtEmailId.setHint(Config.editTextHint("Email ID", Registration2Activity.this));
+        edtEmailId.setHintTextColor(getResources().getColor(R.color.greycolor));
+        edtEmailId.setTypeface(face1);
+
+
+        edtPhoneno.setHint(Config.editTextHint("Contact Number", Registration2Activity.this));
+        edtPhoneno.setHintTextColor(getResources().getColor(R.color.greycolor));
+        edtPhoneno.setTypeface(face1);
+
+
+        edtUserid.setHint(Config.editTextHint("User ID", Registration2Activity.this));
+        edtUserid.setHintTextColor(getResources().getColor(R.color.greycolor));
+        edtUserid.setTypeface(face1);
+
+        edtPassword.setHint(Config.editTextHint("Password",Registration2Activity.this));
+        edtPassword.setHintTextColor(getResources().getColor(R.color.greycolor));
+        edtPassword.setTypeface(face1);
+
+
+        edtConfirmPass.setHint(Config.editTextHint("Confirm Password",Registration2Activity.this));
+        edtConfirmPass.setHintTextColor(getResources().getColor(R.color.greycolor));
+        edtConfirmPass.setTypeface(face1);
+
 
          date = new DatePickerDialog.OnDateSetListener() {
 
@@ -205,7 +239,8 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
         }
         else if(s.equals("400"))
         {
-            Toast.makeText(Registration2Activity.this, "Username Already Exist.", Toast.LENGTH_SHORT).show();
+            Config.alertDialog(Registration2Activity.this,"Error","Username already exists");
+            //Toast.makeText(Registration2Activity.this, "Username Already Exist.", Toast.LENGTH_SHORT).show();
         }
         else
         {
@@ -246,7 +281,7 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
     }
     public void upDateLable()
     {
-        String myFormat = "d/M/yyyy"; //In which you need put here
+        String myFormat = "dd MMM yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         txtRegDob.setText(sdf.format(myCalendar.getTime()));
         dob=txtRegDob.getText().toString();
@@ -267,5 +302,11 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
 
         }
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

@@ -8,28 +8,38 @@
             android:icon="@drawable/home_drawer"
             android:title="@string/DashBoard" />
 
+
+        <item android:id="@+id/nav_timetable"
+            android:icon="@drawable/timetable_drawer"
+            android:title="@string/Invitetoother" />
+
         <item android:id="@+id/nav_myclass"
             android:icon="@drawable/myclass_drawer"
             android:title="@string/MyClass" />
 
         <item android:id="@+id/nav_mypupil"
-            android:icon="@drawable/myclass_drawer"
+            android:icon="@drawable/pupil_drawer"
             android:title="@string/MyPupil" />
 
-        <item android:id="@+id/nav_timetable"
-            android:icon="@drawable/timetable_drawer"
-            android:title="@string/Invitetoother" />
+        <item android:id="@+id/nav_tracking"
+            android:icon="@drawable/tracking_drawer"
+            android:title="Tracking" />
 
         <item android:id="@+id/nav_homework"
             android:icon="@drawable/homework_drawer"
             android:title="@string/Homework" />
 
         <item android:id="@+id/nav_classwork"
-            android:icon="@drawable/homework_drawer"
+            android:icon="@drawable/classwork_drawer"
             android:title="@string/Classwork" />
+
         <item android:id="@+id/nav_communication"
             android:icon="@drawable/chat_drawer"
             android:title="@string/Communication" />
+
+        <item android:id="@+id/nav_manual_sync"
+            android:icon="@drawable/sync_drawer"
+            android:title="Sync up" />
         <!--<item android:id="@+id/nav_star"-->
             <!--android:icon="@drawable/rewardstar_drawer"-->
             <!--android:title="@string/RewardStar" />-->

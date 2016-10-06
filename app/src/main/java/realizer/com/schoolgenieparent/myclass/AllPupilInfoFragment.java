@@ -29,12 +29,14 @@ import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.GetImages;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
+import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 
-public class AllPupilInfoFragment extends Fragment  {
+public class AllPupilInfoFragment extends Fragment  implements OnBackPressFragment{
     TextView name,studclass,studdiv,rollno,dob,hobbies,bloodgroup,parentname,contactno,address,emergencyContact,profile_init;
     TextView nameT,studclassT,studdivT,rollnoT,dobT,hobbiesT,bloodgroupT,parentnameT,contactnoT,addressT,emergencyContactT;
     DatabaseQueries qr;
@@ -233,5 +235,12 @@ public class AllPupilInfoFragment extends Fragment  {
         super.onResume();
         getActivity().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    @Override
+    public void OnBackPress() {
+        Singleton.setSelectedFragment(Singleton.getMainFragment());
+        if (getFragmentManager().getBackStackEntryCount() > 0)
+            getFragmentManager().popBackStack();
     }
 }

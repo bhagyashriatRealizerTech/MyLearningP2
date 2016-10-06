@@ -1,10 +1,8 @@
 package realizer.com.schoolgenieparent.homework.asynctask;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -30,7 +28,7 @@ import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
  */
 public class HomeworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
 {
-    ProgressDialog dialog;
+    //ProgressDialog dialog;
     StringBuilder resultLogin;
     ParentHomeworkListModel obj ;
     Context myContext;
@@ -45,7 +43,7 @@ public class HomeworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPreExecute() {
         // super.onPreExecute();
-        dialog= ProgressDialog.show(myContext, "", "Please wait Downloading Homework...");
+        //dialog= ProgressDialog.show(myContext, "", "Please wait Homework is Loading...");
     }
 
     @Override
@@ -105,9 +103,10 @@ public class HomeworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
-        dialog.dismiss();
+        //dialog.dismiss();
         Log.d("RESULTASYNC", stringBuilder.toString());
         //Pass here result of async task
+        stringBuilder.append("@@@Homework");
         callback.onTaskCompleted(stringBuilder.toString());
     }
 }

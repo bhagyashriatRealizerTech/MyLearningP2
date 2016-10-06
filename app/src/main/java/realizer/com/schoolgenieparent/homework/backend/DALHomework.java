@@ -8,12 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 import realizer.com.schoolgenieparent.backend.SqliteHelper;
 import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 
 /**
  * Created by shree on 1/8/2016.
@@ -30,7 +30,7 @@ public class DALHomework {
     }
 
     public long insertHomeworkInfo(String schoolCode,String standard,String division,String givenBy,
-                                   String homeworkDate,String hwImage64Lst,String hwTxtLst,String subject,String work)
+                                   String homeworkDate,String hwImage64Lst,String hwTxtLst,String subject,String work,String userid)
     {
         ContentValues conV = new ContentValues();
         conV.put("SchoolCode", schoolCode);
@@ -38,11 +38,11 @@ public class DALHomework {
         conV.put("Division", division);
         conV.put("GivenBy", givenBy);
         conV.put("HomeworkDate", homeworkDate);
-        Log.d("DBDATE", homeworkDate);
         conV.put("HwImage64Lst", hwImage64Lst);
         conV.put("HwTxtLst", hwTxtLst);
         conV.put("Subject", subject);
         conV.put("Work", work);
+        conV.put("UserId", userid);
 
         long newRowInserted = db.insert("HomeworkInfo", null, conV);
         if(newRowInserted >= 0)
@@ -56,6 +56,31 @@ public class DALHomework {
         return newRowInserted;
     }
 
+    public ArrayList<ParentHomeworkListModel> GetHomeworkInfoData(String date,String work,String userid) {
+
+        Cursor c = db.rawQuery("SELECT * FROM HomeworkInfo where HomeworkDate = "+"'"+date+"' AND Work='"+work+"' AND UserId='"+userid+"'", null);
+        ArrayList<ParentHomeworkListModel> result = new ArrayList<>();
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    ParentHomeworkListModel o = new ParentHomeworkListModel();
+                    o.setHomework(c.getString(c.getColumnIndex("HwTxtLst")));
+                    o.setImage(c.getString(c.getColumnIndex("HwImage64Lst")));
+                    o.setSubject(c.getString(c.getColumnIndex("Subject")));
+                    result.add(o);
+                    cnt = cnt + 1;
+                }
+                while (c.moveToNext());
+            }
+        } /*else {
+            mToast("Table Has No contain");
+        }*/
+        c.close();
+        return result;
+    }
 
     public ArrayList<ParentHomeworkListModel> GetHomeworkAllInfoData(String date) {
 
@@ -90,31 +115,8 @@ public class DALHomework {
         return result;
     }
 
-    public ArrayList<ParentHomeworkListModel> GetHomeworkInfoData(String date,String work) {
 
-        Cursor c = db.rawQuery("SELECT * FROM HomeworkInfo where HomeworkDate = "+"'"+date+"' AND Work='"+work+"' ", null);
-        ArrayList<ParentHomeworkListModel> result = new ArrayList<>();
-        int cnt = 1;
-        if (c != null) {
-            if (c.moveToFirst()) {
-                System.out.print("while moving  - C != null");
-                do {
 
-                    ParentHomeworkListModel o = new ParentHomeworkListModel();
-                    o.setHomework(c.getString(c.getColumnIndex("HwTxtLst")));
-                    o.setImage(c.getString(c.getColumnIndex("HwImage64Lst")));
-                    o.setSubject(c.getString(c.getColumnIndex("Subject")));
-                    result.add(o);
-                    cnt = cnt + 1;
-                }
-                while (c.moveToNext());
-            }
-        } /*else {
-            mToast("Table Has No contain");
-        }*/
-        c.close();
-        return result;
-    }
 
     public List<String> GetHomeDateTableData() {
         List<String> list = new ArrayList<String>();
@@ -266,6 +268,81 @@ public class DALHomework {
             mToast("Table Has No contain");
         }*/
         c.close();
+        return result;
+    }
+
+    public ArrayList<TeacherHomeworkModel> GetHomeworkData( String date,String work,String std,String div) {
+
+        Cursor c = db.rawQuery("SELECT * FROM Homework WHERE hwDate='"+date+"' AND Work='"+work+"' " +
+                "AND Std= '"+std+"' AND Div= '"+div+"'", null);
+
+
+        ArrayList<TeacherHomeworkModel> result = new ArrayList<>();
+
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    TeacherHomeworkModel o = new TeacherHomeworkModel();
+                    o.setHid(c.getInt(c.getColumnIndex("HomeworkId")));
+                    o.setSubject(c.getString(c.getColumnIndex("subject")));
+                    o.setStd(c.getString(c.getColumnIndex("Std")));
+                    o.setDiv(c.getString(c.getColumnIndex("Div")));
+                    o.setHwTxtLst(c.getString(c.getColumnIndex("textlst")));
+                    o.setHwImage64Lst(c.getString(c.getColumnIndex("Imglst")));
+                    o.setGivenBy(c.getString(c.getColumnIndex("Givenby")));
+                    o.setHwDate(c.getString(c.getColumnIndex("hwDate")));
+                    o.setWork(c.getString(c.getColumnIndex("Work")));
+                    o.setIsSync(c.getString(c.getColumnIndex("HasSyncedUp")));
+                    result.add(o);
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }
+
+    public ArrayList<TeacherHomeworkModel> GetHomeworkAllData(String date,String work) {
+
+        Cursor c = db.rawQuery("SELECT * FROM Homework WHERE hwDate ="+"'"+date+"' AND Work='"+work+"' ", null);
+
+
+        ArrayList<TeacherHomeworkModel> result = new ArrayList<>();
+
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    TeacherHomeworkModel o = new TeacherHomeworkModel();
+                    o.setHid(c.getInt(c.getColumnIndex("HomeworkId")));
+                    o.setSubject(c.getString(c.getColumnIndex("subject")));
+                    o.setStd(c.getString(c.getColumnIndex("Std")));
+                    o.setDiv(c.getString(c.getColumnIndex("Div")));
+                    o.setHwTxtLst(c.getString(c.getColumnIndex("textlst")));
+                    o.setHwImage64Lst(c.getString(c.getColumnIndex("Imglst")));
+                    o.setGivenBy(c.getString(c.getColumnIndex("Givenby")));
+                    o.setHwDate(c.getString(c.getColumnIndex("hwDate")));
+                    o.setWork(c.getString(c.getColumnIndex("Work")));
+                    o.setIsSync(c.getString(c.getColumnIndex("HasSyncedUp")));
+                    result.add(o);
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
         return result;
     }
 }

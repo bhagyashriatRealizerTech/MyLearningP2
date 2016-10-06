@@ -119,7 +119,7 @@ public class AlphabetListAdapter extends BaseAdapter {
             ImageView userImage = (ImageView)view.findViewById(R.id.img_user_image);
 
 
-            if(item.text.getProfileimage() != null && !item.text.getProfileimage().equals("") && !item.text.getProfileimage().equalsIgnoreCase("null"))
+            /*if(item.text.getProfileimage() != null && !item.text.getProfileimage().equals("") && !item.text.getProfileimage().equalsIgnoreCase("null"))
             {
                 String urlString = item.text.getProfileimage();
                 StringBuilder sb=new StringBuilder();
@@ -136,10 +136,11 @@ public class AlphabetListAdapter extends BaseAdapter {
                         sb.append(urlString.charAt(i));
                     }
                 }
-                String newURL=sb.toString();
+
                 textviewDP.setVisibility(View.GONE);
                 userImage.setVisibility(View.VISIBLE);
-                if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                userImage.setImageBitmap(bitmap);
+                *//*if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
                     new GetImages(newURL,userImage,textviewDP,item.text.getUserName().trim(),newURL.split("/")[newURL.split("/").length-1]).execute(AsyncTask.THREAD_POOL_EXECUTOR,newURL);
                 else
                 {
@@ -149,7 +150,13 @@ public class AlphabetListAdapter extends BaseAdapter {
                     textviewDP.setVisibility(View.GONE);
                     userImage.setVisibility(View.VISIBLE);
                     userImage.setImageBitmap(bitmap);
-                }
+                }*//*
+            }*/
+            if(item.text.getProfilePic() != null)
+            {
+                textviewDP.setVisibility(View.GONE);
+                userImage.setVisibility(View.VISIBLE);
+                userImage.setImageBitmap(item.text.getProfilePic());
             }
             else
             {

@@ -29,7 +29,9 @@ import java.util.Date;
 
 import realizer.com.schoolgenieparent.communication.model.TeacherQuery1model;
 import realizer.com.schoolgenieparent.communication.model.TeacherQuerySendModel;
+import realizer.com.schoolgenieparent.exceptionhandler.ExceptionModel;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
+import realizer.com.schoolgenieparent.queue.QueueListModel;
 
 /**
  * Created by Win on 12/21/2015.
@@ -51,6 +53,21 @@ public class DatabaseQueries {
          scode= sharedpreferences.getString("SchoolCode", "");
          std= sharedpreferences.getString("SyncStd", "");
          div= sharedpreferences.getString("SyncDiv", "");
+    }
+
+    public void deleteAllData()
+    {
+        long deleterow =0;
+
+        deleterow = db.delete("StudentInfo",null, null);
+        deleterow = db.delete("QueryInfo",null, null);
+        deleterow = db.delete("HomeworkInfo",null, null);
+        deleterow = db.delete("Query", null, null);
+        deleterow = db.delete("SyncUPQueue", null, null);
+
+        //deleterow = db.delete("InitiatedChat",null, null);
+        //deleterow = db.delete("RememberME",null, null);
+        deleterow = db.delete("StdDivSub", null, null);
     }
 
 //Insert Student Information
@@ -76,7 +93,7 @@ public class DatabaseQueries {
         conV.put("Div", division);
         conV.put("StudArr", Studarr);
         conV.put("UserID", UserId);
-        long newRowInserted = db.update("StudInfo", conV, "UserID='" + UserId+"'", null);
+        long newRowInserted = db.update("StudInfo", conV, "UserID='" + UserId + "'", null);
 
         return newRowInserted;
     }
@@ -152,6 +169,62 @@ public class DatabaseQueries {
         c.close();
         //dbClose(db);
         return Stud;
+    }
+
+
+    // Select queue Information
+    public ArrayList<QueueListModel> GetQueueData() {
+        Cursor c = db.rawQuery("SELECT * FROM SyncUPQueue ORDER BY SyncPriority ASC ", null);
+        ArrayList<QueueListModel> result = new ArrayList<>();
+
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    QueueListModel o = new QueueListModel();
+                    o.setId(c.getInt(c.getColumnIndex("Id")));
+                    o.setType(c.getString(c.getColumnIndex("Type")));
+                    o.setPriority(c.getString(c.getColumnIndex("SyncPriority")));
+                    o.setTime(c.getString(c.getColumnIndex("Time")));
+
+                    result.add(o);
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }
+
+    public ArrayList<String> GetHWDate() {
+
+        Cursor c = db.query(true, "Homework", new String[]{"hwDate"}, null, null, "hwDate", null, "hwDate", null);
+
+        ArrayList<String> result = new ArrayList<>();
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    String sub = c.getString(c.getColumnIndex("hwDate"));
+                    result.add(sub);
+                    cnt = cnt + 1;
+
+                }
+                while (c.moveToNext());
+            }
+        } /*else {
+            mToast("Table Has No contain");
+        }*/
+        c.close();
+        return result;
     }
 
 
@@ -652,41 +725,129 @@ public class DatabaseQueries {
         db.delete("Holiday",null,null);
         db.delete("GiveStar",null,null);
         db.delete("InitiatedChat", null, null);
-        db.delete("Query",null,null);
+        db.delete("Query", null, null);
         //db.delete("Homework",null,null);
 
     }
 
 
-    // Select queue Information
-//    public ArrayList<QueueListModel> GetQueueData() {
-//        Cursor c = db.rawQuery("SELECT * FROM SyncUPQueue ORDER BY SyncPriority ASC ", null);
-//        ArrayList<QueueListModel> result = new ArrayList<>();
-//
-//        int cnt = 1;
-//        if (c != null) {
-//            if (c.moveToFirst()) {
-//                System.out.print("while moving  - C != null");
-//                do {
-//
-//                    QueueListModel o = new QueueListModel();
-//                    o.setId(c.getInt(c.getColumnIndex("Id")));
-//                    o.setType(c.getString(c.getColumnIndex("Type")));
-//                    o.setPriority(c.getString(c.getColumnIndex("SyncPriority")));
-//                    o.setTime(c.getString(c.getColumnIndex("Time")));
-//
-//                    result.add(o);
-//                    cnt = cnt+1;
-//                }
-//                while (c.moveToNext());
-//            }
-//        } else {
-//            // mToast("Table Has No contain");
-//        }
-//        c.close();
-//        //dbClose(db);
-//        return result;
-//    }
+   /*  //Select queue Information
+    public ArrayList<QueueListModel> GetQueueData() {
+        Cursor c = db.rawQuery("SELECT * FROM SyncUPQueue ORDER BY SyncPriority ASC ", null);
+        ArrayList<QueueListModel> result = new ArrayList<>();
+
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    QueueListModel o = new QueueListModel();
+                    o.setId(c.getInt(c.getColumnIndex("Id")));
+                    o.setType(c.getString(c.getColumnIndex("Type")));
+                    o.setPriority(c.getString(c.getColumnIndex("SyncPriority")));
+                    o.setTime(c.getString(c.getColumnIndex("Time")));
+
+                    result.add(o);
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }*/
+
+    //Insert Homework data
+    public long insertException(ExceptionModel obj)
+    {
+        ContentValues conV = new ContentValues();
+        conV.put("UserId", obj.getUserId());
+        conV.put("ExceptionDetails", obj.getExceptionDetails());
+        conV.put("DeviceModel",obj.getDeviceModel());
+        conV.put("AndroidVersion", obj.getAndroidVersion());
+        conV.put("ApplicationSource", obj.getApplicationSource());
+        conV.put("DeviceBrand", obj.getDeviceBrand());
+        conV.put("HasSyncedUp","false");
+        long newRowInserted = db.insert("Exception", null, conV);
+
+        return newRowInserted;
+    }
+
+    public long updateException(ExceptionModel obj)
+    {
+
+        ContentValues conV = new ContentValues();
+        conV.put("ExceptionId", obj.getExceptionID());
+        conV.put("UserId", obj.getUserId());
+        conV.put("ExceptionDetails", obj.getExceptionDetails());
+        conV.put("DeviceModel",obj.getDeviceModel());
+        conV.put("AndroidVersion", obj.getAndroidVersion());
+        conV.put("ApplicationSource", obj.getApplicationSource());
+        conV.put("DeviceBrand", obj.getDeviceBrand());
+        conV.put("HasSyncedUp","true");
+
+        long newRowUpdate = db.update("Exception", conV, "ExceptionId=" + obj.getExceptionID(), null);
+
+        return newRowUpdate;
+    }
+
+    public ExceptionModel GetException(int ID) {
+
+        Cursor c = db.rawQuery("SELECT * FROM Exception WHERE ExceptionId="+ID+"", null);
+        ExceptionModel result = new ExceptionModel();
+
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+                    ExceptionModel obj = new ExceptionModel();
+                    obj.setExceptionID(c.getInt(c.getColumnIndex("ExceptionId")));
+                    obj.setUserId(c.getString(c.getColumnIndex("UserId")));
+                    obj.setExceptionDetails(c.getString(c.getColumnIndex("ExceptionDetails")));
+                    obj.setDeviceModel(c.getString(c.getColumnIndex("DeviceModel")));
+                    obj.setAndroidVersion(c.getString(c.getColumnIndex("AndroidVersion")));
+                    obj.setApplicationSource(c.getString(c.getColumnIndex("ApplicationSource")));
+                    obj.setDeviceBrand(c.getString(c.getColumnIndex("DeviceBrand")));
+                    result = obj;
+
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }
+
+    public int getExceptionId() {
+        Cursor c = db.rawQuery("SELECT ExceptionId FROM Exception ORDER BY ExceptionId DESC LIMIT 1;", null);
+        int cnt = 1;
+        int att=0;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    att = c.getInt(0);
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return att;
+    }
 
 
     public  void delete()

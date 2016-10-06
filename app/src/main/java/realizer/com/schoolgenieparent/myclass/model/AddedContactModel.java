@@ -1,5 +1,7 @@
 package realizer.com.schoolgenieparent.myclass.model;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Bhagyashri on 9/1/2016.
  */
@@ -9,6 +11,7 @@ public class AddedContactModel {
     String userId;
     String profileimage;
     String rollNo;
+    Bitmap profilePic;
 
     public String getUserName() {
         return userName;
@@ -40,6 +43,14 @@ public class AddedContactModel {
 
     public void setRollNo(String rollNo) {
         this.rollNo = rollNo;
+    }
+
+    public Bitmap getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(Bitmap profilePic) {
+        this.profilePic = profilePic;
     }
 
     @Override

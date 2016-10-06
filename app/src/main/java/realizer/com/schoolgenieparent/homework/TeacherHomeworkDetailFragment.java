@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -101,7 +100,7 @@ public class TeacherHomeworkDetailFragment extends Fragment implements OnBackPre
             String[] IMG1 ;
             try {
                 qr= new DALHomework(getActivity());
-                ArrayList<ParentHomeworkListModel> hwlst = qr.GetHomeworkInfoData(hwDate,htext);
+                ArrayList<ParentHomeworkListModel> hwlst = qr.GetHomeworkInfoData(hwDate,htext,"");
 
                 //getting path
                 JSONArray jarr = new JSONArray(path);

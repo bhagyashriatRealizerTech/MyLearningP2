@@ -3,36 +3,29 @@ package realizer.com.schoolgenieparent;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-//
-//import com.google.android.gcm.GCMRegistrar;
-//import com.realizer.schoolgenie.parent.backend.DatabaseQueries;
-//import com.realizer.schoolgenie.parent.backend.SqliteHelper;
-//import com.realizer.schoolgenie.parent.chat.backend.DALQueris;
-//import com.realizer.schoolgenie.parent.exceptionhandler.ExceptionHandler;
-//import com.realizer.schoolgenie.parent.generalcommunication.backend.DALGeneralCommunication;
-//import com.realizer.schoolgenie.parent.holiday.backend.DALHoliday;
-//import com.realizer.schoolgenie.parent.pupil.backend.DALMyPupilInfo;
-//import com.realizer.schoolgenie.parent.service.BackgroundSyncupService;
-//import com.realizer.schoolgenie.parent.service.TestAnnouncementService;
-//import com.realizer.schoolgenie.parent.utils.Config;
-//import com.realizer.schoolgenie.parent.utils.OnTaskCompleted;
 
 import com.google.android.gcm.GCMRegistrar;
 
@@ -41,193 +34,385 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import realizer.com.schoolgenieparent.Utils.Config;
+import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
+import realizer.com.schoolgenieparent.Utils.Singleton;
+import realizer.com.schoolgenieparent.Utils.StoreBitmapImages;
+import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
 import realizer.com.schoolgenieparent.backend.DALQueris;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
+import realizer.com.schoolgenieparent.backend.SqliteHelper;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
+import realizer.com.schoolgenieparent.forgotpassword.SetMagicWordAsyncTaskGet;
+import realizer.com.schoolgenieparent.forgotpassword.SetPasswordAsyncTaskGet;
+import realizer.com.schoolgenieparent.forgotpassword.SetPasswordByEmailAsyncTaskGet;
+import realizer.com.schoolgenieparent.forgotpassword.ValidateMagicWordAsyncTaskGet;
+import realizer.com.schoolgenieparent.service.AutoSyncService;
+import realizer.com.schoolgenieparent.view.ProgressWheel;
+
 
 public class LoginActivity extends Activity implements OnTaskCompleted {
 
     EditText userName, password;
     Button loginButton;
+    AlertDialog.Builder adbdialog;
     CheckBox checkBox;
-    TextView forgotpwd;
-    Intent gpsTrackerIntent;
-    String roll_no,Std,schoolCode,Year,Division;
-    String getValueBack;
+    SqliteHelper myhelper;
+    DatabaseQueries dbqr;
+    ProgressWheel loading;
+    TextView txtForgetPswrd;
     int num;
-
+    String defaultMagicWord;
     SharedPreferences sharedpreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
         setContentView(R.layout.login_activity);
 
-        //dbqr = new DatabaseQueries(getApplicationContext());
-
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String android_id = telephonyManager.getDeviceId();
-
         userName = (EditText) findViewById(R.id.edtEmpId);
         password = (EditText) findViewById((R.id.edtPassword));
-        forgotpwd = (TextView) findViewById((R.id.txtForgetPswrd));
+        txtForgetPswrd = (TextView) findViewById((R.id.txtForgetPswrd));
         loginButton = (Button) findViewById(R.id.btnLogin);
+        loading = (ProgressWheel) findViewById(R.id.loading);
         Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
         loginButton.setTypeface(face);
         checkBox = (CheckBox) findViewById(R.id.checkBox1);
-        num=0;
+        num =0;
+        dbqr=new DatabaseQueries(getApplicationContext());
+        defaultMagicWord="";
 
+
+        //About Remember me in login page
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         SharedPreferences.Editor edit = sharedpreferences.edit();
-        edit.putString("DWEVICEID", android_id);
+        edit.putString("DWEVICEID", telephonyManager.getDeviceId());
         edit.commit();
 
 
-//        userName.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//
-//                String result = s.toString().replaceAll(" ", "");
-//                if (!s.toString().equals(result)) {
-//                    userName.setText(result);
-//                    userName.setSelection(result.length());
-//                    // alert the user
-//                }
-//            }
-//        });
-//
-//        password.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//
-//                String result = s.toString().replaceAll(" ", "");
-//                if (!s.toString().equals(result)) {
-//                    password.setText(result);
-//                    password.setSelection(result.length());
-//                    // alert the user
-//                }
-//            }
-//        });
+        userName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                String result = s.toString().replaceAll(" ", "");
+                if (!s.toString().equals(result)) {
+                    userName.setText(result);
+                    userName.setSelection(result.length());
+                    // alert the user
+                }
+            }
+        });
+
+        password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                String result = s.toString().replaceAll(" ", "");
+                if (!s.toString().equals(result)) {
+                    password.setText(result);
+                    password.setSelection(result.length());
+                    // alert the user
+                }
+            }
+        });
 
 
-//        checkBox.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                int num = dbqr.GetRememberMeCount();
-//                if (checkBox.isChecked()) {
-//
-//                    if(num==0)
-//                    {
-//                        long n = dbqr.insertRememberMe(userName.getText().toString().trim(),password.getText().toString().trim(),"true");
-//                    }
-//
-//                    else
-//                    {
-//                        long n = dbqr.updateRememberMe(userName.getText().toString().trim(), password.getText().toString().trim(), "true");
-//                    }
-//                }
-//                else {
-//                    if(num==0)
-//                    {
-//                        long n = dbqr.insertRememberMe(userName.getText().toString().trim(),password.getText().toString().trim(),"false");
-//                    }
-//
-//                    else
-//                    {
-//                        long n = dbqr.updateRememberMe(userName.getText().toString().trim(), password.getText().toString().trim(), "false");
-//                    }
-//
-//                }
-//            }
-//        });
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor edit = sharedpreferences.edit();
+                if (checkBox.isChecked()) {
+
+                    edit.putString("UserName", userName.getText().toString().trim());
+                    edit.putString("Password", password.getText().toString().trim());
+                    edit.putString("CHKSTATE", "true");
+                    edit.commit();
+                }
+                else
+                {
+                    edit.putString("UserName", "");
+                    edit.putString("Password", "");
+                    edit.putString("CHKSTATE", "false");
+                    edit.commit();
+                }
+            }
+        });
 
 
-
-//        int num = dbqr.GetRememberMeCount();
-//        if(num==0)
-//        {
-//
-//        }
-//        else
-//        {
-//
-//            String chk[] = dbqr.GetRememberMe();
-//            if(chk[2].equals("true"))
-//            {
-//                checkBox.setChecked(true);
-//                userName.setText(chk[0]);
-//                password.setText(chk[1]);
-//            }
-//            else
-//            {
-//                checkBox.setChecked(false);
-//                userName.setText("");
-//                password.setText("");
-//            }
-//        }
-
-
+        String chk = sharedpreferences.getString("CHKSTATE","");
+        Log.d("CHECKED", chk);
+        if(chk.equals("true"))
+        {
+            checkBox.setChecked(true);
+            userName.setText(sharedpreferences.getString("UserName",""));
+            password.setText(sharedpreferences.getString("Password", ""));
+        }
+        else
+        {
+            checkBox.setChecked(false);
+            userName.setText("");
+            password.setText("");
+        }
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                SharedPreferences.Editor edit = sharedpreferences.edit();
-                edit.putString("UidName", userName.getText().toString().trim());
+                /*SharedPreferences.Editor edit = sharedpreferences.edit();
+                edit.putString("UidName", userName.getText().toString());
                 edit.putString("UserName", userName.getText().toString().trim());
                 edit.putString("Password", password.getText().toString().trim());
-                edit.commit();
+                edit.commit();*/
 
                 boolean res = isConnectingToInternet();
                 if (res == false) {
                     Toast.makeText(LoginActivity.this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-                } else
-                if (userName.getText().toString().equals("") && password.getText().toString().equals("")) {
+                    //Utils.alertDialog(LoginActivity.this, "", Utils.actionBarTitle(getString(R.string.LoginNoInternate)).toString());
+                } else if (userName.getText().toString().equals("") && password.getText().toString().equals("")) {
                     Toast.makeText(getApplicationContext(), "Please Enter Username/Password", Toast.LENGTH_LONG).show();
+                    //Utils.alertDialog(LoginActivity.this, "", Utils.actionBarTitle(getString(R.string.LoginEnterUserPswd)).toString());
                 } else if (userName.getText().toString().equals("")) {
                     Toast.makeText(getApplicationContext(), "Please Enter Username", Toast.LENGTH_LONG).show();
+                    //Utils.alertDialog(LoginActivity.this, "", Utils.actionBarTitle(getString(R.string.LoginEnterUsername)).toString());
                 } else if (password.getText().toString().equals("")) {
                     Toast.makeText(getApplicationContext(), "Please Enter Password", Toast.LENGTH_LONG).show();
+                    //Utils.alertDialog(LoginActivity.this, "", Utils.actionBarTitle(getString(R.string.LoginEnterPassword)).toString());
                 } else {
-//                    Intent intent=new Intent(LoginActivity.this,DrawerActivity.class);
-//                    startActivity(intent);
 
-                    LoginAsyncTaskGet obj = new LoginAsyncTaskGet(userName.getText().toString(), password.getText().toString(), LoginActivity.this, LoginActivity.this);
-                    obj.execute();
+                    final SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    String logchk = sharedpreferences.getString("LogChk", "");
+                    String uname = sharedpreferences.getString("UserName","");
+                    if(logchk.equals("true") && !uname.equals(userName.getText().toString().trim()))
+                    {
+                        adbdialog = new AlertDialog.Builder(LoginActivity.this);
+                        adbdialog.setTitle("Login Alert");
+                        adbdialog.setMessage("All the Data of Previous User will be Deleted,\nDo You want to Proceed?");
+                        adbdialog.setIcon(android.R.drawable.ic_dialog_alert);
+                        adbdialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                loading.setVisibility(View.VISIBLE);
+
+                                new NewLoginAsync().execute();
+
+                            } });
+
+
+                        adbdialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                userName.setText("");
+                                password.setText("");
+                            } });
+                        adbdialog.show();
+
+                    }
+                    else {
+                        loading.setVisibility(View.VISIBLE);
+                        LoginAsyncTaskGet obj = new LoginAsyncTaskGet(userName.getText().toString(), password.getText().toString(), sharedpreferences.getString("DWEVICEID",""),LoginActivity.this, LoginActivity.this);
+                        obj.execute();
+                    }
                 }
             }
         });
 
-        forgotpwd.setOnClickListener(new View.OnClickListener() {
+        txtForgetPswrd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Under Implementing!!!", Toast.LENGTH_SHORT).show();
+                final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+
+                LayoutInflater inflater = getLayoutInflater();
+                View dialoglayout = inflater.inflate(R.layout.forgotpwd_recoveryoption, null);
+                Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
+                Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
+                final RadioButton mail = (RadioButton)dialoglayout.findViewById(R.id.rb_option_mail);
+                final RadioButton magicword = (RadioButton)dialoglayout.findViewById(R.id.rb_option_magic_word);
+                submit.setTypeface(face);
+                cancel.setTypeface(face);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                builder.setView(dialoglayout);
+
+                final AlertDialog alertDialog = builder.create();
+                mail.setChecked(true);
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mail.isChecked()) {
+                            alertDialog.dismiss();
+                            recoverPasswordByEmail();
+                        }
+                        else if (magicword.isChecked()) {
+                            alertDialog.dismiss();
+                            recoverPasswordByMagicWord("ForgotPassword",false,"");
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Please select anyone option for recovery password.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
+                    }
+                });
+
+                alertDialog.show();
+
             }
         });
     }
 
+    public void recoverPasswordByEmail()
+    {
+        final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+
+        LayoutInflater inflater = getLayoutInflater();
+        View dialoglayout = inflater.inflate(R.layout.forgotpwd_rmailpassword, null);
+        Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
+        Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
+        final EditText userID = (EditText)dialoglayout.findViewById(R.id.edtuserid);
+        final EditText email = (EditText)dialoglayout.findViewById(R.id.edtmailid);
+        submit.setTypeface(face);
+        cancel.setTypeface(face);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        builder.setView(dialoglayout);
+        final AlertDialog alertDialog = builder.create();
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String userId = userID.getText().toString().trim();
+                String userEmail =  email.getText().toString().trim();
+
+                if(userID.length()>0 && userEmail.length()>0)
+                {
+                    loading.setVisibility(View.VISIBLE);
+                    new SetPasswordByEmailAsyncTaskGet(userId,userEmail,LoginActivity.this,LoginActivity.this).execute();
+                    alertDialog.dismiss();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Please enter User ID/Email ID...", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    public void recoverPasswordByMagicWord(final String from, boolean b1,final String s)
+    {
+        final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+
+        LayoutInflater inflater = getLayoutInflater();
+        View dialoglayout = inflater.inflate(R.layout.forgotpwd_mwordpassword, null);
+        Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
+        Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
+        final EditText userID = (EditText)dialoglayout.findViewById(R.id.edtuserid);
+        userID.setText(userName.getText().toString());
+        final EditText magicWord = (EditText)dialoglayout.findViewById(R.id.edtmagicword);
+
+        final TextView titledialog = (TextView)dialoglayout.findViewById(R.id.dialogTitle);
+        final TextView infodialog = (TextView)dialoglayout.findViewById(R.id.infodialog);
+
+        submit.setTypeface(face);
+        cancel.setTypeface(face);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        builder.setView(dialoglayout);
+        if(from.equalsIgnoreCase("FirstLogin"))
+        {
+            titledialog.setText("Set Magic Word");
+            infodialog.setText("You  are Logged in First Time ,Please Set Your Magic Word");
+            builder.setCancelable(false);
+        }
+
+        final AlertDialog alertDialog = builder.create();
+
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String userId = userID.getText().toString().trim();
+                String wordMagic =  magicWord.getText().toString().trim();
+                alertDialog.dismiss();
+                if (from.equalsIgnoreCase("FirstLogin")) {
+                    if(userId.length()>0 && wordMagic.length()>0)
+
+                        new SetMagicWordAsyncTaskGet(userId,wordMagic,s,LoginActivity.this,LoginActivity.this).execute();
+                }
+                else
+                {
+                    loading.setVisibility(View.VISIBLE);
+                    new ValidateMagicWordAsyncTaskGet(userId,wordMagic,LoginActivity.this,LoginActivity.this).execute();
+                }
+                //resetPassword();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                alertDialog.dismiss();
+                if (from.equalsIgnoreCase("FirstLogin")) {
+                    boolean b = parsData(s);
+                    if (b == true) {
+                        loading.setVisibility(View.GONE);
+                        GCMReg();
+                        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                        SharedPreferences.Editor edit = sharedpreferences.edit();
+                        edit.putString("Login", "true");
+                        edit.commit();
+                        Intent ser = new Intent(LoginActivity.this, AutoSyncService.class);
+                        Singleton.setAutoserviceIntent(ser);
+                        startService(ser);
+                        Intent i = new Intent(LoginActivity.this, DrawerActivity.class);
+                        startActivity(i);
+
+                    } else {
+                        if (num == 0)
+                            Toast.makeText(getApplicationContext(), "Invalid credentials, Pls Try again!", Toast.LENGTH_LONG).show();
+                        else if (num == 1)
+                            Toast.makeText(getApplicationContext(), "Server Not Responding Please Try After Some Time", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        alertDialog.show();
+    }
 
     @Override
     public void onTaskCompleted(String s)  {
@@ -235,66 +420,172 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
 
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = sharedpreferences.edit();
+        edit.putString("UidName", userName.getText().toString());
+        edit.putString("UserName", userName.getText().toString().trim());
+        edit.putString("Password", password.getText().toString().trim());
+        edit.putString("FragName", "Dashboard");
         edit.commit();
+
         String logchk = sharedpreferences.getString("LogChk","");
-        if (logchk=="")
-        {
-            logchk="true";
+        String mWord = "";
+        String validate = "";
+        JSONObject emp=null;
+        JSONObject studentInfo=null;
+        try {
+            JSONObject rootObj = new JSONObject(s);
+            emp=rootObj.getJSONObject("StudentloginResult");
+            validate  = emp.getString("loginResult");
+            studentInfo  = emp.getJSONObject("studentDtls");
+            mWord =studentInfo.getString("magicWord");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        if(logchk.equals("true"))
+        String onTaskResult[]=s.split("@@@");
+        if (onTaskResult[1].contains("LoginIN"))
         {
-            try {
-                JSONObject rootObj = new JSONObject(s);
-                JSONObject emp=rootObj.getJSONObject("StudentloginResult");
-                String validate  = emp.getString("loginResult");
-                if(validate.equals("valid"))
-                {
-                    b=true;
-                    parsData(s);
+            if(logchk.equals("true"))
+            {
+                try {
+
+                    if (validate.equals("valid")) {
+                        b = true;
+                    } else {
+                        String Schoolcode = studentInfo.getString("schoolCode");
+                        if (Schoolcode.length() == 0) {
+                            num = 1;
+                        }
+                        b = false;
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(mWord.trim().length()>0) {
+                    if (b == true) {
+
+                        loading.setVisibility(View.GONE);
+                        GCMReg();
+                        edit.putString("Login", "true");
+                        edit.commit();
+                        Intent ser = new Intent(LoginActivity.this, AutoSyncService.class);
+                        Singleton.setAutoserviceIntent(ser);
+                        startService(ser);
+                        /*Intent i2 = new Intent(getApplicationContext(), BackgroundSyncupService.class);
+                        startService(i2);*/
+
+                        Intent i = new Intent(LoginActivity.this, DrawerActivity.class);
+                        i.putExtra("FragName", "NoValue");
+                        startActivity(i);
+
+                    } else {
+                        loading.setVisibility(View.GONE);
+                        if (num == 0)
+                            Toast.makeText(getApplicationContext(), "Invalid credentials, Pls Try again!", Toast.LENGTH_LONG).show();
+                        else if (num == 1)
+                            Toast.makeText(getApplicationContext(), "Server Not Responding Please Try After Some Time", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else
                 {
-                    JSONArray hldList = emp.getJSONArray("Phs");
-                    b=false;
+                    recoverPasswordByMagicWord("FirstLogin", b, s);
                 }
+            }
+            else
+            {
+                if(mWord.trim().length()>0) {
+                    b = parsData(onTaskResult[0]);
+                    if (b == true) {
+                        loading.setVisibility(View.GONE);
+                        GCMReg();
+                        edit.putString("Login", "true");
+                        edit.commit();
+                        Intent ser = new Intent(LoginActivity.this, AutoSyncService.class);
+                        Singleton.setAutoserviceIntent(ser);
+                        startService(ser);
+                       /* Intent i2 = new Intent(getApplicationContext(), BackgroundSyncupService.class);
+                        startService(i2);*/
+                        Intent i = new Intent(LoginActivity.this, DrawerActivity.class);
+                        i.putExtra("FragName", "NoValue");
+                        startActivity(i);
 
-            } catch (JSONException e) {
-                num=1;
-                e.printStackTrace();
-                Log.e("Login(LocalizedMessage)", e.getLocalizedMessage());
-                Log.e("Login(StackTrace)", e.getStackTrace().toString());
-                Log.e("Login(Cause)", e.getCause().toString());
-                Log.wtf("Login(Msg)", e.getMessage());
+                    } else {
+                        loading.setVisibility(View.GONE);
+                        if (num == 0)
+                            Toast.makeText(getApplicationContext(), "Invalid credentials, Pls Try again!", Toast.LENGTH_LONG).show();
+                        else if (num == 1)
+                            Toast.makeText(getApplicationContext(), "Server Not Responding Please Try After Some Time", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else
+                    recoverPasswordByMagicWord("FirstLogin", b, s);
             }
         }
-        else
-        {
-            b = parsData(s);
+        if (onTaskResult[1].contains("SetMagicWord")) {
+            //String magic[]=onTaskResult[2].split("@@@");
+            if(onTaskResult[0].equalsIgnoreCase("true"))
+            {
+
+            }
+            boolean b1 = parsData(onTaskResult[2]);
+            if (b1 == true) {
+                loading.setVisibility(View.GONE);
+                GCMReg();
+                SharedPreferences sharedpreferences1 = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                SharedPreferences.Editor edit1 = sharedpreferences1.edit();
+                edit1.putString("Login", "true");
+                edit1.commit();
+                Intent ser = new Intent(LoginActivity.this, AutoSyncService.class);
+                Singleton.setAutoserviceIntent(ser);
+                startService(ser);
+                Intent i = new Intent(LoginActivity.this, DrawerActivity.class);
+                i.putExtra("FragName", "NoValue");
+                startActivity(i);
+
+            } else {
+                loading.setVisibility(View.GONE);
+                if (num == 0)
+                    Toast.makeText(getApplicationContext(), "Invalid credentials, Pls Try again!", Toast.LENGTH_LONG).show();
+                else if (num == 1)
+                    Toast.makeText(getApplicationContext(), "Server Not Responding Please Try After Some Time", Toast.LENGTH_SHORT).show();
+            }
         }
+        else  if (onTaskResult[1].contains("ValidateMagicWord")) {
+            loading.setVisibility(View.GONE);
+            if(onTaskResult[0].equalsIgnoreCase("true"))
+            {
+                resetPassword();
+            }
+            else
+            {
+                Toast.makeText(LoginActivity.this, "Wrong User ID / Wrong Magic Word Entered", Toast.LENGTH_SHORT).show();
+            }
 
-        if(b==true) {
-//            GCMReg();
-            edit.putString("Login", "true");
-            edit.commit();
-
-//            Intent i1 = new Intent(getApplicationContext(), TestAnnouncementService.class);
-//            startService(i1);
-//
-//            Intent i2 = new Intent(getApplicationContext(), BackgroundSyncupService.class);
-//            startService(i2);
-            GCMReg();
-
-            Intent i = new Intent(LoginActivity.this, DrawerActivity.class);
-            i.putExtra("FragName", "NoValue");
-            startActivity(i);
         }
+        else  if (onTaskResult[1].contains("SetPassword")) {
+            loading.setVisibility(View.GONE);
+            if(onTaskResult[0].equalsIgnoreCase("true"))
+            {
+                Toast.makeText(LoginActivity.this, "Reset Password Successfully.", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(LoginActivity.this, "Fail to Reset Password.", Toast.LENGTH_SHORT).show();
+            }
 
-        else {
-            if(num==0)
-                Toast.makeText(getApplicationContext(), "Invalid credentials, Pls Try again!", Toast.LENGTH_LONG).show();
-            else if(num==1)
-                Toast.makeText(getApplicationContext(), "Server Not Responding Please Try After Some Time", Toast.LENGTH_SHORT).show();
+        }
+        else  if (onTaskResult[1].equalsIgnoreCase("SendEmail")) {
+            loading.setVisibility(View.GONE);
+            if(s.equalsIgnoreCase("true"))
+            {
+                Toast.makeText(LoginActivity.this, "Email Sent Successfully", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(LoginActivity.this, "Fail to Send Email", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -304,6 +595,8 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                 new IntentFilter(Config.DISPLAY_MESSAGE_ACTION));
         GCMRegistrar.register(LoginActivity.this, Config.SENDER_ID);
     }
+
+
 
     private final BroadcastReceiver mHandleMessageReceiver =
             new BroadcastReceiver() {
@@ -315,11 +608,10 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
             };
 
     public boolean parsData(String json) {
-        DALMyPupilInfo qr = new DALMyPupilInfo(LoginActivity.this);
-        DatabaseQueries dr=new DatabaseQueries(LoginActivity.this);
-        DALQueris Qdal = new DALQueris(LoginActivity.this);
-//        DALHoliday Hdal = new DALHoliday(getApplicationContext());
-//        DALGeneralCommunication dla = new DALGeneralCommunication(getApplicationContext());
+        DALMyPupilInfo qr = new DALMyPupilInfo(getApplicationContext());
+        DALQueris Qdal = new DALQueris(getApplicationContext());
+       // DALHoliday Hdal = new DALHoliday(getApplicationContext());
+        //DALGeneralCommunication dla = new DALGeneralCommunication(getApplicationContext());
 
         String validate="";
         JSONObject rootObj = null;
@@ -358,24 +650,27 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
             String acdyear= sdlist.getString("academicYear");
             String schoolcode= sdlist.getString("schoolCode");
             String thumbnailurl= sdlist.getString("ThumbnailURL");
+            String magicWord=sdlist.getString("magicWord");
 
             edit.putInt("SyncRNO", Integer.valueOf(rollno));
             edit.putString("SyncStd", std);
             edit.putString("SyncDiv", division);
             edit.putString("SyncScode", schoolcode);
             edit.putString("SyncAyear", acdyear);
-            edit.putString("DisplayName",fname+" "+lname);
+            edit.putString("DisplayName", fname+" "+lname);
             edit.putString("ThumbnailID", thumbnailurl);
-            edit.putString("StudentUserID", userId);
             edit.putString("Firstname",fname);
             edit.putString("STANDARD",std);
             edit.putString("DIVISION",division);
             edit.putString("SchoolCode",schoolcode);
+            edit.putString("StudentUserID", userId);
             edit.commit();
 
-
+            String newURL= Utility.getURLImage(thumbnailurl);
+            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                new StoreBitmapImages(newURL,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
             long n =qr.insertStudInfo(userId, pwd, std, division, classrollno, rollno, fname, mname, lname, dob, bldgrp, fathername, mothername, contactno,
-                    emergencycontactno, address, hobbies, comment, isactive, Activetill,registrationcode,acdyear,schoolcode,thumbnailurl);
+                    emergencycontactno, address, hobbies, comment, isactive, Activetill,registrationcode,acdyear,schoolcode,thumbnailurl,magicWord);
             if(n>=0)
             {
                 Log.d("Student", " Done!!!");
@@ -386,12 +681,9 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
 
             JSONObject stddiv = emp.getJSONObject("sa");
             JSONArray subAllocation = stddiv.getJSONArray("subjAllocation");
-            String teacherid="",Stndard="",division1="",teachername="",subject="",teacherthumbnailurl="";
+            String teacherid="",Stndard="",division1="",teachername="",teachersubject="",teacherthumbnailurl="";
             int i=subAllocation.length();
-            DatabaseQueries qr1 = new DatabaseQueries(getApplicationContext());
-            //qr1.deleteTable();
-            /*DALHomework h = new DALHomework(getApplicationContext());
-            h.deltehomework();*/
+
             DatabaseQueries chat = new DatabaseQueries(getApplicationContext());
             for(int j=0;j<i;j++)
             {
@@ -400,35 +692,43 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                 Stndard=obj.getString("Std");
                 division1=obj.getString("division");
                 teachername=obj.getString("TeacherName");
-                subject=obj.getString("subject");
+                teachersubject=obj.getString("subject");
                 teacherthumbnailurl=obj.getString("ThumbNailURL");
-                long n1=dr.insertSubInfo(Stndard,division1,subject);
+                long n1=chat.insertSubInfo(Stndard,division1,teachersubject);
+
                 if(n1>=0)
                 {
                     n1=-1;
-                    long n2= Qdal.insertTeacherSubInfo(Stndard, teachername, teacherid, division1, subject,teacherthumbnailurl);
+                    long n2= Qdal.insertTeacherSubInfo(Stndard, teachername, teacherid, division1, teachersubject,teacherthumbnailurl);
+                    n = chat.insertInitiatechat(teachername,"false",teacherid,0,teacherthumbnailurl);
+                    Log.d("Teacher", " Done!!!");
+                    if(n>=0) {
+
+                        Log.d("Initiate", " " + teacherid + " " + teachername);
+                    }
+
                 }else {
                     Log.d("Teacher", " Not Done!!!");
                 }
             }
 
-//            JSONArray hldList = emp.getJSONArray("Phs");
-//            for(int k =0;k<hldList.length();k++)
-//            {
-//                JSONObject obj = hldList.getJSONObject(k);
-//                String createdby= obj.getString("CreatedBy");
-//                String holiday= obj.getString("Holiday");
-//                String enddate= obj.getString("PHEndDate");
-//                String startdate= obj.getString("PHStartDate");
-//
-//                long n2 =Hdal.insertHolidayInfo(createdby, holiday, enddate, startdate);
-//                if(n2>=0)
-//                {
-//                    Log.d("Holiday", " Done!!!");
-//                }else {
-//                    Log.d("Holiday", " Not Done!!!");
-//                }
-//            }
+            /*JSONArray hldList = emp.getJSONArray("Phs");
+            for(int k =0;k<hldList.length();k++)
+            {
+                JSONObject obj = hldList.getJSONObject(k);
+                String createdby= obj.getString("CreatedBy");
+                String holiday= obj.getString("Holiday");
+                String enddate= obj.getString("PHEndDate");
+                String startdate= obj.getString("PHStartDate");
+
+                long n2 =Hdal.insertHolidayInfo(createdby, holiday, enddate, startdate);
+                if(n2>=0)
+                {
+                    Log.d("Holiday", " Done!!!");
+                }else {
+                    Log.d("Holiday", " Not Done!!!");
+                }
+            }*/
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -441,14 +741,17 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
         }
 
         if(validate.equals("valid"))
-        {return true;}
+            return true;
         else
-        {return false;}
+            return false;
     }
+
 
     public boolean isConnectingToInternet(){
 
-        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity =
+                (ConnectivityManager) getSystemService(
+                        Context.CONNECTIVITY_SERVICE);
         if (connectivity != null)
         {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
@@ -462,5 +765,74 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
         return false;
     }
 
+    public void resetPassword()
+    {
+        final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
 
+        LayoutInflater inflater = getLayoutInflater();
+        View dialoglayout = inflater.inflate(R.layout.forgotpwd_resetpassword, null);
+        Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
+        Button cancel = (Button)dialoglayout.findViewById(R.id.btn_cancel);
+        final EditText userID = (EditText)dialoglayout.findViewById(R.id.edtuserid);
+        final EditText pwd = (EditText)dialoglayout.findViewById(R.id.edtpwd);
+        final EditText cPwd = (EditText)dialoglayout.findViewById(R.id.edtconfirmpwd);
+        submit.setTypeface(face);
+        cancel.setTypeface(face);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        builder.setView(dialoglayout);
+        final AlertDialog alertDialog = builder.create();
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String userId = userID.getText().toString().trim();
+                String password =  pwd.getText().toString().trim();
+                String cPassword =  cPwd.getText().toString().trim();
+
+                alertDialog.dismiss();
+
+                if(password.equals(cPassword))
+                    new SetPasswordAsyncTaskGet(userId,password,LoginActivity.this,LoginActivity.this).execute();
+                else
+                    Toast.makeText(LoginActivity.this, "Password Mismatch", Toast.LENGTH_SHORT).show();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    public class NewLoginAsync extends AsyncTask<Void,Void,Void>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+        dbqr.deleteAllData();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+            SharedPreferences.Editor edit = sharedpreferences.edit();
+            edit.putString("LogChk", "false");
+            edit.commit();
+            LoginAsyncTaskGet obj = new LoginAsyncTaskGet(userName.getText().toString(), password.getText().toString(), sharedpreferences.getString("DWEVICEID",""),LoginActivity.this, LoginActivity.this);
+            obj.execute();
+        }
+    }
 }

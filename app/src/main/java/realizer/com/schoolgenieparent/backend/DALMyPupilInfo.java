@@ -24,7 +24,7 @@ public class DALMyPupilInfo {
     public long insertStudInfo(String userId,String pwd,String std,String division,String classrollno,String rollno,String fname
             ,String mname,String lname,String dob,String bldgrp,String fathername,String mothername,String contactno,
                                String emergencycontactno,String address,String hobbies,String comment,String isactive,String Activetill,
-                               String registrationcode,String acdyear,String schoolcode,String thumbnailurl)
+                               String registrationcode,String acdyear,String schoolcode,String thumbnailurl,String magicword)
     {
         ContentValues conV = new ContentValues();
         conV.put("UserId", userId);
@@ -51,6 +51,7 @@ public class DALMyPupilInfo {
         conV.put("AcademicYear", acdyear);
         conV.put("SchoolCode", schoolcode);
         conV.put("ThumbnailURL", thumbnailurl);
+        conV.put("MagicWord", magicword);
         long newRowInserted = db.insert("StudentInfo", null, conV);
         return newRowInserted;
     }

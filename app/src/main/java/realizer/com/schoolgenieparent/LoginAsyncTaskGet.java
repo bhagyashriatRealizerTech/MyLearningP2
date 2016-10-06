@@ -27,15 +27,17 @@ public class LoginAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     ProgressDialog dialog;
     StringBuilder resultLogin;
     String uName, password;
+    String deviceID;
     Context myContext;
     private OnTaskCompleted callback;
 
-    public LoginAsyncTaskGet(String uName, String password, Context myContext, OnTaskCompleted cb)
+    public LoginAsyncTaskGet(String uName, String password,String deviceID ,Context myContext, OnTaskCompleted cb)
     {
         this.uName = uName;
         this.password = password;
         this.myContext = myContext;
         this.callback = cb;
+        this.deviceID = deviceID;
     }
 
     @Override
@@ -49,6 +51,7 @@ public class LoginAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
 
+        //String my= Config.URL+"StudentLogin/"+ uName + "/" +password+ "/" +deviceID;
         String my= Config.URL+"StudentLogin/"+ uName + "/" +password;
         Log.d("URL", my);
         HttpGet httpGet = new HttpGet(my);

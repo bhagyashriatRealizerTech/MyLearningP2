@@ -3,6 +3,7 @@ package realizer.com.schoolgenieparent.homework;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,26 +28,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import realizer.com.schoolgenieparent.DrawerActivity;
-import realizer.com.schoolgenieparent.R;
-import realizer.com.schoolgenieparent.Utils.Config;
-import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
-import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
-//import realizer.com.schoolgenieparent.backend.DatabaseQueries;
-import realizer.com.schoolgenieparent.Utils.Singleton;
-import realizer.com.schoolgenieparent.backend.DatabaseQueries;
-import realizer.com.schoolgenieparent.homework.asynctask.TeacherClassworkAsyncTaskPost;
-import realizer.com.schoolgenieparent.homework.asynctask.TeacherHomeworkAsyncTaskPost;
-import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
-//import realizer.com.schoolgenieparent.myclass.TeacherMyClassDialogBoxActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,10 +50,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import realizer.com.schoolgenieparent.DrawerActivity;
+import realizer.com.schoolgenieparent.R;
+import realizer.com.schoolgenieparent.Utils.Config;
+import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
+import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
+import realizer.com.schoolgenieparent.Utils.Singleton;
+import realizer.com.schoolgenieparent.backend.DatabaseQueries;
+
 /**
  * Created by Win on 11/23/2015.
  */
-public class TeacherHomeworkNewFragment extends Fragment implements View.OnClickListener ,OnTaskCompleted,OnBackPressFragment {
+public class TeacherHomeworkNewFragment extends Fragment implements View.OnClickListener ,OnTaskCompleted, OnBackPressFragment {
 
     // LogCat tag
     private static final String TAG = TeacherHomeworkNewFragment.class.getSimpleName();
@@ -79,7 +74,7 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
     int cpature1,cpature2,cpature3;
     int hid = 0;
 
-
+    ArrayList<Bitmap> BitmapImages =new ArrayList<>();
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     Bitmap bitmap;
@@ -88,6 +83,10 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
     TextView txtstd,txtclss;
     EditText edthwork;
     String htext;
+
+    ArrayList<String> listofDate = new ArrayList<>();
+    ArrayList<String> listofDay = new ArrayList<>();
+    MenuItem search;
 
     private Uri fileUri; // file url to store image/video
 
@@ -99,7 +98,10 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(getActivity()));
         final View rootView = inflater.inflate(R.layout.teacher_newhomework_layout, container, false);
+
+        //getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setHasOptionsMenu(true);
+
         btnCapturePicture = (ImageView) rootView.findViewById(R.id.btnCapturePicture1);
         btnCapturePicture1 = (ImageView) rootView.findViewById(R.id.btnCapturePicture2);
         btnCapturePicture2 = (ImageView) rootView.findViewById(R.id.btnCapturePicture3);
@@ -114,8 +116,9 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
 
 
         Bundle b = getArguments();
-        htext = b.getString("HEADERTEXTN");
+        htext = b.getString("HEADERTEXT");
         edthwork.setHint(htext);
+
 
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
@@ -127,18 +130,23 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
         txtclss.setText(preferences.getString("DIVISION", ""));
         /**
          * Capture image button click event
-         **/
-
-       FillSubjectTypes();
+         */
+        FillSubjectTypes();
         FillDates();
 
+        Config.hideSoftKeyboardWithoutReq(getActivity(), edthwork);
         btnCapturePicture.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 // capture picture
-                cpature1 = 1;
-                getOption();
+                if (cpature1 != 2) {
+                    cpature1 = 1;
+                    getOption();
+                }
+                else {
+                    open(btnCapturePicture);
+                }
             }
         });
         btnCapturePicture1.setOnClickListener(new View.OnClickListener() {
@@ -146,8 +154,13 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
             @Override
             public void onClick(View v) {
                 // capture picture
-                cpature2=1;
-                getOption();
+                if (cpature2 != 2) {
+                    cpature2 = 1;
+                    getOption();
+                }
+                else {
+                    open(btnCapturePicture1);
+                }
             }
         });
         btnCapturePicture2.setOnClickListener(new View.OnClickListener() {
@@ -155,141 +168,134 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
             @Override
             public void onClick(View v) {
                 // capture picture
-                cpature3=1;
-                getOption();
-            }
-        });
-
-
-        btnCapturePicture.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-
-                //Toast.makeText(getActivity(),"Long Click",Toast.LENGTH_SHORT).show();
-                if(cpature1==2)
-                open(btnCapturePicture);
-                return true;
-            }
-        });
-
-        btnCapturePicture1.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-
-                if(cpature2==2)
-                open(btnCapturePicture1);
-                return true;
-            }
-        });
-        btnCapturePicture2.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-
-                if(cpature3==2)
-                open(btnCapturePicture2);
-                return true;
-            }
-        });
-
-
-
-        /*// Checking camera availability
-        if (!isDeviceSupportCamera()) {
-            Toast.makeText(getActivity(),
-                    "Sorry! Your device doesn't support camera",
-                    Toast.LENGTH_LONG).show();
-            // will close the app if the device does't have camera
-            //finish();
-        }*/
-
-        Button btnsend = (Button)rootView.findViewById(R.id.btnhomeworksubmit);
-        Typeface face= Typeface.createFromAsset(getActivity().getAssets(), "fonts/font.ttf");
-        btnsend.setTypeface(face);
-        btnsend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(txtstd.getText().toString().isEmpty() )
-                {
-                    Toast.makeText(getActivity(), "Please Select Standard", Toast.LENGTH_SHORT).show();
+                if (cpature3 != 2) {
+                    cpature3 = 1;
+                    getOption();
                 }
-                else if(txtclss.getText().toString().isEmpty())
-                {
-                    Toast.makeText(getActivity(), "Please Select Division", Toast.LENGTH_SHORT).show();
-                }
-                else if( spinnersub.getSelectedItem().toString().isEmpty())
-                {
-                    Toast.makeText(getActivity(), "Please Select Subject", Toast.LENGTH_SHORT).show();
-                }
-                else if( spinnerdate.getSelectedItem().toString().isEmpty())
-                {
-                    Toast.makeText(getActivity(), "Please Select Date", Toast.LENGTH_SHORT).show();
-                }
-                else if(edthwork.getText().toString().isEmpty())
-                {
-                    Toast.makeText(getActivity(), "Please Enter Description", Toast.LENGTH_SHORT).show();
-                }
-               else {
-
-                    Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-
-                    String sub = spinnersub.getSelectedItem().toString();
-                    ArrayList<String> imglst = GetImgLst();
-                    JSONArray imglstbase64 = new JSONArray();
-                    String txtlst = edthwork.getText().toString();
-                    String date = spinnerdate.getSelectedItem().toString();
-                    SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    String givenby = sharedpreferences.getString("UidName", "");
-
-                    for (int i = 0; i < imglst.size(); i++) {
-
-                        try {
-                            imglstbase64.put(i, imglst.get(i));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    long n = qr.insertHomework(givenby, sub, date, txtlst, imglstbase64.toString(), txtstd.getText().toString(), txtclss.getText().toString(), htext);
-                    if (n > 0) {
-                        // Toast.makeText(getActivity(), "Homework Inserted Successfully", Toast.LENGTH_SHORT).show();
-                        n = -1;
-
-                        hid = qr.getHomeworkId();
-                        SimpleDateFormat df1 = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                        n = qr.insertQueue(hid, "Homework", "1", df1.format(calendar.getTime()));
-                        if (n > 0) {
-                            // Toast.makeText(getActivity(), "Queue Inserted Successfully", Toast.LENGTH_SHORT).show();
-                            n = -1;
-                            if (isConnectingToInternet()) {
-                                TeacherHomeworkModel o = qr.GetHomework(hid);
-                                if (o.getWork().equalsIgnoreCase("Homework")) {
-                                    TeacherHomeworkAsyncTaskPost obj = new TeacherHomeworkAsyncTaskPost(o, getActivity(), TeacherHomeworkNewFragment.this, "true");
-                                    obj.execute();
-                                } else if (o.getWork().equalsIgnoreCase("Classwork")) {
-                                    TeacherClassworkAsyncTaskPost obj = new TeacherClassworkAsyncTaskPost(o, getActivity(), TeacherHomeworkNewFragment.this, "true");
-                                    obj.execute();
-                                }
-                            } else {
-                                TeacherHomeworkNewFragment fragment = new TeacherHomeworkNewFragment();
-                                Bundle bundle = new Bundle();
-                                bundle.putString("HEADERTEXTN", htext);
-                                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                                fragment.setArguments(bundle);
-                                fragmentTransaction.addToBackStack(null);
-                                fragmentTransaction.replace(R.id.frame_container, fragment);
-                                fragmentTransaction.commit();
-                                Toast.makeText(getActivity(), "" + htext + " Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
+                else {
+                    open(btnCapturePicture2);
                 }
             }
         });
+
 
         return rootView;
+    }
+
+    public void saveHomework()
+    {
+        if(txtstd.getText().toString().isEmpty() )
+        {
+            Config.alertDialog(Singleton.getContext(), "New Homework", "Please Select Standard");
+           // Toast.makeText(getActivity(), "Please Select Standard", Toast.LENGTH_SHORT).show();
+        }
+        else if(txtclss.getText().toString().isEmpty())
+        {
+            Config.alertDialog(Singleton.getContext(), "New Homework", "Please Select Division");
+           // Toast.makeText(getActivity(), "Please Select Division", Toast.LENGTH_SHORT).show();
+        }
+        else if( spinnersub.getSelectedItem().toString().isEmpty())
+        {
+            Config.alertDialog(Singleton.getContext(), "New Homework", "Please Select Subject");
+           // Toast.makeText(getActivity(), "Please Select Subject", Toast.LENGTH_SHORT).show();
+        }
+        else if( spinnerdate.getSelectedItem().toString().isEmpty())
+        {
+            Config.alertDialog(Singleton.getContext(), "New " + htext, "Please Select Date");
+           // Toast.makeText(getActivity(), "Please Select Date", Toast.LENGTH_SHORT).show();
+        }
+        else if(edthwork.getText().toString().isEmpty())
+        {
+            Config.alertDialog(Singleton.getContext(), "New " + htext, "Please Enter " + htext + " Description");
+            //Toast.makeText(getActivity(), "Please Enter Description", Toast.LENGTH_SHORT).show();
+        }
+        else {
+
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+            String sub = spinnersub.getSelectedItem().toString();
+            ArrayList<String> imglst = GetImgLst();
+            JSONArray imglstbase64 = new JSONArray();
+            String txtlst = edthwork.getText().toString();
+            String date = listofDate.get(spinnerdate.getSelectedItemPosition());
+            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String givenby = sharedpreferences.getString("UidName", "");
+
+            String encodedImage="";
+            for (int i=0;i<BitmapImages.size();i++)
+            {
+               encodedImage = ImageStorage.saveEventToSdCard(BitmapImages.get(i), "P2P", getActivity());
+               /* String getimg="";
+                if(encodedImage != null) {
+                    String f2[] = encodedImage.split(File.separator);
+                    getimg = f2[f2.length - 1];
+                }*/
+
+                for (int k = 0; k< imglst.size(); k++) {
+                    try {
+                        imglstbase64.put(k,encodedImage);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+           /* String grid="";
+            String image1="";
+            for (int i = 0; i < imglst.size(); i++) {
+
+                grid = String.valueOf(imglst.get(i));
+                File f=new File(grid);
+                String imageName = f.getName();
+                Bitmap bitmap = BitmapFactory.decodeFile(grid);
+                image1 = ImageStorage.saveEventToSdCard(bitmap, imageName, getActivity());
+                try {
+                    imglstbase64.put(i,image1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }*/
+            String[] dateArr=date.split("/");
+            String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
+            long n = qr.insertHomework(givenby, sub, newDate, txtlst, imglstbase64.toString(), txtstd.getText().toString(), txtclss.getText().toString(), htext);
+            if (n > 0) {
+                // Toast.makeText(getActivity(), "Homework Inserted Successfully", Toast.LENGTH_SHORT).show();
+                n = -1;
+
+                hid = qr.getHomeworkId();
+                SimpleDateFormat df1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+                n = qr.insertQueue(hid, htext, "1", df1.format(calendar.getTime()));
+                if (n > 0) {
+                    // Toast.makeText(getActivity(), "Queue Inserted Successfully", Toast.LENGTH_SHORT).show();
+                    n = -1;
+                   /* if (isConnectingToInternet()) {
+                        TeacherHomeworkModel o = qr.GetHomework(hid);
+                        if (o.getWork().equalsIgnoreCase("Homework")) {
+                            TeacherHomeworkAsyncTaskPost obj = new TeacherHomeworkAsyncTaskPost(o, getActivity(), TeacherHomeworkNewFragment.this, "true");
+                            obj.execute();
+                        } else if (o.getWork().equalsIgnoreCase("Classwork")) {
+                            TeacherClassworkAsyncTaskPost obj = new TeacherClassworkAsyncTaskPost(o, getActivity(), TeacherHomeworkNewFragment.this, "true");
+                            obj.execute();
+                        }
+                    } else {*/
+                        ParentHomeWorkFragment fragment = new ParentHomeWorkFragment();
+                        Singleton.setMainFragment(fragment);
+                        Singleton.setSelectedFragment(fragment);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("HEADERTEXT", htext);
+                        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                        fragment.setArguments(bundle);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.replace(R.id.frame_container, fragment);
+                        fragmentTransaction.commit();
+                       // Toast.makeText(getActivity(), "" + htext + " Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                    //}
+                }
+            }
+        }
     }
 
 
@@ -298,12 +304,13 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
 
         ArrayList<String> Test = new ArrayList<>();
 
+
         int i=0;
 
         if(cpature1==2)
         {
             Bitmap bitmap = ((BitmapDrawable)btnCapturePicture.getDrawable()).getBitmap();
-
+            BitmapImages.add(bitmap);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
             byte[] b = baos.toByteArray();
@@ -315,7 +322,7 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
         {
             Bitmap bitmap = ((BitmapDrawable)btnCapturePicture1.getDrawable()).getBitmap();
 
-
+            BitmapImages.add(bitmap);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
             byte[] b = baos.toByteArray();
@@ -328,7 +335,7 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
         {
             Bitmap bitmap = ((BitmapDrawable)btnCapturePicture2.getDrawable()).getBitmap();
 
-
+            BitmapImages.add(bitmap);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
             byte[] b = baos.toByteArray();
@@ -359,7 +366,11 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
 public void getOption() {
     Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT, null);
     galleryIntent.setType("image/*");
-    galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
+    galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+    galleryIntent.setAction(Intent.ACTION_GET_CONTENT);//
+    //startActivityForResult(Intent.createChooser(galleryIntent, "Select Picture"),'a' );
+   // galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
+
 
     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -408,6 +419,8 @@ public void getOption() {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+
+
         // if the result is capturing Image
         if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
             if (resultCode == getActivity().RESULT_OK) {
@@ -442,15 +455,16 @@ public void getOption() {
             } else if (resultCode == getActivity().RESULT_CANCELED) {
 
                 // user cancelled Image capture
-                /*Toast.makeText(getActivity(),
+              /*  Toast.makeText(getActivity(),
                         "User cancelled image capture", Toast.LENGTH_SHORT)
                         .show();*/
 
             } else {
                 // failed to capture image
-                Toast.makeText(getActivity(),
+                Config.alertDialog(Singleton.getContext(), "Camera", "Sorry, Failed to Capture Image");
+             /*   Toast.makeText(getActivity(),
                         "Sorry! Failed to capture image", Toast.LENGTH_SHORT)
-                        .show();
+                        .show();*/
             }
 
         }
@@ -458,8 +472,134 @@ public void getOption() {
 
 
     private void launchUploadActivity(Intent data){
+        ClipData clipData = data.getClipData();
 
-        if(data.getData()!=null)
+        if(clipData != null)
+        {
+            try
+            {
+                int lengthCount = clipData.getItemCount();
+                if(lengthCount==1)
+                {
+                    ClipData.Item item = clipData.getItemAt(0);
+                    InputStream stream = getActivity().getContentResolver().openInputStream(item.getUri());
+                    bitmap = BitmapFactory.decodeStream(stream);
+                    if(cpature1 != 2) {
+                        btnCapturePicture.setImageBitmap(bitmap);
+                        cpature1=2;
+                    }
+                    else if(cpature2 != 2){
+                        btnCapturePicture1.setImageBitmap(bitmap);
+                        cpature2=2;
+                    }
+                    else if(cpature3 != 2){
+                        btnCapturePicture2.setImageBitmap(bitmap);
+                        cpature3=2;
+                    }
+
+                    stream.close();
+                }
+                else if(lengthCount==2)
+                {
+                    ClipData.Item item = clipData.getItemAt(0);
+                    InputStream stream = getActivity().getContentResolver().openInputStream(item.getUri());
+                    bitmap = BitmapFactory.decodeStream(stream);
+                    if(cpature1 != 2) {
+                        btnCapturePicture.setImageBitmap(bitmap);
+                        cpature1=2;
+                    }
+                    else if(cpature2 != 2){
+                        btnCapturePicture1.setImageBitmap(bitmap);
+                        cpature2=2;
+                    }
+                    else if(cpature3 != 2){
+                        btnCapturePicture2.setImageBitmap(bitmap);
+                        cpature3=2;
+                    }
+
+                    ClipData.Item item1 = clipData.getItemAt(1);
+                    InputStream stream1 = getActivity().getContentResolver().openInputStream(item1.getUri());
+                    bitmap = BitmapFactory.decodeStream(stream1);
+                    if(cpature1 != 2) {
+                        btnCapturePicture.setImageBitmap(bitmap);
+                        cpature1=2;
+                    }
+                    else if(cpature2 != 2){
+                        btnCapturePicture1.setImageBitmap(bitmap);
+                        cpature2=2;
+                    }
+                    else if(cpature3 != 2){
+                        btnCapturePicture2.setImageBitmap(bitmap);
+                        cpature3=2;
+                    }
+                    stream.close();
+
+                }
+                else if(lengthCount==3)
+                {
+                    ClipData.Item item = clipData.getItemAt(0);
+                    InputStream stream = getActivity().getContentResolver().openInputStream(item.getUri());
+                    bitmap = BitmapFactory.decodeStream(stream);
+                    if(cpature1 != 2) {
+                        btnCapturePicture.setImageBitmap(bitmap);
+                        cpature1=2;
+                    }
+                    else if(cpature2 != 2){
+                        btnCapturePicture1.setImageBitmap(bitmap);
+                        cpature2=2;
+                    }
+                    else if(cpature3 != 2){
+                        btnCapturePicture2.setImageBitmap(bitmap);
+                        cpature3=2;
+                    }
+
+                    ClipData.Item item1 = clipData.getItemAt(1);
+                    InputStream stream1 = getActivity().getContentResolver().openInputStream(item1.getUri());
+                    bitmap = BitmapFactory.decodeStream(stream1);
+                    if(cpature1 != 2) {
+                        btnCapturePicture.setImageBitmap(bitmap);
+                        cpature1=2;
+                    }
+                    else if(cpature2 != 2){
+                        btnCapturePicture1.setImageBitmap(bitmap);
+                        cpature2=2;
+                    }
+                    else if(cpature3 != 2){
+                        btnCapturePicture2.setImageBitmap(bitmap);
+                        cpature3=2;
+                    }
+
+
+                    ClipData.Item item2 = clipData.getItemAt(2);
+                    InputStream stream2 = getActivity().getContentResolver().openInputStream(item2.getUri());
+                    bitmap = BitmapFactory.decodeStream(stream2);
+                    if(cpature1 != 2) {
+                        btnCapturePicture.setImageBitmap(bitmap);
+                        cpature1=2;
+                    }
+                    else if(cpature2 != 2){
+                        btnCapturePicture1.setImageBitmap(bitmap);
+                        cpature2=2;
+                    }
+                    else if(cpature3 != 2){
+                        btnCapturePicture2.setImageBitmap(bitmap);
+                        cpature3=2;
+                    }
+                    stream.close();
+
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+       else if(data.getData()!=null)
         {
             try
             {
@@ -557,7 +697,8 @@ public void getOption() {
     //Encode image to Base64 to send to server
     private void setPhoto(Bitmap bitmapm) {
         File mediaStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 Config.IMAGE_DIRECTORY_NAME);
 
         // Create the storage directory if it does not exist
@@ -595,30 +736,59 @@ public void getOption() {
         }
     }
 
-    public void FillDates()
-    {
+    public void FillDates() {
+
+        listofDate.clear();
+        listofDay.clear();
         Calendar c = Calendar.getInstance();
+        int month = c.get(Calendar.MONTH) + 1;
+        int year = c.get(Calendar.YEAR);
         int currentdate = c.get(Calendar.DATE);
-        int month = c.get(Calendar.MONTH)+1;
-        int year=  c.get(Calendar.YEAR);
-        int monthMaxDays = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-        ArrayList<String> listofDate = new ArrayList<>();
-        for(int i=1;i<=monthMaxDays;i++)
-        {
-
-                listofDate.add("" + i + "/" + month + "/" + year);
-
+        if(currentdate>=1 && currentdate<10) {
+            if(month>=1 && month<10)
+                listofDate.add(0, "0" + currentdate + "/0" + month + "/" + year);
+            else
+                listofDate.add(0, "0" + currentdate + "/" + month + "/" + year);
         }
+        else
+        {
+            if(month>=1 && month<10)
+                listofDate.add(0, "" + currentdate + "/0" + month + "/" + year);
+            else
+                listofDate.add(0, "" + currentdate + "/" + month + "/" + year);
+        }
+        listofDay.add(0,"Today"+" ("+currentdate+" "+ Config.getMonth(month)+")");
+        for (int i = 1; i <7; i++) {
+            c.add(Calendar.DATE, 1);
+            int month1 = c.get(Calendar.MONTH) + 1;
+            int year1 = c.get(Calendar.YEAR);
+            int currentdate1 = c.get(Calendar.DATE);
+            if(currentdate1>=1 && currentdate1<10) {
+                if(month1>=1 && month1<10)
+                listofDate.add(i, "0" + currentdate1 + "/0" + month1 + "/" + year1);
+                else
+                    listofDate.add(i, "0" + currentdate1 + "/" + month1 + "/" + year1);
+            }
+            else {
+                if(month1>=1 && month1<10)
+                    listofDate.add(i, "" + currentdate1 + "/0" + month1 + "/" + year1);
+                else
+                    listofDate.add(i, "" + currentdate1 + "/" + month1 + "/" + year1);
+            }
+
+            listofDay.add(i, Config.getDayOfWeek(c.get(Calendar.DAY_OF_WEEK)) + " (" +currentdate1+" "+ Config.getMonth(month1) + ")");
+        }
+
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_spinner_item, listofDate);
+                android.R.layout.simple_spinner_item, listofDay);
         adapter.setDropDownViewResource(R.layout.viewstar_subject_spiner);
-        for(int i=0;i<adapter.toString().length();i++) {
+        for (int i = 0; i < adapter.toString().length(); i++) {
             spinnerdate.setAdapter(adapter);
             break;
         }
-        spinnerdate.setSelection(currentdate-1);
 
-
+        spinnerdate.setSelection(0);
     }
 
     public void FillSubjectTypes()
@@ -640,26 +810,25 @@ public void getOption() {
     @Override
     public void onTaskCompleted(String s) {
 
-         s =s.replace("\"","");
+        s =s.replace("\"","");
         if(s.equals("success"))
         {
-            long n = qr.deleteQueueRow(hid,"Homework");
+            long n = qr.deleteQueueRow(hid,htext);
             if(n>0) {
-              //  Toast.makeText(getActivity(), "Queue Deleted Successfully", Toast.LENGTH_SHORT).show();
                 n = -1;
-
                 n = qr.updateHomeworkSyncFlag(qr.GetHomework(hid));
                 if(n>0) {
-                    TeacherHomeworkNewFragment fragment = new TeacherHomeworkNewFragment();
+                    ParentHomeWorkFragment fragment = new ParentHomeWorkFragment();
+                    Singleton.setMainFragment(fragment);
+                    Singleton.setSelectedFragment(fragment);
                     Bundle bundle = new Bundle();
                     FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                    bundle.putString("HEADERTEXTN", htext);
+                    bundle.putString("HEADERTEXT", htext);
                     fragment.setArguments(bundle);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.replace(R.id.frame_container, fragment);
                     fragmentTransaction.commit();
-                    Toast.makeText(getActivity(), "" + htext + " Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                    n = -1;
+
                 }
             }
         }
@@ -686,9 +855,9 @@ public void getOption() {
 
     public void open(final ImageView v){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle("Remove Image");
+        alertDialogBuilder.setTitle("Delete Image");
 
-        alertDialogBuilder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 if (v == btnCapturePicture) {
@@ -711,25 +880,28 @@ public void getOption() {
         alertDialog.show();
     }
 
-    public void SwitchClass()
+   /* public void SwitchClass()
     {
 
         String classList="1.,,2nd,,B,,Hindi@@@2.,,4th,,A,,English@@@3.,,2nd,,A,,English@@@4.,,7th,,B,,History@@@5.,,3rd,,B,,English@@@6.,,6th,,B,,History";
-//        TeacherMyClassDialogBoxActivity newTermDialogFragment = new TeacherMyClassDialogBoxActivity();
-//        FragmentManager fragmentManager = getFragmentManager();
-//        Bundle b =new Bundle();
-//        b.putString("StudentClassList", classList);
-//        b.putInt("MYCLASS",10);
-//        newTermDialogFragment.setArguments(b);
-//        newTermDialogFragment.setCancelable(false);
-//        newTermDialogFragment.show(fragmentManager, "Dialog!");
-    }
+        TeacherMyClassDialogBoxActivity newTermDialogFragment = new TeacherMyClassDialogBoxActivity();
+        Singlton.setSelectedFragment(newTermDialogFragment);
+        FragmentManager fragmentManager = getFragmentManager();
+        Bundle b =new Bundle();
+        b.putString("StudentClassList", classList);
+        b.putInt("MYCLASS",10);
+        b.putString("HeaderText",htext);
+        newTermDialogFragment.setArguments(b);
+        newTermDialogFragment.setCancelable(false);
+        newTermDialogFragment.show(fragmentManager, "Dialog!");
+    }*/
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu,inflater);
         inflater.inflate(R.menu.menu_main, menu);
-
+        search = menu.findItem(R.id.action_search);
+        search.setVisible(false);
     }
 
     @Override
@@ -738,11 +910,25 @@ public void getOption() {
             case R.id.action_settings:
                 return true;
             case R.id.action_switchclass:
-                SwitchClass();
+                Config.hideSoftKeyboardWithoutReq(getActivity(), edthwork);
+                //SwitchClass();
+                return true;
+            case R.id.action_done:
+                Config.hideSoftKeyboardWithoutReq(getActivity(), edthwork);
+                saveHomework();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     @Override
@@ -751,4 +937,5 @@ public void getOption() {
         if (getFragmentManager().getBackStackEntryCount() > 0)
             getFragmentManager().popBackStack();
     }
+
 }

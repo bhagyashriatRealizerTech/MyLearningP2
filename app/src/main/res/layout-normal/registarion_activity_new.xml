@@ -7,13 +7,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="11"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:layout_above="@+id/linearlayout">
         <FrameLayout
-            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="0dp">
+            android:layout_height="50dp">
             <TextView
                 android:layout_gravity="center_horizontal"
                 android:textColor="#FFF"
@@ -23,7 +23,7 @@
                 style="@style/HeadingNavFontStyle"
                 android:layout_width="match_parent"
                 android:gravity="center"
-                android:layout_height="47dp"
+                android:layout_height="40dp"
                 android:textSize="22dp"
                 android:text="Registration"/>
             <TextView
@@ -33,7 +33,8 @@
                 style="@style/HeadingNavFontStyle"
                 android:layout_width="wrap_content"
                 android:layout_marginRight="10dp"
-                android:layout_height="27dp"
+                android:gravity="center"
+                android:layout_height="40dp"
                 android:textSize="16dp"
                 android:text="(Step : 1)"/>
         </FrameLayout>
@@ -41,18 +42,39 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="50dp"
             android:padding="10dp"
             android:id="@+id/txtSchoolNm"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginBottom="15dp"
             android:layout_gravity="center"
             android:background="@drawable/genie_logo_action_bar"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/textView"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:background="@drawable/tag_line"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+        <realizer.com.schoolgenieparent.view.TextViewCustom
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/txtinfo"
+            android:text="School Information"
+            android:textSize="25sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:layout_gravity="center"/>
 
-        <LinearLayout
+<!--        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
@@ -79,11 +101,13 @@
                 android:enabled="false"
                 android:id="@+id/edtAddress"
                 android:layout_marginLeft="20dp"
-                android:hint="Address"
+                android:text="School Address"
                 android:layout_marginBottom="20dp"
                 android:fontFamily="sans-serif-condensed"
                 android:layout_marginRight="20dp"
-                android:background="@drawable/square"
+                android:textSize="18sp"
+                android:textColor="@color/darkgreycolor"
+                android:background="@drawable/square_registarion"
                 android:inputType="text"
                 />
             <Spinner
@@ -115,20 +139,114 @@
                 android:dropDownVerticalOffset="61dp"
                 />
 
-            <Button style="@style/LoginButton"
-                android:layout_width="150dp"
-                android:layout_weight="0"
-                android:background="@drawable/login_button_orange"
-                android:layout_height="50dp"
-                android:gravity="center"
-                android:textSize="22sp"
-                android:id="@+id/btnContinue"
-                android:text="Continue"
-                android:onClick="ContinueClick"
-                android:layout_marginTop="0dp"
-                android:layout_gravity="center_horizontal"/>
-
-        </LinearLayout>
+        </LinearLayout>-->
     </LinearLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearlayout"
+        android:layout_above="@+id/btnContinue">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="vertical"
+        >
+    <Spinner
+        android:layout_height="60dp"
+        android:foregroundGravity="right"
+        style="@style/FinalSpinner"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        android:fontFamily="sans-serif-condensed"
+        android:popupBackground="@drawable/list_selector"
+        android:id="@+id/spSchoolName"
+        android:spinnerMode="dropdown"
+        android:overlapAnchor="false"
+        android:prompt="@string/MyPupil"
+        android:layout_above="@+id/edtAddress"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:enabled="false"
+        android:focusable="false"
+        android:layout_marginTop="10dp"
+        android:id="@+id/edtAddress"
+        android:text="School Address"
+        android:layout_marginBottom="20dp"
+        android:textSize="18sp"
+        android:textColor="@color/greycolor"
+        android:background="@drawable/square_registarion"
+        android:inputType="text"
+        />
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:foregroundGravity="right"
+        style="@style/FinalSpinner"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="sans-serif-condensed"
+        android:popupBackground="@drawable/list_selector"
+        android:id="@+id/spStandard"
+        android:spinnerMode="dropdown"
+        android:overlapAnchor="false"
+        android:layout_marginRight="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_above="@+id/spDivision"
+        />
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:foregroundGravity="right"
+        style="@style/FinalSpinner"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="sans-serif-condensed"
+        android:popupBackground="@drawable/list_selector"
+        android:id="@+id/spDivision"
+        android:spinnerMode="dropdown"
+        android:overlapAnchor="false"
+        android:visibility="visible"
+        android:layout_marginRight="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_above="@+id/btnContinue"
+        />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:singleLine="false"
+            android:lines="2"
+            android:layout_marginTop="10dp"
+            android:id="@+id/edtDiv"
+            android:hint="Enter Division"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/darkgreycolor"
+            android:background="@drawable/square_registarion"
+            android:inputType="text"
+            android:visibility="gone"
+            android:layout_above="@+id/spStandard"
+            />
 
+</LinearLayout>
+    </ScrollView>
+    <Button style="@style/LoginButton"
+        android:layout_width="150dp"
+        android:layout_weight="0"
+        android:background="@drawable/login_button_orange"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:textSize="22sp"
+        android:id="@+id/btnContinue"
+        android:text="Continue"
+        android:onClick="ContinueClick"
+        android:layout_marginTop="0dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

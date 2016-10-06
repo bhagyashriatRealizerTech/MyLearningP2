@@ -1,11 +1,13 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<realizer.com.schoolgenieparent.view.TextViewCustom xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:background="@drawable/spineergradient"
-    android:textSize="16sp"
+    android:textSize="18sp"
     android:fontFamily="sans-serif-condensed"
-    android:paddingLeft="20dp"
-    android:textColor="#000000"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:padding="5dp"
+    android:textColor="@color/white"
     android:gravity="left|center_vertical">
 
-</TextView>
+</realizer.com.schoolgenieparent.view.TextViewCustom>

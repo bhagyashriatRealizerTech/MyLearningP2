@@ -3,13 +3,12 @@ package realizer.com.schoolgenieparent.homework.asynctask;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
-
-import realizer.com.schoolgenieparent.Utils.Config;
-import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
-import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,10 +22,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+
+import realizer.com.schoolgenieparent.Utils.Config;
+import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 
 /**
  * Created by Win on 1/4/2016.
@@ -40,6 +46,7 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
     ArrayList<String> presence;
     ArrayList<String> absent;
     int precount, abcount;
+    JSONArray uploadimage;
     private OnTaskCompleted callback;
     String flag;
 
@@ -50,6 +57,32 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
         obj = o;
         this.flag = flag;
 
+        uploadimage = new JSONArray();
+        try {
+            JSONArray arr = new JSONArray(obj.getHwImage64Lst());
+            if(arr.length()>0) {
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    File file = ImageStorage.getEventImage(obj.get("" + i).toString());
+                    String imagebse64 = "";
+                    if (file != null) {
+                        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                        Bitmap bitmap = BitmapFactory.decodeFile(obj.get("" + i).toString(), bmOptions);
+                        ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos1); //bm is the bitmap object
+                        byte[] b1 = baos1.toByteArray();
+                        imagebse64 = Base64.encodeToString(b1, Base64.DEFAULT);
+                        uploadimage.put(i, imagebse64);
+                    }
+                }
+            }
+            else
+            {
+                uploadimage = arr;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -87,18 +120,10 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
             jobj.put("div",obj.getDiv());
             jobj.put("subject",obj.getSubject());
             jobj.put("givenBy",obj.getGivenBy());
-
-            JSONArray arr = new JSONArray(obj.getHwImage64Lst());
-           /* arr.put(0,encodedImage);
-            arr.put(1,encodedImage);*/
-
-            jobj.put("cwImage64Lst",arr);
+            jobj.put("cwImage64Lst",uploadimage);
 
             JSONArray arr1 = new JSONArray();
             arr1.put(0,obj.getHwTxtLst());
-
-            /*arr1.put(1,"TEXT2");*/
-
             jobj.put("CwTxtLst",arr1);
 
 
@@ -146,6 +171,7 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
         }
         Log.d("RESULTASYNC", stringBuilder.toString());
         //Pass here result of async task
+        stringBuilder.append("@@@UploadCW@@@"+ Integer.valueOf(obj.getHid())+"@@@Classwork");
         callback.onTaskCompleted(stringBuilder.toString());
 
     }

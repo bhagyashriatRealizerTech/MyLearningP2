@@ -5,25 +5,21 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -33,15 +29,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import realizer.com.schoolgenieparent.DrawerActivity;
 import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.Config;
-import realizer.com.schoolgenieparent.Utils.GetImages;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
@@ -50,15 +42,14 @@ import realizer.com.schoolgenieparent.Utils.StoreBitmapImages;
 import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
 import realizer.com.schoolgenieparent.backend.DALQueris;
-import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
+import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.homework.adapter.ParentHomeworkListAdapter;
-import realizer.com.schoolgenieparent.homework.adapter.TeacherHomeworkListAdapter;
-import realizer.com.schoolgenieparent.homework.asynctask.ClassworkAsyncTaskPost;
-import realizer.com.schoolgenieparent.homework.asynctask.HomeworkAsyncTaskPost;
 import realizer.com.schoolgenieparent.homework.backend.DALHomework;
 import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.view.FullImageViewActivity;
+import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
  * Created by Win on 11/9/2015.
@@ -75,7 +66,10 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
     DALMyPupilInfo DAP;
     static int counter=0;
     Bundle b;
-
+    String userName;
+    MessageResultReceiver resultReceiver;
+    ProgressWheel loading;
+    ArrayList<TeacherHomeworkListModel> homewok;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,55 +82,82 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
         noHwMsg=(TextView) rootView.findViewById(R.id.tvNoDataMsg);
         txtClassName=(TextView)rootView.findViewById(R.id.txttclassname);
         txtDivName=(TextView) rootView.findViewById(R.id.txttdivname);
+        loading = (ProgressWheel)rootView.findViewById(R.id.loading);
         newHomework = (FloatingActionButton) rootView.findViewById(R.id.imgbtnAddHw);
-        sharedpreferences=PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sharedpreferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
         txtClassName.setText(sharedpreferences.getString("STANDARD", ""));
         txtDivName.setText(sharedpreferences.getString("DIVISION", ""));
-
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        userName = sharedpreferences.getString("UidName", "");
          b = getArguments();
         htext = b.getString("HEADERTEXT");
         //header.setText(htext);
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
-
+        Singleton obj = Singleton.getInstance();
+        resultReceiver = new MessageResultReceiver(null);
+        obj.setResultReceiver(resultReceiver);
         noHwMsg.setText("No "+ htext +" uploaded for today.");
         DAP=new DALMyPupilInfo(getActivity());
         qr = new DALHomework(getActivity());
-
-        ArrayList<String> datespin = qr.GetHWDate();
+        DatabaseQueries db=new DatabaseQueries(getActivity());
+        ArrayList<String> datespin = db.GetHWDate();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, datespin);
         adapter.setDropDownViewResource(R.layout.viewstar_subject_spiner);
         datespinner.setAdapter(adapter);
         datespinner.setSelection(datespin.size() - 1);
 
+        DALQueris qrt = new DALQueris(getActivity());
+        final ArrayList<String> subjects = qrt.GetAllSub();
 
         newHomework.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Bundle b = getArguments();
-                String htext = b.getString("HEADERTEXT");
-                TeacherHomeworkNewFragment fragment = new TeacherHomeworkNewFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("HEADERTEXTN", htext);
-                fragment.setArguments(bundle);
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame_container, fragment);
-                fragmentTransaction.commit();
-            }
-        });
+                @Override
+                public void onClick(View v) {
+                    if (subjects.size() > 0)
+                    {
+                        Bundle b = getArguments();
+                        String htext = b.getString("HEADERTEXT");
+                        TeacherHomeworkNewFragment fragment = new TeacherHomeworkNewFragment();
+                        Singleton.setSelectedFragment(fragment);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("HEADERTEXT",htext);
+                        fragment.setArguments(bundle);
+                        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frame_container,fragment);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                    }
+                    else
+                    {
+                        Toast.makeText(getActivity(), "Subjects are not allocated", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
         datespinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                ArrayList<ParentHomeworkListModel> homewok = GetHomeWorkList();
+                loading.setVisibility(View.VISIBLE);
+                homewok = GetHomeWorkListNew();
 
                 if (homewok.size()!=0) {
                     listHomewrok.setVisibility(View.VISIBLE);
                     listHomewrok.setAdapter(new ParentHomeworkListAdapter(getActivity(), homewok));
                     noHwMsg.setVisibility(View.GONE);
+                    loading.setVisibility(View.GONE);
+
+                    ArrayList<TeacherHomeworkListModel> allImages=new ArrayList<TeacherHomeworkListModel>();
+                    for (int i=0;i<homewok.size();i++)
+                    {
+                        TeacherHomeworkListModel obj=new TeacherHomeworkListModel();
+                        obj.setImage(homewok.get(i).getImage());
+                        obj.setHomework(homewok.get(i).getHomework());
+                        allImages.add(obj);
+                    }
+
+                    Singleton.setAllImages(allImages);
                 }
                 else
                 {
@@ -146,6 +167,7 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                     else
                         noHwMsg.setText("No Classwork Provided.");
                     listHomewrok.setVisibility(View.GONE);
+                    loading.setVisibility(View.GONE);
                 }
             }
 
@@ -155,9 +177,6 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
             }
         });
 
-//        ArrayList<ParentHomeworkListModel> homewok = GetHomeWorkList();
-//        if(homewok.size()>0)
-//            listHomewrok.setAdapter(new ParentHomeworkListAdapter(getActivity(), homewok));
 
 
         listHomewrok.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -166,189 +185,69 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
 
                 Object o = listHomewrok.getItemAtPosition(position);
 
-                ParentHomeworkListModel homeworkObj = (ParentHomeworkListModel) o;
+                TeacherHomeworkListModel homeworkObj = (TeacherHomeworkListModel) o;
+
                 String path = homeworkObj.getImage();
                 String hwText = homeworkObj.getHomework();
                 if (path.equals("NoImage")) {
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    SharedPreferences.Editor editor = preferences.edit();
+                    JSONArray jsonArray=new JSONArray();
+                    try {
+                        jsonArray.put(0,"http://farmaciileremedia.ro/image/cache/data/Produse/cosmetice/No_available_image-500x505.gif");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    editor.putString("HomeworkImage", jsonArray.toString());
+                    editor.putString("HomeworkText", hwText);
+                    editor.commit();
 
                 } else {
-
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("HomeworkImage", path);
                     editor.putString("HomeworkText", hwText);
                     editor.commit();
-                    loadPhoto(0);
                 }
-
-
-
-//                Object o = listHomewrok.getItemAtPosition(position);
-//                ParentHomeworkListModel homeworkObj = (ParentHomeworkListModel) o;
-//
-//                TeacherHomeworkDetailFragment fragment = new TeacherHomeworkDetailFragment();
-//                Singleton.setSelectedFragment(fragment);
-//                Bundle bundle = new Bundle();
-//                bundle.putString("HEADERTEXT", b.getString("HEADERTEXT"));
-//                bundle.putString("SubjectName", homeworkObj.getSubject());
-//                bundle.putString("HomeworkDate", homeworkObj.getHwdate());
-//                bundle.putString("TeacherName", homeworkObj.getGivenBy());
-//                bundle.putString("Status", "Done");
-//                bundle.putString("HomeworkImage", homeworkObj.getImage());
-//                bundle.putInt("Imageid", homeworkObj.getImgId());
-//                bundle.putString("HomeworkText", homeworkObj.getHomework());
-//                fragment.setArguments(bundle);
-//                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-//                fragmentTransaction.replace(R.id.frame_container, fragment);
-//                fragmentTransaction.addToBackStack(null);
-//                fragmentTransaction.commit();
+                loadPhoto(0);
             }
         });
         return rootView;
     }
 
-    public void GetHomWrk()
+    private ArrayList<TeacherHomeworkListModel> GetHomeWorkListNew()
     {
+        Bundle b = this.getArguments();
+        //ArrayList<TeacherHomeworkModel> hwlst = qr.GetHomeworkData(datespinner.getSelectedItem().toString(), htext, txtClassName.getText().toString(), txtDivName.getText().toString());
+        ArrayList<TeacherHomeworkModel> hwlst = qr.GetHomeworkAllData(datespinner.getSelectedItem().toString(),htext);
 
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("d/M/yyyy");
-        String datetody = df.format(calendar.getTime());
-        String datedb = qr.GetLastSyncHomeworkDate();
-
-        Log.d("SCHOOLCODE", datetody + "\n" + datedb);
-
-        String UserData[]=  DAP.GetSTDDIVData();
-
-        Log.d("SCHOOLCODE", UserData[0] + "\n" + UserData[1] + "\n" + UserData[2]);
-
-
-        String[] comp1 = datetody.split("/");
-        String[] comp2 = datedb.split("/");
-
-        String month = comp1[1];
-        String year = comp1[2];
-
-        int counter = 0;
-        int Noval=0;
-        if (datedb.length() == 0)
-        {
-            datedb = datetody;
-            comp2 = datedb.split("/");
-            counter = 1;
-            Noval=1;
-        }
-        else {
-            counter = Integer.valueOf(comp1[0]) - Integer.valueOf(comp2[0]);
-            if (counter == 0) {
-                counter = 1;
-            }
-        }
-
-        DALQueris qrt = new DALQueris(getActivity());
-        ArrayList<String> subjects = qrt.GetAllSub();
-        Log.d("COUNTER", "" + counter);
-        for (int i = 0; i < counter; i++) {
-            int d;
-            if (Noval == 1) {
-                d = Integer.valueOf(comp2[0]) + (i);
-            }
-            else {
-                d = Integer.valueOf(comp2[0]) + (i + 1);
-            }
-
-            String snddate = "" + month + "/" + d + "/" + year;
-            Log.d("Date", snddate);
-            ArrayList<String> subj = qr.GetHWSub(snddate,htext);
-
-            int len = subjects.size() - subj.size();
-
-            ArrayList<String> removesub = new ArrayList<>();
-            int cnt = 0;
-
-            if (subj.size() == 0) {
-                removesub = subjects;
-            } else {
-                for (int knum = 0; knum < subjects.size(); knum++) {
-                    for (int num = 0; num < subj.size(); num++) {
-                        if (subj.get(num).equals(subjects.get(knum))) {
-                            break;
-                        } else {
-
-                            if (num == (subj.size() - 1)) {
-                                removesub.add(cnt, subjects.get(knum));
-                                // Log.d("SUB ", removesub.get(cnt));
-                                cnt = cnt + 1;
-                            }
-
-                        }
-                    }
-                }
-            }
-
-            for (int l = 0; l < removesub.size(); l++) {
-                Log.d("SUB ", removesub.get(l));
-            }
-
-            Log.d("DATEFOR", snddate + "  " + removesub.size() + " " + subj.size() + " " + len);
-
-            for (int k = 0; k < len; k++) {
-
-                ParentHomeworkListModel home = new ParentHomeworkListModel();
-                home.setSchoolcode(UserData[2]);
-                home.setStandard(UserData[0]);
-                home.setDivision(UserData[1]);
-                home.setHwdate(snddate);
-                home.setSubject(removesub.get(k));
-                if(isConnectingToInternet()) {
-                    if(htext.equalsIgnoreCase("Homework"))
-                    {
-                        HomeworkAsyncTaskPost obj1 = new HomeworkAsyncTaskPost(home, getActivity(), ParentHomeWorkFragment.this);
-                        obj1.execute();
-                    }
-                    else if(htext.equalsIgnoreCase("Classwork"))
-                    {
-                        ClassworkAsyncTaskPost obj1 = new ClassworkAsyncTaskPost(home, getActivity(), ParentHomeWorkFragment.this);
-                        obj1.execute();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(getActivity(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    private ArrayList<ParentHomeworkListModel> GetHomeWorkList()
-    {
-        ArrayList<ParentHomeworkListModel> hwlst = qr.GetHomeworkInfoData(datespinner.getSelectedItem().toString(), htext);
-        ArrayList<ParentHomeworkListModel> results = new ArrayList<>();
+        ArrayList<TeacherHomeworkListModel> results = new ArrayList<>();
 
         for(int i=0;i<hwlst.size();i++)
         {
-            ParentHomeworkListModel hDetail = new ParentHomeworkListModel();
-            ParentHomeworkListModel obj = hwlst.get(i);
+            TeacherHomeworkListModel hDetail = new TeacherHomeworkListModel();
+            TeacherHomeworkModel obj = hwlst.get(i);
             hDetail.setSubject(obj.getSubject());
+            hDetail.setGivenBy(obj.getGivenBy());
+            hDetail.setHasSync(obj.getIsSync());
             try {
 
-                if(obj.getHomework().length()==0)
+                if(obj.getHwTxtLst().length()==0)
                     hDetail.setHomework("NoText");
                 else
-                    hDetail.setHomework(obj.getHomework());
+                    hDetail.setHomework(obj.getHwTxtLst());
 
-                JSONArray jarr1 = new JSONArray(obj.getImage());
+                JSONArray jarr1 = new JSONArray(obj.getHwImage64Lst());
                 if(jarr1.length()==0)
                     hDetail.setImage("NoImage");
                 else
-                    hDetail.setImage(obj.getImage());
+                    hDetail.setImage(obj.getHwImage64Lst());
                 results.add(hDetail);
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.e("HW(LocalizedMessage)", e.getLocalizedMessage());
-                Log.e("HW(StackTrace)", e.getStackTrace().toString());
-                Log.e("HW(Cause)", e.getCause().toString());
             }
         }
+
         return results;
     }
 
@@ -380,10 +279,8 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
             adapter.setDropDownViewResource(R.layout.viewstar_subject_spiner);
             datespinner.setAdapter(adapter);
             datespinner.setSelection(datespin.size()-1);
-
             // Toast.makeText(getActivity(), "Homework inserted Successfully", Toast.LENGTH_LONG).show();
         }
-
         else {
             //Toast.makeText(getActivity(), "Not Homework inserted,Pls Try again!", Toast.LENGTH_LONG).show();
         }
@@ -460,7 +357,7 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                                 }
                             }
 
-                            dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,htext);
+                            dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,htext,userName);
                             Toast.makeText(getActivity(), "Homework Downloaded Successfully...", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -468,29 +365,6 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
-               /* rootObj = new JSONObject(json);
-                JSONObject obj = rootObj.getJSONObject("fetchHomeWorkResult");
-                String schoolCode = obj.getString("SchoolCode");
-                String std = obj.getString("Std");
-                String division = obj.getString("div");
-                String givenby = obj.getString("givenBy");
-                String hwdate = obj.getString("hwDate");
-                JSONArray img = obj.getJSONArray("hwImage64Lst");
-                JSONArray text = obj.getJSONArray("hwTxtLst");
-                String subject = obj.getString("subject");
-                if (img.length() == 0 && text.length() == 0) {
-
-                } else {
-
-                    n = dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, htext);
-                    if (n >= 0) {
-                        // Toast.makeText(getActivity(), "Homework Done", Toast.LENGTH_SHORT).show();
-                        n = -1;
-                    }
-                }*/
             }
             else  if(htext.equalsIgnoreCase("Classwork"))
             {
@@ -556,7 +430,7 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                                 }
                             }
 
-                            dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, htext);
+                            dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, htext,userName);
                             Toast.makeText(getActivity(), "Classwork Downloaded Successfully...", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -565,52 +439,8 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                 {
                     e.printStackTrace();
                 }
-                /*rootObj = new JSONObject(json);
-                JSONObject obj = rootObj.getJSONObject("fetchClassWorkResult");
-                String schoolCode = obj.getString("SchoolCode");
-                String std = obj.getString("Std");
-                String division = obj.getString("div");
-                String givenby = obj.getString("givenBy");
-                String hwdate = obj.getString("cwDate");
-                JSONArray img = obj.getJSONArray("cwImage64Lst");
-                JSONArray text = obj.getJSONArray("CwTxtLst");
-                String subject = obj.getString("subject");
-                if (img.length() == 0 && text.length() == 0) {
-
-                } else {
-
-                    n = dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, htext);
-                    if (n >= 0) {
-                        // Toast.makeText(getActivity(), "Homework Done", Toast.LENGTH_SHORT).show();
-                        n = -1;
-                    }
-                }*/
             }
         return true;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu,inflater);
-        inflater.inflate(R.menu.menu_download, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_download:
-                if(htext.toString().equals("Homework"))
-                {
-                    GetHomWrk1();
-                }
-                else if(htext.toString().equals("Classwork"))
-                {
-                    GetHomWrk1();
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     public boolean isConnectingToInternet(){
@@ -626,7 +456,6 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                     {
                         return true;
                     }
-
         }
         return false;
     }
@@ -637,42 +466,63 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
         startActivity(intent);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
 
-    public void GetHomWrk1()
+
+    //Recive the result when new Message Arrives
+    class MessageResultReceiver extends ResultReceiver
     {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("MM/d/yyyy");
-        String datetody = df.format(calendar.getTime());
-        String UserData[]=  DAP.GetSTDDIVData();
-        DALQueris qrt = new DALQueris(getActivity());
-        ArrayList<String> subjects = qrt.GetAllSub();
+        public MessageResultReceiver(Handler handler) {
+            super(handler);
+        }
 
-        for (int k = 0; k < subjects.size(); k++) {
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
 
-            ParentHomeworkListModel home = new ParentHomeworkListModel();
-            home.setSchoolcode(UserData[2]);
-            home.setStandard(UserData[0]);
-            home.setDivision(UserData[1]);
-            home.setHwdate(datetody);
-            home.setSubject(subjects.get(k));
-            if(isConnectingToInternet()) {
-                if(htext.equalsIgnoreCase("Homework"))
-                {
-                    HomeworkAsyncTaskPost obj1 = new HomeworkAsyncTaskPost(home, getActivity(), ParentHomeWorkFragment.this);
-                    obj1.execute();
-                }
-                else if(htext.equalsIgnoreCase("Classwork"))
-                {
-                    ClassworkAsyncTaskPost obj1 = new ClassworkAsyncTaskPost(home, getActivity(), ParentHomeWorkFragment.this);
-                    obj1.execute();
-                }
+            if(resultCode == 1000){
+                getActivity().runOnUiThread(new UpdateUI("RefreshUI"));
             }
-            else
-            {
-                Toast.makeText(getActivity(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    //Update UI
+    class UpdateUI implements Runnable {
+        String update;
+
+        public UpdateUI(String update) {
+
+            this.update = update;
+        }
+
+        public void run() {
+
+            if(update.equals("RefreshUI")) {
+                ArrayList<TeacherHomeworkListModel> homewok = GetHomeWorkListNew();
+
+                if (homewok.size()!=0) {
+                    listHomewrok.setVisibility(View.VISIBLE);
+                    listHomewrok.setAdapter(new ParentHomeworkListAdapter(getActivity(), homewok));
+                    noHwMsg.setVisibility(View.GONE);
+                }
+                else
+                {
+                    noHwMsg.setVisibility(View.VISIBLE);
+                    if (htext.equalsIgnoreCase("Homework"))
+                        noHwMsg.setText("No Homework Provided.");
+                    else
+                        noHwMsg.setText("No Classwork Provided.");
+                    listHomewrok.setVisibility(View.GONE);
+                }
             }
         }
     }
+
 }
 
 
