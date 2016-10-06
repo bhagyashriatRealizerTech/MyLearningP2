@@ -19,7 +19,7 @@
 
 
 
-            <item > <bitmap android:gravity="center_horizontal|right" android:src="@drawable/navigation_arrow_spinner">
+            <item > <bitmap android:gravity="center_horizontal|right" android:src="@drawable/newdropdonwarrow">
                 <padding android:bottom="0dp" android:left="0dp" android:right="10dp" android:top="0dp" />
                 </bitmap>
           </item>

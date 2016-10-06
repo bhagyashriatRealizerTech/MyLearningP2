@@ -2,6 +2,7 @@ package realizer.com.schoolgenieparent;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -123,7 +124,7 @@ public class DrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        View header=navigationView;
+        View header=navigationView.getHeaderView(0);
         //userName = (TextView) header.findViewById(R.id.txt_user_name);
         userName=(TextView) header.findViewById(R.id.txt_user_name);
         userImage = (ImageView) header.findViewById(R.id.img_user_image);
@@ -396,9 +397,18 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public Fragment Communication(String name) {
-        fragment = new TeacherQueryViewFragment();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(DrawerActivity.this);
+        String userId=preferences.getString("UidName", "");
+        String sendarname=preferences.getString("Firstname","");
+        String urlimage=preferences.getString("ThumbnailID","");
+
+
+         fragment = new TeacherQueryViewFragment();
         Bundle bundle = new Bundle();
         bundle.putString("HEADERTEXT", name);
+        bundle.putString("USERID",userId);
+        bundle.putString("SENDERNAME",sendarname);
+        bundle.putString("UrlImage",urlimage);
         fragment.setArguments(bundle);
         return fragment;
     }

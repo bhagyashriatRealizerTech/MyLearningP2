@@ -217,7 +217,6 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
                                 loading.setVisibility(View.VISIBLE);
-
                                 new NewLoginAsync().execute();
 
                             } });
