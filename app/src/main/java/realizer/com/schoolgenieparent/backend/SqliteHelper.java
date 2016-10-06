@@ -12,7 +12,7 @@ import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
  */
 public class SqliteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SchoolGeniePToP";
-    private static final int DATABASE_VERSION =22;
+    private static final int DATABASE_VERSION =23;
     Context mycontext;
     private static final String STUDINFO =
             "CREATE TABLE StudentInfo(  UserId TEXT," +
@@ -38,7 +38,9 @@ public class SqliteHelper extends SQLiteOpenHelper {
                     "RegistrationCode TEXT,"+
                     "AcademicYear TEXT,"+
                     "SchoolCode TEXT,"+
-                    "ThumbnailURL TEXT)";
+                    "ThumbnailURL TEXT,"+
+                    "MagicWord TEXT"+
+                    ")";
     private static final String STDSUBALLOCATE ="CREATE TABLE StdDivSub(Std TEXT,Div TEXT, Sub TEXT)";
     private static final String STUDLIST ="CREATE TABLE StudInfo(Std TEXT,Div TEXT, UserID TEXT,StudArr TEXT)";
     private static final String QUERYINFO =

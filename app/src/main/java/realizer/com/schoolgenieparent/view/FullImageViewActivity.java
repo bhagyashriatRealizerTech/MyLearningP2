@@ -46,6 +46,7 @@ public class FullImageViewActivity extends FragmentActivity {
     ViewPager viewPager;
     static ProgressWheel loading;
     static String[] IMG;
+    static String[] TEMP;
     //static String[] TEXT;
     static ImageView imageView;
     static ActionBar bar;
@@ -70,7 +71,6 @@ public class FullImageViewActivity extends FragmentActivity {
         String path = preferences.getString("HomeworkImage", "");
         String hwtext = preferences.getString("HomeworkText", "");
 
-        ArrayList<TeacherHomeworkListModel> allImages=Singleton.getAllImages();
         try {
             if (path.equals("http://farmaciileremedia.ro/image/cache/data/Produse/cosmetice/No_available_image-500x505.gif"))
             {
@@ -105,7 +105,6 @@ public class FullImageViewActivity extends FragmentActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         imageFragmentPagerAdapter = new ImageFragmentPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.pager1);
 
@@ -187,6 +186,7 @@ public class FullImageViewActivity extends FragmentActivity {
 
             txtcnt.setText("" + (position + 1) + " / " + NUM_ITEMS);
             imgv[position] = imageView;
+            barr[position] = decodedByte;
             loading.setVisibility(View.GONE);
             return swipeView;
         }
