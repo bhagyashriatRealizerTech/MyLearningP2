@@ -8,6 +8,7 @@ import android.os.ResultReceiver;
 import java.util.ArrayList;
 
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
@@ -25,6 +26,7 @@ public class Singleton {
     public static Fragment mainFragment;
     public static ProgressWheel messageCenter = null;
     public static ArrayList<String> imageList = new ArrayList<>();
+    public  static ArrayList<TeacherHomeworkModel> fialbitmaplist = new ArrayList<>();
 
     private Singleton()
     {
@@ -121,6 +123,14 @@ public class Singleton {
 
     public static void setImageList(ArrayList<String> imageList) {
         Singleton.imageList = imageList;
+    }
+
+    public static ArrayList<TeacherHomeworkModel> getFialbitmaplist() {
+        return fialbitmaplist;
+    }
+
+    public static void setFialbitmaplist(ArrayList<TeacherHomeworkModel> fialbitmaplist) {
+        Singleton.fialbitmaplist = fialbitmaplist;
     }
 }
 
