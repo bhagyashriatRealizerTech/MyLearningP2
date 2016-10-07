@@ -158,10 +158,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
 
             if (notifications.size()>1 && notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
             {
-                for (int i=1;i<notifications.size();i++)
-                {
-                    qr.deleteNotificationRow(notifications.get(i).getId());
-                }
+                qr.deleteNotificationRow(notifications.get(notifications.size()-1).getId());
             }
         }
 
