@@ -58,7 +58,7 @@ public class ContactListFragment extends Fragment implements OnBackPressFragment
     ListView lst;
     String htext;
     EditText edtmessage;
-    TextView textView;
+    TextView textView,noContact;
     String mobno;
     String SENT="SMS_SENT";
     String DELIVERED = "SMS_DELIVERED";
@@ -88,15 +88,25 @@ public class ContactListFragment extends Fragment implements OnBackPressFragment
         rlPBContainer = (RelativeLayout) rootview.findViewById(R.id.pbcontainer);
         edtSearch = (EditText) rootview.findViewById(R.id.input_search);
         llContainer = (LinearLayout) rootview.findViewById(R.id.data_container);
-
+        noContact= (TextView) rootview.findViewById(R.id.textviewNocontact);
         edtSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence cs, int arg1, int arg2,
                                       int arg3) {
                 // When user changed the Text
-                String text = edtSearch.getText().toString()
-                        .toLowerCase(Locale.getDefault());
+                String text = edtSearch.getText().toString().toLowerCase(Locale.getDefault());
                 objAdapter.filter(text);
+                if (objAdapter.getCount()==0)
+                {
+//                    Toast.makeText(getActivity(), "No Contacts", Toast.LENGTH_SHORT).show();
+                    llContainer.setVisibility(View.GONE);
+                    noContact.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    llContainer.setVisibility(View.VISIBLE);
+                    noContact.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -197,12 +207,9 @@ public class ContactListFragment extends Fragment implements OnBackPressFragment
                     lv.setAdapter(objAdapter);
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
-                        public void onItemClick(AdapterView<?> parent,
-                                                View view, int position, long id) {
-                            CheckBox chk = (CheckBox) view
-                                    .findViewById(R.id.contactcheck);
-                            ContactModel bean = ContactsListClass.phoneList
-                                    .get(position);
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            CheckBox chk = (CheckBox) view.findViewById(R.id.contactcheck);
+                            ContactModel bean = ContactsListClass.phoneList.get(position);
                             if (bean.isSelected()) {
                                 bean.setSelected(false);
                                 chk.setChecked(false);
@@ -285,13 +292,20 @@ public class ContactListFragment extends Fragment implements OnBackPressFragment
                             String[] nums =s.split(",");
                             for (int i=0;i<nums.length;i++)
                             {
+                                nums[i].replace("(","");
+                                nums[i].replace(")","");
                                 mobList.add(nums[i]);
                             }
                             //Toast.makeText(getActivity(), mobList.toString(), Toast.LENGTH_SHORT).show();
                             String inviteMsg = edtmessage.getText().toString();
                             if (inviteMsg.equals("")) {
                                 Toast.makeText(getActivity(), "Enter Message", Toast.LENGTH_SHORT).show();
-                            } else {
+                            }
+                            else if (TextUtils.isEmpty(inviteMsg))
+                            {
+                                Toast.makeText(getActivity(), "Enter Message", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
                                 if (!mobList.equals(null)) {
                                     for (int i = 1; i <= mobList.size(); i++) {
                                         //sb.append(mobList.get(i)+" ");
@@ -329,8 +343,6 @@ public class ContactListFragment extends Fragment implements OnBackPressFragment
                         }
                     });
                     alertDialog.show();
-
-
                 }
                 return true;
             default:

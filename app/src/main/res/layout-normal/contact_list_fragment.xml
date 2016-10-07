@@ -17,7 +17,20 @@
         android:layout_below="@+id/input_search"
         android:gravity="center|top"
         android:orientation="vertical" />
-
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:id="@+id/textviewNocontact"
+    android:layout_above="@+id/pbcontainer"
+    android:layout_below="@+id/input_search"
+    android:gravity="center"
+    android:textSize="18sp"
+    android:inputType="text"
+    android:visibility="gone"
+    android:textColor="#777777"
+    android:text="No Contact"
+    android:textStyle="bold"
+    />
     <RelativeLayout
         android:id="@+id/pbcontainer"
         android:layout_width="match_parent"
