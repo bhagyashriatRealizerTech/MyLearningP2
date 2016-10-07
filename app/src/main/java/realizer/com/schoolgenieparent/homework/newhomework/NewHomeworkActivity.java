@@ -8,6 +8,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -52,10 +55,7 @@ public class NewHomeworkActivity extends Fragment {
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
 
-
         initiateView(rootView);
-
-
 
         return rootView;
     }
@@ -63,6 +63,7 @@ public class NewHomeworkActivity extends Fragment {
     public void initiateView(View rootview)
     {
         addImage = (ImageButton) rootview.findViewById(R.id.addimage);
+        homeworktext = (EditText) rootview.findViewById(R.id.edtmsgtxt);
         gridView= (GridView) rootview.findViewById(R.id.gallerygridView);
         addImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +79,7 @@ public class NewHomeworkActivity extends Fragment {
     {
 
 
-        //ArrayList<TeacherFunCenterGalleryModel> allData = new ArrayList<>();
+        ArrayList<String> temp;
 
         @Override
         protected void onPreExecute() {
@@ -90,9 +91,11 @@ public class NewHomeworkActivity extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
 
-            templist.addAll(Singleton.getImageList());
-            Singleton.setImageList(new ArrayList<String>());
+             templist = new ArrayList<>();
+             templist.addAll(Singleton.getImageList());
+             Singleton.setImageList(new ArrayList<String>());
              hwimage = new ArrayList<>();
+             temp = new ArrayList<>();
 
             for(int i=0;i<templist.size();i++)
             {
@@ -100,7 +103,8 @@ public class NewHomeworkActivity extends Fragment {
                 Bitmap bitmap = ImageStorage.decodeSampledBitmapFromPath(path, 150, 150);
                 TeacherHomeworkModel obj = new TeacherHomeworkModel();
                 obj.setPic(bitmap);
-                hwimage.add(obj);
+                hwimage.add(i, obj);
+                temp.add(i,path);
             }
             if(templist.size()<10)
             {
@@ -109,7 +113,7 @@ public class NewHomeworkActivity extends Fragment {
                 TeacherHomeworkModel obj = new TeacherHomeworkModel();
                 obj.setPic(icon);
                 obj.setHwTxtLst("NoIcon");
-                hwimage.add(obj);
+                hwimage.add(templist.size(),obj);
             }
            /* allData=qr.GetImage(getid);
 
@@ -140,7 +144,8 @@ public class NewHomeworkActivity extends Fragment {
 
             if(templist.size()>0) {
                 addImage.setVisibility(View.GONE);
-                adapter = new NewHomeworkGalleryAdapter(getActivity(), hwimage);
+                gridView.setVisibility(View.VISIBLE);
+                adapter = new NewHomeworkGalleryAdapter(getActivity(), hwimage,temp);
                 gridView.setAdapter(adapter);
                 gridView.setFastScrollEnabled(true);
             }
@@ -150,6 +155,33 @@ public class NewHomeworkActivity extends Fragment {
             }
             //loading.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu,inflater);
+        inflater.inflate(R.menu.menu_main, menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_switchclass:
+                Config.hideSoftKeyboardWithoutReq(getActivity(), homeworktext);
+                //SwitchClass();
+                return true;
+            case R.id.action_done:
+                Config.hideSoftKeyboardWithoutReq(getActivity(), homeworktext);
+                //saveHomework();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+
     }
 
     @Override
@@ -163,7 +195,7 @@ public class NewHomeworkActivity extends Fragment {
         else
         {
             addImage.setVisibility(View.VISIBLE);
-            gridView.setVisibility(View.VISIBLE);
+            gridView.setVisibility(View.GONE);
         }
     }
 }

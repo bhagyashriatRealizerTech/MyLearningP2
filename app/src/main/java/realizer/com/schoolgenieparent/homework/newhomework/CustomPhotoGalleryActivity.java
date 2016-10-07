@@ -68,7 +68,10 @@ public class CustomPhotoGalleryActivity extends AppCompatActivity  {
 
         grdImages = (GridView) findViewById(R.id.gridview);
       //  qr = new DatabaseQueries(CustomPhotoGalleryActivity.this);
-        totalselectedImageCount = 0;
+        /*if(Singleton.getImageList().size()>0)
+            totalselectedImageCount = Singleton.getImageList().size();
+        else*/
+            totalselectedImageCount = 0;
 
         final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Thumbnails._ID };
         final String orderBy = MediaStore.Images.Thumbnails._ID;
@@ -151,6 +154,14 @@ public class CustomPhotoGalleryActivity extends AppCompatActivity  {
             }
         }
 
+        if(Singleton.getImageList().size()>0)
+        {
+            ArrayList<String> newList =  new ArrayList<>();
+            newList.addAll(selectedItems);
+            newList.addAll(Singleton.getImageList());
+            Singleton.setImageList(newList);
+        }
+        else
             Singleton.setImageList(selectedItems);
 /*        if (cnt == 0) {
 
