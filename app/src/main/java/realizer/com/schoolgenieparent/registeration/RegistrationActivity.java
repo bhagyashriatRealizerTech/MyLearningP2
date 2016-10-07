@@ -279,6 +279,8 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
     if (s.split("@@@")[1].equalsIgnoreCase("STDREG")) {
         if (Config.isConnectingToInternet(RegistrationActivity.this)) {
             loading.setVisibility(View.VISIBLE);
+            schoolName = new ArrayList<>();
+            schoolName.add("Select School Name");
             RegistrationAsyncTaskGet asyntaskGet = new RegistrationAsyncTaskGet(RegistrationActivity.this, RegistrationActivity.this, "getschoollist");
             asyntaskGet.execute();
         } else {

@@ -2,7 +2,9 @@ package realizer.com.schoolgenieparent.myclass.asynctask;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -28,15 +30,20 @@ public class StudentListAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     String std, div;
     Context myContext;
     private OnTaskCompleted callback;
-    String schoolcode;
+    String schoolcode,deviceId,accesstoken,userID;
 
     public StudentListAsyncTaskGet(String std, String div,String schoolcode, Context myContext, OnTaskCompleted cb)
     {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(myContext);
         this.std = std;
         this.div = div;
         this.myContext = myContext;
         this.callback = cb;
         this.schoolcode = schoolcode;
+        deviceId = preferences.getString("DWEVICEID","");
+        accesstoken = preferences.getString("AccessToken","");
+        userID = preferences.getString("UidName","");
 
     }
 
@@ -51,9 +58,10 @@ public class StudentListAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
 
-        String my= Config.URL+"GetStudentMetaDataP2PList/"+schoolcode +"/"+std + "/" +div;
+        String my= Config.URL+"GetStudentMetaDataP2PList/"+schoolcode +"/"+std + "/" +div+"/"+userID + "/" +deviceId;
         Log.d("URL", my);
         HttpGet httpGet = new HttpGet(my);
+        httpGet.setHeader("AccessToken",accesstoken);
         HttpClient client = new DefaultHttpClient();
         try
         {

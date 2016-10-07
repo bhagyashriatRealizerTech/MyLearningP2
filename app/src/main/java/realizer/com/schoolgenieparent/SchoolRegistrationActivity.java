@@ -126,7 +126,7 @@ public class SchoolRegistrationActivity extends AppCompatActivity implements OnT
                 else
                 {
                     if (Config.isConnectingToInternet(SchoolRegistrationActivity.this)) {
-                       /* loading.setVisibility(View.GONE);
+                        loading.setVisibility(View.GONE);
                         SchoolRegistrationModel obj = new SchoolRegistrationModel();
                         obj.setName(edtSchoolName.getText().toString().trim());
                         obj.setAddress(edtSchoolAddress.getText().toString().trim());
@@ -137,7 +137,7 @@ public class SchoolRegistrationActivity extends AppCompatActivity implements OnT
                         obj.setCommentsForCommunication("");
                         obj.setContactPerson("");
                         obj.setEmailId("");
-                        new SchoolRegistrationAsyncTaskPost(obj,SchoolRegistrationActivity.this,SchoolRegistrationActivity.this).execute();*/
+                        new SchoolRegistrationAsyncTaskPost(obj,SchoolRegistrationActivity.this,SchoolRegistrationActivity.this).execute();
                     }
                 }
             }
@@ -146,30 +146,37 @@ public class SchoolRegistrationActivity extends AppCompatActivity implements OnT
 
     @Override
     public void onTaskCompleted(String s) {
-        final Typeface face= Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
 
-        LayoutInflater inflater = getLayoutInflater();
-        View dialoglayout = inflater.inflate(R.layout.successfull_reg_layout, null);
-        Button submit = (Button)dialoglayout.findViewById(R.id.btn_submit);
-        TextView txtview = (TextView)dialoglayout.findViewById(R.id.infodialog);
-        txtview.setText("Congratulations, your school has been registered successfully.");
+        if (s.equalsIgnoreCase("true")) {
+            final Typeface face = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/font.ttf");
+            LayoutInflater inflater = getLayoutInflater();
+            View dialoglayout = inflater.inflate(R.layout.successfull_reg_layout, null);
+            Button submit = (Button) dialoglayout.findViewById(R.id.btn_submit);
+            TextView txtview = (TextView) dialoglayout.findViewById(R.id.infodialog);
+            txtview.setText("Congratulations, your school has been registered successfully.");
 
-        submit.setTypeface(face);
+            submit.setTypeface(face);
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(SchoolRegistrationActivity.this);
-        builder.setView(dialoglayout);
-        builder.setCancelable(false);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(SchoolRegistrationActivity.this);
+            builder.setView(dialoglayout);
+            builder.setCancelable(false);
 
-        final AlertDialog alertDialog = builder.create();
+            final AlertDialog alertDialog = builder.create();
 
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                Intent intent = new Intent(SchoolRegistrationActivity.this, RegistrationActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+            submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                    Intent intent = new Intent(SchoolRegistrationActivity.this, RegistrationActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            alertDialog.show();
+        }
+        else
+        {
+            Config.alertDialog(SchoolRegistrationActivity.this,"Error","School Registration failed , please try again after some time.");
+        }
     }
 }
