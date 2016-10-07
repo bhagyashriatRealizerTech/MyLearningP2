@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -53,7 +54,7 @@ import realizer.com.schoolgenieparent.invitejoin.model.ContactModel;
 /**
  * Created by Win on 05/10/2016.
  */
-public class ContactListFragment extends Fragment implements OnBackPressFragment
+public class InviteToOthersFragment extends Fragment implements OnBackPressFragment
 {
     ListView lst;
     String htext;
@@ -80,8 +81,13 @@ public class ContactListFragment extends Fragment implements OnBackPressFragment
         setHasOptionsMenu(true);
         Bundle b = getArguments();
         htext = b.getString("HEADERTEXT");
-        //lst= (ListView) rootview.findViewById(R.id.listcontact);
-        //setHasOptionsMenu(true);
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork()
+                .penaltyLog()
+                .penaltyDeath()
+                .build());
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
         context=getActivity();

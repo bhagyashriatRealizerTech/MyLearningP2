@@ -48,7 +48,7 @@ import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
-import realizer.com.schoolgenieparent.invitejoin.ContactListFragment;
+import realizer.com.schoolgenieparent.invitejoin.InviteToOthersFragment;
 
 import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
 import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
@@ -109,7 +109,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 
         //showing dp
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String urlString = preferences.getString("ThumbnailID","");
+        final String urlString = preferences.getString("ThumbnailID","");
         Log.d("Image URL", urlString);
         Typeface face= Typeface.createFromAsset(getActivity().getAssets(), "fonts/font.ttf");
 
@@ -117,47 +117,47 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         nameUSer.setTypeface(face);
         textStdDiv.setText(preferences.getString("SyncStd", "")+"   "+preferences.getString("SyncDiv", ""));
         textStdDiv.setTypeface(face);
-        if(urlString.equals("") || urlString.equalsIgnoreCase("null"))
-        {
-            picUser.setVisibility(View.GONE);
-            userInitials.setVisibility(View.VISIBLE);
-            String name[]=nameUSer.getText().toString().split(" ");
-            String fname = name[0].trim().toUpperCase().charAt(0)+"";
-            if(name.length>1)
-            {
-                String lname = name[1].trim().toUpperCase().charAt(0)+"";
-                userInitials.setText(fname+lname);
-            }
-            else
-                userInitials.setText(fname);
 
-        }
-        else
-        {
-            picUser.setVisibility(View.VISIBLE);
-            userInitials.setVisibility(View.GONE);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (urlString.equals("") || urlString.equalsIgnoreCase("null")) {
+                    picUser.setVisibility(View.GONE);
+                    userInitials.setVisibility(View.VISIBLE);
+                    String name[] = nameUSer.getText().toString().split(" ");
+                    String fname = name[0].trim().toUpperCase().charAt(0) + "";
+                    if (name.length > 1) {
+                        String lname = name[1].trim().toUpperCase().charAt(0) + "";
+                        userInitials.setText(fname + lname);
+                    } else
+                        userInitials.setText(fname);
 
-            if (urlString.contains("http"))
-            {
-                String newURL=new Utility().getURLImage(urlString);
-                if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                    new GetImages(newURL,picUser,userInitials,nameUSer.getText().toString(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
-                else
-                {
-                    File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
-                    //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
-                    picUser.setImageBitmap(bitmap);
+                } else {
+                    picUser.setVisibility(View.VISIBLE);
+                    userInitials.setVisibility(View.GONE);
+
+                    if (urlString.contains("http")) {
+                        String newURL = new Utility().getURLImage(urlString);
+                        if (!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                            new GetImages(newURL, picUser, userInitials, nameUSer.getText().toString(), newURL.split("/")[newURL.split("/").length - 1]).execute(newURL);
+                        else {
+                            File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
+                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                            //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                            picUser.setImageBitmap(bitmap);
+                        }
+                    } else {
+                        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                        Bitmap bitmap = BitmapFactory.decodeFile(urlString, bmOptions);
+                        picUser.setImageBitmap(bitmap);
+                    }
                 }
+
             }
-            else
-            {
-                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(urlString, bmOptions);
-                picUser.setImageBitmap(bitmap);
-            }
-        }
+        },1500);
+
 
         new GetNotificationList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -240,7 +240,18 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                         bundle.putString("UrlImage",urlImage);
 
                         qr.deleteNotificationRow(notificationData.get(position).getId());
-                        Communication("Communication");
+
+                        TeacherQueryViewFragment fragment = new TeacherQueryViewFragment();
+
+                        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                        //bundle.putString("HomeworkList", homewrklist);
+                        bundle.putString("HEADERTEXT", "Communication");
+                        fragment.setArguments(bundle);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.replace(R.id.frame_container, fragment);
+                        fragmentTransaction.commit();
+
+                        //Communication("Communication");
                        /* FragmentTransaction transaction = getFragmentManager().beginTransaction();
                         TeacherQueryViewFragment fragment = new TeacherQueryViewFragment();
                         Singleton.setSelectedFragment(fragment);
@@ -502,7 +513,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
     public Fragment InviteOther(String res) {
         // Get Output as
         //String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";
-        ContactListFragment fragment = new ContactListFragment();
+        InviteToOthersFragment fragment = new InviteToOthersFragment();
         Bundle bundle = new Bundle();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         //bundle.putString("HomeworkList", homewrklist);
@@ -563,12 +574,10 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         protected void onPreExecute() {
             super.onPreExecute();
             //showing dp
-            /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String urlString = preferences.getString("ThumbnailID","");*/
-//            picUser.setVisibility(View.VISIBLE);
-//            userInitials.setVisibility(View.GONE);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String urlString = preferences.getString("ThumbnailID","");
 
-          /*  if(urlString.equals("") || urlString.equalsIgnoreCase("null"))
+            if(urlString.equals("") || urlString.equalsIgnoreCase("null"))
             {
                 picUser.setVisibility(View.GONE);
                 userInitials.setVisibility(View.VISIBLE);
@@ -609,7 +618,6 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     picUser.setImageBitmap(bitmap);
                 }
             }
-*/
         }
 
 
