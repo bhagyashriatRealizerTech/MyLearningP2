@@ -187,7 +187,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
                         if (n>0)
                         {
-                            Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                           // Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
                             Calendar calendar = Calendar.getInstance();
                             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
                             String date = df.format(calendar.getTime());
@@ -265,7 +265,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
                         if (n>0)
                         {
-                            Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                            //Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
                             Calendar calendar = Calendar.getInstance();
                             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
                             String date = df.format(calendar.getTime());
@@ -330,7 +330,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                             if (count==0)
                             {
                                 count++;
-                                Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Uploaded Successfully");
+                               // Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Uploaded Successfully");
                             }
                         }
                     }
@@ -345,6 +345,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (onTaskString[1].equalsIgnoreCase("Classwork"))
                 if (counter==0)
                 {
                     counter++;

@@ -56,7 +56,8 @@ import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
 import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
-import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
+import realizer.com.schoolgenieparent.invitejoin.ContactListFragment;
+
 import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
 import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
 import realizer.com.schoolgenieparent.service.ManualSyncupService;
@@ -427,7 +428,7 @@ public class DrawerActivity extends AppCompatActivity
         return fragment;*/
         // getSupportActionBar().setTitle(Config.actionBarTitle("DashBoard",DrawerActivity.this));
         //String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";
-        fragment = new InviteToJoinActivity();
+        fragment = new ContactListFragment();
         Bundle bundle = new Bundle();
         //bundle.putString("HomeworkList", homewrklist);
         bundle.putString("HEADERTEXT", name);

@@ -18,7 +18,9 @@ import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.GetImages;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.SwipeLayout;
+import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALQueris;
+import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.communication.model.ParentQueriesTeacherNameListModel;
 
 public class TeacherNotificationListAdapter extends BaseAdapter {
@@ -31,6 +33,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
    public SwipeLayout swipeLayout;
    View convrtview;
    float x1, x2;
+    DatabaseQueries qr;
 
     public TeacherNotificationListAdapter(Context context, ArrayList<NotificationModel> notificationList) {
             notifications = notificationList;
@@ -38,6 +41,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
             context1 = context;
             swipeLayout = null;
             prevSwipedLayout = null;
+            qr = new DatabaseQueries(context);
         }
 
         @Override
@@ -119,23 +123,14 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
         else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
         {
             notificationData = "Recieved Message From "+
-                    notifications.get(position).getAdditionalData1().split("@@@")[0]+"\nMessage : "+notifications.get(position).getMessage().split(":")[1];
+                    notifications.get(position).getAdditionalData2()+"\nMessage : "+notifications.get(position).getMessage();
 
             String imageurl[]= notifications.get(position).getAdditionalData1().trim().split("@@@");
             if(imageurl.length == 3) {
-                if (imageurl[2] != null && !imageurl[2].equals("") && !imageurl[2].equalsIgnoreCase("null")) {
-                    String urlString = imageurl[2];
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < urlString.length(); i++) {
-                        char c = '\\';
-                        if (urlString.charAt(i) == '\\') {
-                            urlString.replace("\"", "");
-                            sb.append("/");
-                        } else {
-                            sb.append(urlString.charAt(i));
-                        }
-                    }
-                    String newURL = sb.toString();
+                if (imageurl[0] != null && !imageurl[0].equals("") && !imageurl[0].equalsIgnoreCase("null")) {
+                    String urlString = imageurl[0];
+
+                    String newURL = Utility.getURLImage(urlString);
                     holder.notificationImage.setVisibility(View.VISIBLE);
                     if (!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
                         new GetImages(newURL, holder.notificationImage,holder.txtinitial,notifications.get(position).getMessage(), newURL.split("/")[newURL.split("/").length - 1]).execute(newURL);
@@ -159,6 +154,11 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
             {
                 holder.unreadCount.setVisibility(View.VISIBLE);
                 holder.unreadCount.setText(notifications.get(position).getAdditionalData1().split("@@@")[1]);
+            }
+
+            if (notifications.size()>1 && notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
+            {
+                qr.deleteNotificationRow(notifications.get(notifications.size()-1).getId());
             }
         }
 

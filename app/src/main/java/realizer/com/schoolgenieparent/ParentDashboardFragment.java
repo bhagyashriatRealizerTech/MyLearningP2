@@ -48,7 +48,8 @@ import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
-import realizer.com.schoolgenieparent.invitejoin.InviteToJoinActivity;
+import realizer.com.schoolgenieparent.invitejoin.ContactListFragment;
+
 import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
 import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
 import realizer.com.schoolgenieparent.trackpupil.TrackShowMap;
@@ -501,7 +502,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
     public Fragment InviteOther(String res) {
         // Get Output as
         //String homewrklist = "Marathi,,lesson no 2 and 3 lesson no 2 and 3 lesson no 2 and 3,,NoImage,,20/11/2015_English,,NoText,,Image,,19/11/2015_Hindi,,hindi homework,,NoImage,,18/11/2015_History,,history homework lesson no 2 and 3,,NoImage,,17/11/2015_Math,,Math homework,,Image,,16/11/2015";
-        InviteToJoinActivity fragment = new InviteToJoinActivity();
+        ContactListFragment fragment = new ContactListFragment();
         Bundle bundle = new Bundle();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         //bundle.putString("HomeworkList", homewrklist);
