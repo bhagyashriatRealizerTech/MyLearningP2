@@ -51,7 +51,7 @@ public class NewHomeworkGalleryAdapter extends BaseAdapter
 
     public View getView(final int position, View convertView, ViewGroup parent)
     {
-        convertView = mInflater.inflate(R.layout.row_multi_photo_item, null);
+        convertView = mInflater.inflate(R.layout.row_multi_photo_item_hw, null);
         ImageView imageview = (ImageView) convertView.findViewById(R.id.imgThumb);
         if(elementDetails.get(position).getPic() != null)
             imageview.setImageBitmap(elementDetails.get(position).getPic());
