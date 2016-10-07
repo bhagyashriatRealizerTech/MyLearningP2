@@ -81,13 +81,13 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
         setHasOptionsMenu(true);
         Bundle b = getArguments();
         htext = b.getString("HEADERTEXT");
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+      /*  StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads()
                 .detectDiskWrites()
                 .detectNetwork()
                 .penaltyLog()
                 .penaltyDeath()
-                .build());
+                .build());*/
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
         context=getActivity();

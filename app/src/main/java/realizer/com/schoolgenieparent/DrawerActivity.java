@@ -53,6 +53,7 @@ import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
+import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.communication.TeacherQueryViewFragment;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.invitejoin.InviteToOthersFragment;
@@ -726,16 +727,34 @@ public class DrawerActivity extends AppCompatActivity
                 userImage.setImageBitmap(bitmap);
                 String path = encodephoto(bitmap);
 
-                Boolean result=isConnectingToInternet();
-                if (result)
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(DrawerActivity.this);
+                DALMyPupilInfo dp=new DALMyPupilInfo(DrawerActivity.this);
+                String[] student=dp.GetAllTableData(preferences.getString("StudentUserID",""));
+                long n=0;
+                n=dp.updateStudentInfo(student[15], student[16], student[3], student[4], student[17], student[5], student[0], student[1], student[2], student[6], student[8], student[9], student[18], student[10],
+                        student[19], student[11], student[7], student[20], student[21], student[22],student[23],student[13],student[12],localPath,student[24]);
+                if (n>0)
+                {
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat df1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+                    DatabaseQueries qr =new DatabaseQueries(DrawerActivity.this);
+                    n = qr.insertQueue(1010, "ProfilePic", "1", df1.format(calendar.getTime()));
+                    if (n>0)
+                    {
+                        SharedPreferences.Editor edit = sharedpreferences.edit();
+                        edit.putString("NewThumbnailID", localPath);
+                        edit.putString("ProfilePicPath", path);
+                        edit.commit();
+                    }
+                }
+
+               /* if (isConnectingToInternet())
                 {
                     ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(this,this,userid,path);
                     uploadimage.execute();
-                }
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("ProfilePicPath", path);
-                editor.commit();
+                }*/
+
                 userInitials.setVisibility(View.GONE);
                 userImage.setVisibility(View.VISIBLE);
             } catch (FileNotFoundException e) {
@@ -748,17 +767,18 @@ public class DrawerActivity extends AppCompatActivity
             localPath = ImageStorage.saveEventToSdCard(bitmap, "P2PDP",DrawerActivity.this);
             userImage.setImageBitmap(bitmap);
             String path = encodephoto(bitmap);
-
-            Boolean result=isConnectingToInternet();
-            if (result)
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat df1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+            DatabaseQueries qr =new DatabaseQueries(DrawerActivity.this);
+            long n=0;
+            n = qr.insertQueue(1010, "ProfilePic", "1", df1.format(calendar.getTime()));
+            if (n>0)
             {
-                ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(this,this,userid,path);
-                uploadimage.execute();
+                SharedPreferences.Editor edit = sharedpreferences.edit();
+                edit.putString("NewThumbnailID", localPath);
+                edit.putString("ProfilePicPath", path);
+                edit.commit();
             }
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("ProfilePicPath", path);
-            editor.commit();
             userInitials.setVisibility(View.GONE);
             userImage.setVisibility(View.VISIBLE);
         }
