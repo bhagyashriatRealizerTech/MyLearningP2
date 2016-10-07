@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -86,6 +87,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
             holder.unreadCount = (TextView) convertView.findViewById(R.id.txtunreadcount);
             holder.notificationImage = (ImageView) convertView.findViewById(R.id.img_user_image);
             holder.txtinitial = (TextView) convertView.findViewById(R.id.txtinitial);
+            holder.outerLayer = (LinearLayout) convertView.findViewById(R.id.outerLayer);
 
             convertView.setTag(holder);
         } else {
@@ -98,6 +100,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
 
         if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Homework") || notifications.get(position).getNotificationtype().equalsIgnoreCase("Classwork"))
         {
+            holder.outerLayer.setVisibility(View.VISIBLE);
             DALQueris dbQ=new DALQueris(context1);
             ParentQueriesTeacherNameListModel result=dbQ.GetQueryTableData(notifications.get(position).getAdditionalData1());
             notificationData = "Downloaded "+notifications.get(position).getNotificationtype()+" For "+
@@ -112,7 +115,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
         }
         else  if(notifications.get(position).getNotificationtype().equalsIgnoreCase("HomeworkUpload") || notifications.get(position).getNotificationtype().equalsIgnoreCase("ClassworkUpload"))
         {
-
+            holder.outerLayer.setVisibility(View.VISIBLE);
             notificationData = notifications.get(position).getAdditionalData1().split("@@@")[2]+" "+
                     notifications.get(position).getNotificationtype()+" "+notifications.get(position).getMessage()
                     +" "+notifications.get(position).getAdditionalData1().split("@@@")[0]+" "+
@@ -122,53 +125,62 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
         }
         else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
         {
-            notificationData = "Recieved Message From "+
-                    notifications.get(position).getAdditionalData2()+"\nMessage : "+notifications.get(position).getMessage();
+            if (position==0)
+            {
+                holder.outerLayer.setVisibility(View.VISIBLE);
+                notificationData = "Recieved Message From "+
+                        notifications.get(position).getAdditionalData2()+"\nMessage : "+notifications.get(position).getMessage();
 
-            String imageurl[]= notifications.get(position).getAdditionalData1().trim().split("@@@");
-            if(imageurl.length == 3) {
-                if (imageurl[0] != null && !imageurl[0].equals("") && !imageurl[0].equalsIgnoreCase("null")) {
-                    String urlString = imageurl[0];
+                String imageurl[]= notifications.get(position).getAdditionalData1().trim().split("@@@");
+                if(imageurl.length == 3) {
+                    if (imageurl[0] != null && !imageurl[0].equals("") && !imageurl[0].equalsIgnoreCase("null")) {
+                        String urlString = imageurl[0];
 
-                    String newURL = Utility.getURLImage(urlString);
-                    holder.notificationImage.setVisibility(View.VISIBLE);
-                    if (!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                        new GetImages(newURL, holder.notificationImage,holder.txtinitial,notifications.get(position).getMessage(), newURL.split("/")[newURL.split("/").length - 1]).execute(newURL);
-                    else {
-                        File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
-                        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                        holder.notificationImage.setImageBitmap(bitmap);
-                    }
-                } else
+                        String newURL = Utility.getURLImage(urlString);
+                        holder.notificationImage.setVisibility(View.VISIBLE);
+                        if (!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                            new GetImages(newURL, holder.notificationImage,holder.txtinitial,notifications.get(position).getMessage(), newURL.split("/")[newURL.split("/").length - 1]).execute(newURL);
+                        else {
+                            File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
+                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                            holder.notificationImage.setImageBitmap(bitmap);
+                        }
+                    } else
+                        holder.notificationImage.setImageResource(R.drawable.chat_icon);
+                }
+                else
                     holder.notificationImage.setImageResource(R.drawable.chat_icon);
+
+                if(notifications.get(position).getAdditionalData1().split("@@@")[1].equals("0"))
+                {
+                    holder.unreadCount.setVisibility(View.INVISIBLE);
+                }
+                else
+                {
+                    holder.unreadCount.setVisibility(View.VISIBLE);
+                    holder.unreadCount.setText(notifications.get(position).getAdditionalData1().split("@@@")[1]);
+                }
+                date = notifications.get(position).getNotificationDate().trim().split(" ")[0];
+                String sdate[]=date.split("/");
+                String newDate=sdate[1]+"/"+sdate[0]+"/"+sdate[2];
+
+                holder.type.setText(notifications.get(position).getNotificationtype());
+                holder.notificationDate.setText(Config.getDate(newDate, "D"));
+                holder.notificationText.setText(notificationData);
+
             }
             else
-                holder.notificationImage.setImageResource(R.drawable.chat_icon);
-
-            if(notifications.get(position).getAdditionalData1().split("@@@")[1].equals("0"))
             {
-                holder.unreadCount.setVisibility(View.INVISIBLE);
-            }
-            else
-            {
-                holder.unreadCount.setVisibility(View.VISIBLE);
-                holder.unreadCount.setText(notifications.get(position).getAdditionalData1().split("@@@")[1]);
+                holder.outerLayer.setVisibility(View.GONE);
+                qr.deleteNotificationRow(notifications.get(position).getId());
             }
 
-            if (notifications.size()>1 && notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
+          /*  if (notifications.size()>1 && notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
             {
                 qr.deleteNotificationRow(notifications.get(notifications.size()-1).getId());
-            }
+            }*/
         }
-
-        date = notifications.get(position).getNotificationDate().trim().split(" ")[0];
-        String sdate[]=date.split("/");
-        String newDate=sdate[1]+"/"+sdate[0]+"/"+sdate[2];
-
-        holder.type.setText(notifications.get(position).getNotificationtype());
-        holder.notificationDate.setText(Config.getDate(newDate, "D"));
-        holder.notificationText.setText(notificationData);
 
         return convertView;
     }
@@ -178,6 +190,7 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
             TextView notificationText,notificationDate,unreadCount,type,txtinitial;
             ImageView notificationImage;
             SwipeLayout swipeLayout;
+            LinearLayout outerLayer;
         }
     }
 

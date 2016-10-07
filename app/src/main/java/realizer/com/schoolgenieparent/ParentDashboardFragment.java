@@ -240,14 +240,14 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                         bundle.putString("UrlImage",urlImage);
 
                         qr.deleteNotificationRow(notificationData.get(position).getId());
-
-                        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                        Communication("Communication");
+                       /* FragmentTransaction transaction = getFragmentManager().beginTransaction();
                         TeacherQueryViewFragment fragment = new TeacherQueryViewFragment();
                         Singleton.setSelectedFragment(fragment);
                         fragment.setArguments(bundle);
                         transaction.replace(R.id.frame_container, fragment);
                         transaction.addToBackStack(null);
-                        transaction.commit();
+                        transaction.commit();*/
                     }
 
                 }

@@ -474,6 +474,13 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                         loading.setVisibility(View.GONE);
                         GCMReg();
                         edit.putString("Login", "true");
+
+                        try {
+                            String thumbnailurl = studentInfo.getString("ThumbnailURL");
+                            edit.putString("ThumbnailID", thumbnailurl);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         edit.commit();
                         Intent ser = new Intent(LoginActivity.this, AutoSyncService.class);
                         Singleton.setAutoserviceIntent(ser);
