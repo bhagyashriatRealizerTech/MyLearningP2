@@ -48,6 +48,7 @@ import realizer.com.schoolgenieparent.homework.backend.DALHomework;
 import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
+import realizer.com.schoolgenieparent.homework.newhomework.NewHomeworkActivity;
 import realizer.com.schoolgenieparent.view.FullImageViewActivity;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
@@ -118,7 +119,8 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                     {
                         Bundle b = getArguments();
                         String htext = b.getString("HEADERTEXT");
-                        TeacherHomeworkNewFragment fragment = new TeacherHomeworkNewFragment();
+                        NewHomeworkActivity fragment = new NewHomeworkActivity();
+                        //TeacherHomeworkNewFragment fragment = new TeacherHomeworkNewFragment();
                         Singleton.setSelectedFragment(fragment);
                         Bundle bundle = new Bundle();
                         bundle.putString("HEADERTEXT",htext);

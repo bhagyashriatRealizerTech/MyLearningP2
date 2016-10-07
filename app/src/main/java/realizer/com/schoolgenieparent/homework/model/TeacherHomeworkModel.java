@@ -1,5 +1,7 @@
 package realizer.com.schoolgenieparent.homework.model;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Win on 1/8/2016.
  */
@@ -17,6 +19,7 @@ public class TeacherHomeworkModel {
     public int hid =0;
     public String Work="";
     public String isSync="";
+    public Bitmap pic;
 
     public String getSchoolCode() {
         return SchoolCode;
@@ -104,5 +107,13 @@ public class TeacherHomeworkModel {
 
     public void setIsSync(String isSync) {
         this.isSync = isSync;
+    }
+
+    public Bitmap getPic() {
+        return pic;
+    }
+
+    public void setPic(Bitmap pic) {
+        this.pic = pic;
     }
 }
