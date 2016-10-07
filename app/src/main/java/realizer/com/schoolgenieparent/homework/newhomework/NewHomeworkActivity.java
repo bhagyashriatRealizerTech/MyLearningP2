@@ -37,6 +37,7 @@ import realizer.com.schoolgenieparent.DrawerActivity;
 import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
 import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
@@ -46,7 +47,7 @@ import realizer.com.schoolgenieparent.homework.newhomework.adapter.NewHomeworkGa
 /**
  * Created by Bhagyashri on 10/6/2016.
  */
-public class NewHomeworkActivity extends Fragment {
+public class NewHomeworkActivity extends Fragment implements OnBackPressFragment {
 
     String htext;
     TextView datetext;
@@ -59,6 +60,7 @@ public class NewHomeworkActivity extends Fragment {
     ArrayList<String> base64imageList;
     DatabaseQueries qr ;
     int hid = 0;
+    String date = null;
 
     @Nullable
     @Override
@@ -76,6 +78,28 @@ public class NewHomeworkActivity extends Fragment {
 
         initiateView(rootView);
 
+
+        Calendar c = Calendar.getInstance();
+        int month = c.get(Calendar.MONTH) + 1;
+        int year = c.get(Calendar.YEAR);
+        int currentdate = c.get(Calendar.DATE);
+        if(currentdate>=1 && currentdate<10) {
+            if(month>=1 && month<10)
+                date =  "0" + currentdate + "/0" + month + "/" + year;
+            else
+                date =  "0" + currentdate + "/" + month + "/" + year;
+        }
+        else
+        {
+            if(month>=1 && month<10)
+                date =  "" + currentdate + "/0" + month + "/" + year;
+            else
+                date =  "" + currentdate + "/" + month + "/" + year;
+        }
+        String datearr[] = date.split("/");
+        String date1 = datearr[1]+"/"+datearr[0]+"/"+datearr[2];
+        datetext.setText(Config.getDate(date1,"D"));
+
         return rootView;
     }
 
@@ -84,6 +108,8 @@ public class NewHomeworkActivity extends Fragment {
         addImage = (ImageButton) rootview.findViewById(R.id.addimage);
         homeworktext = (EditText) rootview.findViewById(R.id.edtmsgtxt);
         gridView= (GridView) rootview.findViewById(R.id.gallerygridView);
+        datetext = (TextView) rootview.findViewById(R.id.txtDate);
+
         addImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,31 +238,14 @@ public class NewHomeworkActivity extends Fragment {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-        String sub = new Date().toString();
+        String sub = "All Sub";
         JSONArray imglstbase64;
         String txtlst;
         if(homeworktext.getText().toString().trim().length()>0)
             txtlst = homeworktext.getText().toString();
         else
             txtlst = "No Homework Text";
-        String date = null;
-        Calendar c = Calendar.getInstance();
-        int month = c.get(Calendar.MONTH) + 1;
-        int year = c.get(Calendar.YEAR);
-        int currentdate = c.get(Calendar.DATE);
-        if(currentdate>=1 && currentdate<10) {
-            if(month>=1 && month<10)
-                date =  "0" + currentdate + "/0" + month + "/" + year;
-            else
-                date =  "0" + currentdate + "/" + month + "/" + year;
-        }
-        else
-        {
-            if(month>=1 && month<10)
-                date =  "" + currentdate + "/0" + month + "/" + year;
-            else
-                date =  "" + currentdate + "/" + month + "/" + year;
-        }
+
 
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String givenby = sharedpreferences.getString("UidName", "");
@@ -296,5 +305,12 @@ public class NewHomeworkActivity extends Fragment {
             addImage.setVisibility(View.VISIBLE);
             gridView.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void OnBackPress() {
+        Singleton.setSelectedFragment(Singleton.getMainFragment());
+        if (getFragmentManager().getBackStackEntryCount() > 0)
+            getFragmentManager().popBackStack();
     }
 }

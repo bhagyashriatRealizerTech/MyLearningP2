@@ -427,29 +427,33 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
         if (onTaskResult[1].contains("LoginIN"))
         {
             boolean b = false;
-            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor edit = sharedpreferences.edit();
-            edit.putString("UidName", userName.getText().toString());
-            edit.putString("UserName", userName.getText().toString().trim());
-            edit.putString("Password", password.getText().toString().trim());
-            edit.putString("FragName", "Dashboard");
-            edit.commit();
 
             String logchk = sharedpreferences.getString("LogChk","");
             String mWord = "";
             String validate = "";
             JSONObject emp=null;
             JSONObject studentInfo=null;
+            String accesstoken ="";
             try {
                 JSONObject rootObj = new JSONObject(s);
                 emp=rootObj.getJSONObject("StudentloginResult");
                 validate  = emp.getString("loginResult");
                 studentInfo  = emp.getJSONObject("studentDtls");
                 mWord =studentInfo.getString("magicWord");
+                accesstoken =  emp.getString("AccessToken");
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor edit = sharedpreferences.edit();
+            edit.putString("UidName", userName.getText().toString());
+            edit.putString("UserName", userName.getText().toString().trim());
+            edit.putString("Password", password.getText().toString().trim());
+            edit.putString("AccessToken",accesstoken);
+            edit.putString("FragName", "Dashboard");
+            edit.commit();
             if(logchk.equals("true"))
             {
                 try {
