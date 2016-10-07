@@ -216,7 +216,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
                 if(n>0)
                 {
-                    NotificationModel obj = qr.GetNotificationByUserId(msg[3]);
+                    NotificationModel obj = qr.GetNotificationByUserId(msg[2]);
                     if(obj.getId() == 0)
                     {
                         n =0;
@@ -226,8 +226,8 @@ public class GCMIntentService extends GCMBaseIntentService {
                         notification1.setNotificationtype("Message");
                         notification1.setMessage(msg[4]);
                         notification1.setIsRead("false");
-                        notification1.setAdditionalData2(msg[2]);
-                        notification1.setAdditionalData1(msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
+                        notification1.setAdditionalData2(msg[3]);
+                        notification1.setAdditionalData1(msg[5]+"@@@"+(unread+1));
                         n = qr.InsertNotification(notification1);
                         if(Singleton.getResultReceiver() != null)
                             Singleton.getResultReceiver().send(1,null);
@@ -237,7 +237,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                         n =0;
                         obj.setMessage(msg[4]);
                         obj.setNotificationDate(date);
-                        obj.setAdditionalData1(msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
+                        obj.setAdditionalData1(msg[5]+"@@@"+(unread+1));
 
                         n = qr.UpdateNotification(obj);
 
@@ -247,8 +247,8 @@ public class GCMIntentService extends GCMBaseIntentService {
                         b1.putString("NotificationType", "Query");
                         b1.putString("NotificationMessage", msg[4]);
                         b1.putString("IsNotificationread", "false");
-                        b1.putString("AdditionalData1",msg[3]+"@@@"+(unread+1)+"@@@"+msg[5]);
-                        b1.putString("AdditionalData2",msg[2]);
+                        b1.putString("AdditionalData1",msg[5]+"@@@"+(unread+1));
+                        b1.putString("AdditionalData2",msg[3]);
 
                         if(Singleton.getResultReceiver() != null)
                             Singleton.getResultReceiver().send(1,b);
