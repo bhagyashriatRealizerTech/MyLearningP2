@@ -38,6 +38,7 @@ public class NewHomeworkGalleryAdapter extends BaseAdapter
         mInflater = LayoutInflater.from(context);
         this.context=context;
         this.imageList = imageList;
+        Singleton.setFialbitmaplist(elementDetails);
     }
 
     @Override
@@ -83,8 +84,8 @@ public class NewHomeworkGalleryAdapter extends BaseAdapter
                 int pos = (Integer)v.getTag();
 
                 elementDetails.remove(pos);
+                Singleton.setFialbitmaplist(elementDetails);
                 imageList.remove(pos);
-
                 notifyDataSetChanged();
 
             }

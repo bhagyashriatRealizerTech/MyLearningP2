@@ -1,12 +1,16 @@
 package realizer.com.schoolgenieparent.homework.newhomework;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,14 +22,24 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import realizer.com.schoolgenieparent.DrawerActivity;
 import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.Singleton;
+import realizer.com.schoolgenieparent.backend.DatabaseQueries;
+import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.homework.newhomework.adapter.NewHomeworkGalleryAdapter;
 
@@ -42,16 +56,21 @@ public class NewHomeworkActivity extends Fragment {
     ArrayList<String> templist;
     ArrayList<TeacherHomeworkModel> hwimage;
     NewHomeworkGalleryAdapter adapter;
+    ArrayList<String> base64imageList;
+    DatabaseQueries qr ;
+    int hid = 0;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.new_homework_layout, container, false);
-
+        setHasOptionsMenu(true);
+        Singleton.setFialbitmaplist(new ArrayList<TeacherHomeworkModel>());
         Bundle b = getArguments();
         htext = b.getString("HEADERTEXT");
         templist = new ArrayList<>();
+        qr = new DatabaseQueries(getActivity());
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
 
@@ -92,6 +111,7 @@ public class NewHomeworkActivity extends Fragment {
         protected Void doInBackground(Void... params) {
 
              templist = new ArrayList<>();
+             base64imageList = new ArrayList<>();
              templist.addAll(Singleton.getImageList());
              Singleton.setImageList(new ArrayList<String>());
              hwimage = new ArrayList<>();
@@ -101,8 +121,10 @@ public class NewHomeworkActivity extends Fragment {
             {
                 String path = templist.get(i).toString();
                 Bitmap bitmap = ImageStorage.decodeSampledBitmapFromPath(path, 150, 150);
+
                 TeacherHomeworkModel obj = new TeacherHomeworkModel();
                 obj.setPic(bitmap);
+
                 hwimage.add(i, obj);
                 temp.add(i,path);
             }
@@ -175,13 +197,90 @@ public class NewHomeworkActivity extends Fragment {
                 return true;
             case R.id.action_done:
                 Config.hideSoftKeyboardWithoutReq(getActivity(), homeworktext);
-                //saveHomework();
+                saveHomework();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
 
+    }
+
+
+    public void saveHomework()
+    {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+        String sub = new Date().toString();
+        JSONArray imglstbase64;
+        String txtlst;
+        if(homeworktext.getText().toString().trim().length()>0)
+            txtlst = homeworktext.getText().toString();
+        else
+            txtlst = "No Homework Text";
+        String date = null;
+        Calendar c = Calendar.getInstance();
+        int month = c.get(Calendar.MONTH) + 1;
+        int year = c.get(Calendar.YEAR);
+        int currentdate = c.get(Calendar.DATE);
+        if(currentdate>=1 && currentdate<10) {
+            if(month>=1 && month<10)
+                date =  "0" + currentdate + "/0" + month + "/" + year;
+            else
+                date =  "0" + currentdate + "/" + month + "/" + year;
+        }
+        else
+        {
+            if(month>=1 && month<10)
+                date =  "" + currentdate + "/0" + month + "/" + year;
+            else
+                date =  "" + currentdate + "/" + month + "/" + year;
+        }
+
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String givenby = sharedpreferences.getString("UidName", "");
+
+        ArrayList<TeacherHomeworkModel>tempImageList = new ArrayList<>();
+        tempImageList = Singleton.getFialbitmaplist();
+
+        String encodedImage="";
+        for (int i=0;i<tempImageList.size();i++)
+        {
+             imglstbase64 = new JSONArray();
+            encodedImage = ImageStorage.saveEventToSdCard(tempImageList.get(i).getPic(), "P2P", getActivity());
+
+            try {
+                imglstbase64.put(0,encodedImage);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        String[] dateArr=date.split("/");
+        String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
+        long n = qr.insertHomework(givenby, sub, newDate, txtlst, imglstbase64.toString(), sharedpreferences.getString("STANDARD", ""), sharedpreferences.getString("DIVISION", ""), htext);
+        if (n > 0) {
+            // Toast.makeText(getActivity(), "Homework Inserted Successfully", Toast.LENGTH_SHORT).show();
+            n = -1;
+
+            hid = qr.getHomeworkId();
+            SimpleDateFormat df1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+            n = qr.insertQueue(hid, htext, "1", df1.format(calendar.getTime()));
+        }
+
+        }
+
+        ParentHomeWorkFragment fragment = new ParentHomeWorkFragment();
+        Singleton.setMainFragment(fragment);
+        Singleton.setSelectedFragment(fragment);
+        Bundle bundle = new Bundle();
+        bundle.putString("HEADERTEXT", htext);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragment.setArguments(bundle);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.frame_container, fragment);
+        fragmentTransaction.commit();
     }
 
     @Override
