@@ -51,8 +51,8 @@ public class LoginAsyncTaskGet extends AsyncTask<Void, Void,StringBuilder>
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
 
-        //String my= Config.URL+"StudentLogin/"+ uName + "/" +password+ "/" +deviceID;
-        String my= Config.URL+"StudentLogin/"+ uName + "/" +password;
+        String my= Config.URL+"StudentLogin/"+ uName + "/" +password+ "/" +deviceID;
+       // String my= Config.URL+"StudentLogin/"+ uName + "/" +password;
         Log.d("URL", my);
         HttpGet httpGet = new HttpGet(my);
         HttpClient client = new DefaultHttpClient();

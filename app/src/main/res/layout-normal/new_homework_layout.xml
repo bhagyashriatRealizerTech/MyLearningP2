@@ -7,15 +7,15 @@
     <TextView style="@style/TextViewFontStyle"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/txttclassname"
+        android:id="@+id/txtDate"
         android:textColor="@color/darkgrey"
         android:gravity="center"
         android:textStyle="normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
+        android:textSize="18sp"
         android:padding="10dp"
-        android:text="Homework Date: 29 Sept 2016"/>
+        android:text="Date: 29 Sept 2016"/>
 
     <GridView
         android:id="@+id/gallerygridView"

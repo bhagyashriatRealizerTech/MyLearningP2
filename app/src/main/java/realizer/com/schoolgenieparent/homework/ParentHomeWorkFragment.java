@@ -115,8 +115,8 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
         newHomework.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (subjects.size() > 0)
-                    {
+                   /* if (subjects.size() > 0)
+                    {*/
                         Bundle b = getArguments();
                         String htext = b.getString("HEADERTEXT");
                         NewHomeworkActivity fragment = new NewHomeworkActivity();
@@ -129,11 +129,11 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                         fragmentTransaction.replace(R.id.frame_container,fragment);
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.commit();
-                    }
+                    /*}
                     else
                     {
                         Toast.makeText(getActivity(), "Subjects are not allocated", Toast.LENGTH_LONG).show();
-                    }
+                    }*/
                 }
             });
 
