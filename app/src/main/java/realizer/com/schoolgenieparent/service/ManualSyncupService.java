@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import realizer.com.schoolgenieparent.Notification.NotificationModel;
+import realizer.com.schoolgenieparent.ProfilePicAsyncTaskPost;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
@@ -414,6 +415,18 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                 {
                                     TeacherClassworkAsyncTaskPost obj = new TeacherClassworkAsyncTaskPost(o, ManualSyncupService.this, ManualSyncupService.this, "false");
                                     obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                }
+                            }
+                            else  if(type.equals("ProfilePic"))
+                            {
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ManualSyncupService.this);
+                                String oldPath=preferences.getString("ThumbnailID","");
+                                String newPath=preferences.getString("NewThumbnailID","");
+                                String bitmapImg=preferences.getString("ProfilePicPath","");
+                                if (!oldPath.equals(newPath))
+                                {
+                                    ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(ManualSyncupService.this,ManualSyncupService.this,preferences.getString("StudentUserID",""),bitmapImg);
+                                    uploadimage.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
                             }
                         }

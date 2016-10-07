@@ -112,11 +112,10 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         final String urlString = preferences.getString("ThumbnailID","");
         Log.d("Image URL", urlString);
         Typeface face= Typeface.createFromAsset(getActivity().getAssets(), "fonts/font.ttf");
-
         nameUSer.setText(preferences.getString("DisplayName", ""));
-        nameUSer.setTypeface(face);
+        nameUSer.setTypeface(face,Typeface.NORMAL);
         textStdDiv.setText(preferences.getString("SyncStd", "")+"   "+preferences.getString("SyncDiv", ""));
-        textStdDiv.setTypeface(face);
+        nameUSer.setTypeface(face,Typeface.NORMAL);
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -420,21 +419,33 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 
     public void Controls(View v)
     {
-        //pupilInfo = (TextView) v.findViewById(R.id.txtpdashmypupil);
+        Typeface face= Typeface.createFromAsset(getActivity().getAssets(), "fonts/font.ttf");
+
         inviteother=(TextView) v.findViewById(R.id.txtpdashinviteother);
+        inviteother.setTypeface(face);
         homework = (TextView) v.findViewById(R.id.txtpdashhomework);
+        homework.setTypeface(face);
         viewStar = (TextView) v.findViewById(R.id.txtpdashviewstar);
+        viewStar.setTypeface(face);
         timeTable = (TextView) v.findViewById(R.id.txtpdashtimetable);
-        //queries = (TextView) v.findViewById(R.id.txtpdashqueries);
+        timeTable.setTypeface(face);
         funCenter = (TextView) v.findViewById(R.id.txtpdashfuncenter);
+        funCenter.setTypeface(face);
         communication = (TextView) v.findViewById(R.id.txtpdashcommunication);
+        communication.setTypeface(face);
         alert= (TextView) v.findViewById(R.id.txtpdashalert);
+        alert.setTypeface(face);
         trackPupil = (TextView) v.findViewById(R.id.txtpdashtrack);
+        trackPupil.setTypeface(face);
         publicHoliday = (TextView) v.findViewById(R.id.txtpdashpublicholiday);
+        publicHoliday.setTypeface(face);
         classwork = (TextView) v.findViewById(R.id.txtpdashclasswork);
+        classwork.setTypeface(face);
         mypupil = (TextView) v.findViewById(R.id.txtpdashpupilinfo);
+        mypupil.setTypeface(face);
         myclass = (TextView) v.findViewById(R.id.txtpdashstudentlist);
-        //payment = (TextView) v.findViewById(R.id.txtpdashReport);
+        myclass.setTypeface(face);
+
         notificationList = (ListView) v.findViewById(R.id.lst_notification);
         userInfoLayout = (LinearLayout)v.findViewById(R.id.linuserlayout);
         picUser = (ImageView)v.findViewById(R.id.iv_uImage);
