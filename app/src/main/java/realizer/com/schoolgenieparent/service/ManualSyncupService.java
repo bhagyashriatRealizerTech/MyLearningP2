@@ -290,6 +290,26 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                 e.printStackTrace();
             }
         }
+        else if (onTaskString[1].equalsIgnoreCase("ProfilePic"))
+        {
+            if (onTaskString[0].equalsIgnoreCase("true"))
+            {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ManualSyncupService.this);
+                DALMyPupilInfo dp=new DALMyPupilInfo(ManualSyncupService.this);
+                String[] student=dp.GetAllTableData(preferences.getString("StudentUserID",""));
+                String newPath=preferences.getString("NewThumbnailID","");
+                long n=0;
+                n=dp.updateStudentInfo(student[15], student[16], student[3], student[4], student[17], student[5], student[0], student[1], student[2], student[6], student[8], student[9], student[18], student[10],
+                        student[19], student[11], student[7], student[20], student[21], student[22],student[23],student[13],student[12],newPath,student[24]);
+
+                if(n>0)
+                {
+                    SharedPreferences.Editor edit = sharedpreferences.edit();
+                    edit.putString("ThumbnailID", newPath);
+                    edit.commit();
+                }
+            }
+        }
         else
         {
             if(onTaskString[0].replace("\"","").equals("success"))
@@ -417,15 +437,17 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                     obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
                             }
-                            else  if(type.equals("ProfilePic"))
+                            else  if(type.equals("ProfilePic") && id==1010)
                             {
                                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ManualSyncupService.this);
                                 String oldPath=preferences.getString("ThumbnailID","");
                                 String newPath=preferences.getString("NewThumbnailID","");
                                 String bitmapImg=preferences.getString("ProfilePicPath","");
+                                String accessToken=preferences.getString("AccessToken","");
+                                String deviceid=preferences.getString("DWEVICEID","");
                                 if (!oldPath.equals(newPath))
                                 {
-                                    ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(ManualSyncupService.this,ManualSyncupService.this,preferences.getString("StudentUserID",""),bitmapImg);
+                                    ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(ManualSyncupService.this,ManualSyncupService.this,preferences.getString("StudentUserID",""),bitmapImg,accessToken,deviceid);
                                     uploadimage.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
                             }

@@ -767,17 +767,18 @@ public class DrawerActivity extends AppCompatActivity
             localPath = ImageStorage.saveEventToSdCard(bitmap, "P2PDP",DrawerActivity.this);
             userImage.setImageBitmap(bitmap);
             String path = encodephoto(bitmap);
-
-            Boolean result=isConnectingToInternet();
-            if (result)
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat df1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+            DatabaseQueries qr =new DatabaseQueries(DrawerActivity.this);
+            long n=0;
+            n = qr.insertQueue(1010, "ProfilePic", "1", df1.format(calendar.getTime()));
+            if (n>0)
             {
-                ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(this,this,userid,path);
-                uploadimage.execute();
+                SharedPreferences.Editor edit = sharedpreferences.edit();
+                edit.putString("NewThumbnailID", localPath);
+                edit.putString("ProfilePicPath", path);
+                edit.commit();
             }
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("ProfilePicPath", path);
-            editor.commit();
             userInitials.setVisibility(View.GONE);
             userImage.setVisibility(View.VISIBLE);
         }

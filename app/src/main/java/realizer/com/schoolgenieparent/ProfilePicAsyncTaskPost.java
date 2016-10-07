@@ -30,23 +30,25 @@ import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
  */
 public class ProfilePicAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
 {
-    ProgressDialog dialog;
+   // ProgressDialog dialog;
     StringBuilder resultUpload;
-    String userId,profileImage;
+    String userId,profileImage,accessToken,deviceId;
     Context myContext;
     private OnTaskCompleted callback;
 
-    public ProfilePicAsyncTaskPost(Context myContext,OnTaskCompleted cb,String userId,String profileImage) {
+    public ProfilePicAsyncTaskPost(Context myContext,OnTaskCompleted cb,String userId,String profileImage,String accesstoken,String deviceid) {
         this.myContext = myContext;
         this.callback = cb;
         this.userId=userId;
+        this.deviceId=deviceid;
+        this.accessToken=accesstoken;
         this.profileImage=profileImage;
     }
 
     @Override
     protected void onPreExecute() {
          //super.onPreExecute();
-        dialog= ProgressDialog.show(myContext, "", "Please wait Uploading image ...");
+        //dialog= ProgressDialog.show(myContext, "", "Please wait Uploading image ...");
     }
 
     @Override
@@ -63,13 +65,14 @@ public class ProfilePicAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
         try {
             jsonobj.put("UserId",userId);
             jsonobj.put("Base64", profileImage);
+            jsonobj.put("DeviceId", deviceId);
 
             json = jsonobj.toString();
                 Log.d("RES", json);
             se = new StringEntity(json);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-
+            httpPost.setHeader("AccessToken",accessToken);
             httpPost.setEntity(se);
             HttpResponse httpResponse = httpclient.execute(httpPost);
             StatusLine statusLine = httpResponse.getStatusLine();
@@ -103,9 +106,10 @@ public class ProfilePicAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
-        dialog.dismiss();
+        //dialog.dismiss();
         Log.d("RESULTASYNC", stringBuilder.toString());
         //Pass here result of async task
+        stringBuilder.append("@@@ProfilePic");
         callback.onTaskCompleted(stringBuilder.toString());
     }
 }
