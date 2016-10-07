@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,12 +50,30 @@ public class NewHomeworkGalleryAdapter extends BaseAdapter
         return position;
     }
 
-    public View getView(final int position, View convertView, ViewGroup parent)
+    public View getView(final int position, View convertView, final ViewGroup parent)
     {
         convertView = mInflater.inflate(R.layout.row_multi_photo_item_hw, null);
         ImageView imageview = (ImageView) convertView.findViewById(R.id.imgThumb);
+        ImageButton imgdelete = (ImageButton)convertView.findViewById(R.id.chkImage);
+        imgdelete.setTag(position);
         if(elementDetails.get(position).getPic() != null)
             imageview.setImageBitmap(elementDetails.get(position).getPic());
+
+        if(elementDetails.get(position).getHwTxtLst().equalsIgnoreCase("NoIcon"))
+            imgdelete.setVisibility(View.GONE);
+
+        imgdelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int pos = (Integer)v.getTag();
+
+                elementDetails.remove(pos);
+
+                notifyDataSetChanged();
+
+            }
+        });
         /*datetext = (TextView) convertView.findViewById(R.id.event_date);
         status = (ImageView) convertView.findViewById(R.id.uploaded);
 

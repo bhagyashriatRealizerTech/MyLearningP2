@@ -9,6 +9,8 @@
         android:id="@+id/imgThumb"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:src="@drawable/f2"
+        android:scaleType="fitXY"
         android:background="@drawable/outer_rect"/>
 
     <ImageButton
@@ -16,10 +18,11 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="left|top"
-        android:background="@color/white"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="5dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="7dp"
+        android:background="#00ffffff"
         android:src="@drawable/ic_close_black"
+        android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/imgThumb"
         android:layout_alignEnd="@+id/imgThumb" />
 </RelativeLayout>

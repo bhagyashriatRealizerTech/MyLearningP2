@@ -108,6 +108,7 @@ public class NewHomeworkActivity extends Fragment {
                         R.drawable.noicon);
                 TeacherHomeworkModel obj = new TeacherHomeworkModel();
                 obj.setPic(icon);
+                obj.setHwTxtLst("NoIcon");
                 hwimage.add(obj);
             }
            /* allData=qr.GetImage(getid);
