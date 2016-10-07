@@ -1,6 +1,7 @@
 package realizer.com.schoolgenieparent.homework.newhomework;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -66,8 +67,8 @@ public class NewHomeworkActivity extends Fragment {
         addImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                Intent intent = new Intent(getActivity(),CustomPhotoGalleryActivity.class);
+                getActivity().startActivity(intent);
 
             }
         });

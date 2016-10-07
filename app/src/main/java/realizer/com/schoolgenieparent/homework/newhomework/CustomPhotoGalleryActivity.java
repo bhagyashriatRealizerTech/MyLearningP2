@@ -113,7 +113,7 @@ public class CustomPhotoGalleryActivity extends AppCompatActivity  {
 
 
 
-    public class insertImageAsync extends AsyncTask<String,Void,Void>
+    public class insertImageAsync extends AsyncTask<Void,Void,Void>
     {
 
         @Override
@@ -123,9 +123,9 @@ public class CustomPhotoGalleryActivity extends AppCompatActivity  {
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            String caption = params[0];
-            selectImages(caption);
+        protected Void doInBackground(Void... params) {
+
+            selectImages("");
             return null;
         }
 
