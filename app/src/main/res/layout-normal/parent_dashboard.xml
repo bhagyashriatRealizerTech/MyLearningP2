@@ -136,7 +136,7 @@
                             android:layout_weight="1"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/mypupil_icon"
+                            android:drawableTop="@drawable/newmyclass"
                             android:text="Invite"/>
                         <Button
                             android:layout_width="90dp"
@@ -152,7 +152,7 @@
                             android:layout_weight="1"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/myclass_icon"
+                            android:drawableTop="@drawable/newmyclass"
                             android:text="Student List"/>
                         <Button
                             android:layout_width="90dp"
@@ -170,7 +170,7 @@
                             android:layout_weight="1"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/mypupil_icon"
+                            android:drawableTop="@drawable/newmyclass"
                             android:text="My Pupil"/>
 
                     </LinearLayout>
@@ -194,7 +194,7 @@
                             android:layout_weight="1"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/tracking3d"
+                            android:drawableTop="@drawable/newtracking"
                             android:text="Tracking"/>
                         <Button
                             android:layout_width="90dp"
@@ -209,7 +209,7 @@
                             android:gravity="center"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/homework_icon"
+                            android:drawableTop="@drawable/newhomework"
                             android:text="Homework"/>
                         <Button
                             android:layout_width="90dp"
@@ -225,7 +225,7 @@
                             android:layout_weight="1"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/classwork3d"
+                            android:drawableTop="@drawable/newclasswork"
                             android:text="Classwork"/>
 
                     </LinearLayout>
@@ -251,7 +251,7 @@
                             android:enabled="false"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/timetable_icon"
+                            android:drawableTop="@drawable/newtimetable"
                             android:text="TimeTable"/>
 
 
@@ -268,7 +268,7 @@
                             android:gravity="center"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/chat_icon"
+                            android:drawableTop="@drawable/newquery"
                             android:text="Chat"/>
                         <Button
                             android:layout_width="90dp"
@@ -285,7 +285,7 @@
                             android:enabled="false"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/funcenter_icon"
+                            android:drawableTop="@drawable/newfuncenter"
                             android:text="FunCenter"/>
 
                     </LinearLayout>
@@ -311,7 +311,7 @@
                             android:textColor="@color/colorAccent"
                             android:background="@color/white"
                             android:layout_weight="1"
-                            android:drawableTop="@drawable/annoucement_icon"
+                            android:drawableTop="@drawable/newalerts"
                             android:text="Alerts"/>
 
                         <Button
@@ -326,7 +326,7 @@
                             android:textColor="@color/colorAccent"
                             android:drawablePadding="5dip"
                             android:layout_weight="1"
-                            android:drawableTop="@drawable/viewstar_icon"
+                            android:drawableTop="@drawable/newstar"
                             android:text="View Star"/>
 
                         <Button
@@ -343,7 +343,7 @@
                             android:enabled="false"
                             android:layout_weight="1"
                             android:textColor="@color/colorAccent"
-                            android:drawableTop="@drawable/holiday_icon"
+                            android:drawableTop="@drawable/newholiday"
                             android:text="Holiday"/>
 
                     </LinearLayout>
