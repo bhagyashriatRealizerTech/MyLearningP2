@@ -42,6 +42,7 @@ import realizer.com.schoolgenieparent.Notification.TeacherNotificationListAdapte
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.GetImages;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
+import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
@@ -61,7 +62,7 @@ import realizer.com.schoolgenieparent.view.SwipeDetector;
 /**
  * Created by Win on 23/08/2016.
  */
-public class ParentDashboardFragment extends Fragment implements View.OnClickListener
+public class ParentDashboardFragment extends Fragment implements View.OnClickListener,OnTaskCompleted
 {
     TextView inviteother, homework, viewStar, timeTable, funCenter, communication, trackPupil,alert, publicHoliday, classwork , mypupil,myclass;
     ViewPager Tab;
@@ -371,37 +372,11 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 
                         String drivername = sharedpreferences.getString("USERNAME","");
                         String driverid = sharedpreferences.getString("USERID","");
-                        TrackingAsyckTaskGet obj = new TrackingAsyckTaskGet(drivername,driverid, getActivity());
-                        try {
-                            StringBuilder result1;
-                            result1 = obj.execute().get();
-                            String dailyDriverList = result1.toString();
-                            try {
-                                //JSONObject obj = new JSONObject(s);
-                                JSONArray locList = new JSONArray(dailyDriverList);
-                                //  for(int i=0;i<locList.length();i++) {
-                                JSONObject obj1 = locList.getJSONObject(locList.length()-1);
-
-                                Intent intent = new Intent(getActivity(), TrackShowMap.class);
-                                Bundle bundle = new Bundle();
-                                bundle.putString("USERNAME", driverid);
-                                bundle.putString("LATITUDE", obj1.getString("latitude"));
-                                bundle.putString("LONGITUDE", obj1.getString("longitude"));
-                                intent.putExtras(bundle);
-                                startActivity(intent);
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            edit.putString("Tracking", "false");
-                            edit.commit();
-
-                        }catch(InterruptedException e){
-                            e.printStackTrace();
-                        }catch(ExecutionException e){
-                            e.printStackTrace();
-                        }
+                        String accessToken=sharedpreferences.getString("AccessToken","");
+                        String deviceid=sharedpreferences.getString("DWEVICEID","");
+                        String userId=sharedpreferences.getString("StudentUserID","");
+                        TrackingAsyckTaskGet obj = new TrackingAsyckTaskGet(drivername,driverid, getActivity(),accessToken,deviceid,userId,ParentDashboardFragment.this);
+                        obj.execute();
                     }
 
                     break;
@@ -544,6 +519,45 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         fragment.show(fragmentManager, "Dialog!");
     }
 
+    @Override
+    public void onTaskCompleted(String s) {
+        try {
+            //JSONObject obj = new JSONObject(s);
+            if(s.equalsIgnoreCase("[]"))
+            {
+                Toast.makeText(getActivity(),"Server Not Responding Please Try After Some Time",Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                JSONArray locList = new JSONArray(s.toString());
+                //  for(int i=0;i<locList.length();i++) {
+                JSONObject obj1 = locList.getJSONObject(locList.length()-1);
+                SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String drivername = sharedpreferences.getString("USERNAME","");
+                String driverid = sharedpreferences.getString("USERID","");
+
+                Intent intent = new Intent(getActivity(), TrackShowMap.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("USERNAME", drivername);
+                bundle.putString("USERID", driverid);
+                bundle.putString("LATITUDE", obj1.getString("latitude"));
+                bundle.putString("LONGITUDE", obj1.getString("longitude"));
+                intent.putExtras(bundle);
+                startActivity(intent);
+
+                SharedPreferences.Editor edit = sharedpreferences.edit();
+                edit.putString("USERNAME", drivername);
+                edit.putString("USERID", driverid);
+                edit.putString("Tracking", "false");
+                edit.commit();
+                Singleton.setIsShowMap(true);
+            }
+
+            //  }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     //Recive the result when new Message Arrives
     class MessageResultReceiver extends ResultReceiver

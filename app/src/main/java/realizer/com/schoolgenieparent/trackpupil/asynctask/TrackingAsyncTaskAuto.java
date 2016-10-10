@@ -2,7 +2,9 @@ package realizer.com.schoolgenieparent.trackpupil.asynctask;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -30,15 +32,22 @@ public class TrackingAsyncTaskAuto extends AsyncTask<Void, Void,StringBuilder> {
 
     // Declare Variables
     StringBuilder resultLogin;
-    String username;
+    String DriverUserId;
+    String UniqueNo;
     Context myContext;
+    String accessToken,deviceid,userId;
     private OnTaskCompleted listener;
 
-    public TrackingAsyncTaskAuto(OnTaskCompleted listener, String username, Context _myContext) {
+    public TrackingAsyncTaskAuto(OnTaskCompleted listener, String username,String userid, Context _myContext) {
 
         this.listener = listener;
-        this.username = username;
+        this.DriverUserId = username;
+        this.UniqueNo = userid;
         this.myContext = _myContext;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(_myContext);
+        accessToken=preferences.getString("AccessToken","");
+        deviceid=preferences.getString("DWEVICEID","");
+        userId=preferences.getString("StudentUserID","");
     }
 
     @Override
@@ -50,10 +59,9 @@ public class TrackingAsyncTaskAuto extends AsyncTask<Void, Void,StringBuilder> {
     @Override
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
-        // Url to get leave details
-        //"http://104.217.254.180/RestWCF/svcEmp.svc/GetEmpMonthlyAttendence/"+ empId+"/"+month+"/"+year;
-        String my="http://104.217.254.180/SJRestWCF/svcEmp.svc/retrievePupilLocation/"+username;
+        String my="http://104.217.254.180/SJRestWCF/svcEmp.svc/retrievePupilLocation/"+DriverUserId+"/"+UniqueNo+"/"+userId+"/"+deviceid;
         HttpGet httpGet = new HttpGet(my);
+        httpGet.setHeader("AccessToken",accessToken);
         HttpClient client = new DefaultHttpClient();
         try
         {

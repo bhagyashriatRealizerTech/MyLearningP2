@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
+
 /**
  * Created by shree on 11/17/2015.
  */
@@ -28,14 +30,20 @@ public class TrackingAsyckTaskGet extends AsyncTask<Void, Void,StringBuilder> {
 
         // Declare Variables
         StringBuilder resultLogin;
-        String username;
-        String userid;
+        String DriverUserId;
+        String UniqueNo;
         Context myContext;
+        String accessToken,deviceid,userId;
+        OnTaskCompleted call;
 
-        public TrackingAsyckTaskGet(String username,String userid, Context _myContext) {
-            this.username = username;
-            this.userid = userid;
+        public TrackingAsyckTaskGet(String username,String driverid, Context _myContext,String accesstoken,String deviceid,String userid,OnTaskCompleted cb) {
+            this.DriverUserId = username;
+            this.UniqueNo = driverid;
             this.myContext = _myContext;
+            this.accessToken=accesstoken;
+            this.deviceid=deviceid;
+            this.userId=userid;
+            this.call=cb;
         }
 
         @Override
@@ -47,10 +55,10 @@ public class TrackingAsyckTaskGet extends AsyncTask<Void, Void,StringBuilder> {
         @Override
         protected StringBuilder doInBackground(Void... params) {
             resultLogin = new StringBuilder();
-            // Url to get leave details
-            //"http://104.217.254.180/RestWCF/svcEmp.svc/GetEmpMonthlyAttendence/"+ empId+"/"+month+"/"+year;
-            String my="http://104.217.254.180/SJRestWCF/svcEmp.svc/retrievePupilLocation/"+username+"/"+userid;
+
+            String my="http://104.217.254.180/SJRestWCF/svcEmp.svc/retrievePupilLocation/"+DriverUserId+"/"+UniqueNo+"/"+userId+"/"+deviceid;
             HttpGet httpGet = new HttpGet(my);
+            httpGet.setHeader("AccessToken",accessToken);
             HttpClient client = new DefaultHttpClient();
             try
             {
@@ -95,6 +103,7 @@ public class TrackingAsyckTaskGet extends AsyncTask<Void, Void,StringBuilder> {
         protected void onPostExecute(StringBuilder stringBuilder) {
             super.onPostExecute(stringBuilder);
             dialog.dismiss();
+            call.onTaskCompleted(stringBuilder.toString());
         }
 
     }

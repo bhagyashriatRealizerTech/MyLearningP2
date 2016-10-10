@@ -226,8 +226,9 @@ public class TrackShowMap extends AppCompatActivity implements OnTaskCompleted {
         StringBuilder result;
         Bundle bundle=getIntent().getExtras();
         String userName=bundle.getString("USERNAME");
+        String userid=bundle.getString("USERID");
 
-        TrackingAsyncTaskAuto obj = new TrackingAsyncTaskAuto(TrackShowMap.this,userName, TrackShowMap.this);
+        TrackingAsyncTaskAuto obj = new TrackingAsyncTaskAuto(TrackShowMap.this,userName,userid, TrackShowMap.this);
         obj.execute();
 
     }
