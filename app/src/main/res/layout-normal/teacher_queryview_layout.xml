@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="#ffffff"
     android:weightSum="10"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:background="#ffffff"
+        android:weightSum="10"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="10"
         android:layout_margin="5dp"
         android:divider="@null"
-
         android:id="@+id/lstviewquery"/>
 
     <LinearLayout
@@ -58,35 +66,15 @@
             android:textStyle="bold" />
 
     </LinearLayout>
+        </LinearLayout>
+    <realizer.com.schoolgenieparent.view.ProgressWheel
+        android:id="@+id/loading"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        app:matProg_barColor="@color/colorAccent"
+        app:matProg_progressIndeterminate="true"
+        />
 
-    <!--  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      android:orientation="horizontal">
-
-      <EditText
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_marginLeft="5dp"
-          android:layout_marginRight="5dp"
-          android:paddingLeft="8dp"
-          android:id="@+id/edtmsgtxt"
-          android:inputType="textCapSentences|textMultiLine"
-          android:maxLines="5"
-          android:layout_weight="2"
-          android:hint="Message"
-          android:background="@drawable/in_message_bg"
-          />
-          <Button
-              android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:layout_weight="0.4"
-              android:id="@+id/btnsndmsgsd"
-              android:layout_marginRight="5dp"
-              android:paddingRight="5dp"
-              android:drawableEnd="@drawable/arrowsend"
-              android:drawableRight="@drawable/arrowsend"
-             android:background="@drawable/add_person_background"/>
-      </LinearLayout>-->
-</LinearLayout>
+</RelativeLayout>

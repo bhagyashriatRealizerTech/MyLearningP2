@@ -35,11 +35,15 @@ public class TeacherQueryAsyncTaskPost extends AsyncTask<Void, Void,StringBuilde
     StringBuilder resultLogin;
     TeacherQuerySendModel obj ;
     Context myContext;
+    String deviceid;
+    String accessToken;
     private OnTaskCompleted callback;
 
-    public TeacherQueryAsyncTaskPost(TeacherQuerySendModel o, Context myContext, OnTaskCompleted cb) {
+    public TeacherQueryAsyncTaskPost(TeacherQuerySendModel o, Context myContext, OnTaskCompleted cb,String deviceid,String accessToken) {
         this.myContext = myContext;
         this.callback = cb;
+        this.deviceid=deviceid;
+        this.accessToken=accessToken;
         obj =o;
     }
 
@@ -47,7 +51,7 @@ public class TeacherQueryAsyncTaskPost extends AsyncTask<Void, Void,StringBuilde
     protected void onPreExecute() {
         // super.onPreExecute();
 
-        //dialog=ProgressDialog.show(myContext,"","Authenticating credentials...");
+        //dialog=ProgressDialog.show(myContext,"","Message Sending...");
 
     }
 
@@ -57,10 +61,7 @@ public class TeacherQueryAsyncTaskPost extends AsyncTask<Void, Void,StringBuilde
         HttpClient httpclient = new DefaultHttpClient();
         String url = Config.URL+"SendMessageInGroupChat";
         HttpPost httpPost = new HttpPost(url);
-
         System.out.println(url);
-
-
 
         String json = "";
        /* Calendar calendar = Calendar.getInstance();
@@ -69,8 +70,7 @@ public class TeacherQueryAsyncTaskPost extends AsyncTask<Void, Void,StringBuilde
         StringEntity se = null;
         JSONObject jsonobj = new JSONObject();
         try {
-
-
+            jsonobj.put("DeviceId",deviceid);
             jsonobj.put("SchoolCode", obj.getSchoolCode());
             jsonobj.put("Std", obj.getStd());
             jsonobj.put("div", obj.getDiv());
@@ -84,6 +84,7 @@ public class TeacherQueryAsyncTaskPost extends AsyncTask<Void, Void,StringBuilde
             se = new StringEntity(json);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
+            httpPost.setHeader("AccessToken",accessToken);
 
             httpPost.setEntity(se);
             HttpResponse httpResponse = httpclient.execute(httpPost);
@@ -119,7 +120,7 @@ public class TeacherQueryAsyncTaskPost extends AsyncTask<Void, Void,StringBuilde
     @Override
     protected void onPostExecute(StringBuilder stringBuilder) {
         super.onPostExecute(stringBuilder);
-       // dialog.dismiss();
+        //dialog.dismiss();
         Log.d("RESULTASYNC", stringBuilder.toString());
         //Pass here result of async task
         String res= stringBuilder.toString()+"Query";

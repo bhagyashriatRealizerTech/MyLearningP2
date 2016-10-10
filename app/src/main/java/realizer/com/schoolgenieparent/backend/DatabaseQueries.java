@@ -325,7 +325,7 @@ public class DatabaseQueries {
     }
 
     //Insert Query Information
-    public long insertQuery(String msgId,String fromUserId,String fromName,String text,String profUrl,String dtime,String flag,Date sentDate)
+    public long insertQuery(String msgId,String fromUserId,String fromName,String touserid,String text,String profUrl,String dtime,String flag,Date sentDate)
     {
         ContentValues conV = new ContentValues();
         conV.put("msgId", msgId);
@@ -334,6 +334,7 @@ public class DatabaseQueries {
         conV.put("msg", text);
         conV.put("profUrl",profUrl);
         conV.put("sentTime", dtime);
+        conV.put("touserId",touserid);
         conV.put("HasSyncedUp", flag);
         conV.put("sentDate" , sentDate.getTime());
         long newRowInserted = db.insert("Query", null, conV);
@@ -387,7 +388,7 @@ public class DatabaseQueries {
     }
     // Select queue Information
     public ArrayList<TeacherQuerySendModel> GetQueuryData(String uid) {
-        Cursor c = db.rawQuery("SELECT * FROM Query ORDER BY sentTime ASC", null);
+        Cursor c = db.rawQuery("SELECT * FROM Query WHERE touserId='"+uid+"' ORDER BY sentTime ASC", null);
         ArrayList<TeacherQuerySendModel> result = new ArrayList<>();
         int cnt = 1;
         if (c != null) {

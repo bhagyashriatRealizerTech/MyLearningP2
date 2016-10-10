@@ -12,7 +12,7 @@ import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
  */
 public class SqliteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SchoolGeniePToP";
-    private static final int DATABASE_VERSION =24;
+    private static final int DATABASE_VERSION =25;
     Context mycontext;
     private static final String STUDINFO =
             "CREATE TABLE StudentInfo(  UserId TEXT," +
@@ -50,10 +50,10 @@ public class SqliteHelper extends SQLiteOpenHelper {
 //    private static final String Announcement ="CREATE TABLE Announcement(Year TEXT,AnnounceID INTEGER PRIMARY KEY   AUTOINCREMENT,Std TEXT,Div TEXT,SDate Text,Message Text,SendBy TEXT,Category TEXT,HasSyncedUp TEXT)";
 //    private static final String Chatting ="CREATE TABLE Chatting(Year TEXT,ChatID INTEGER PRIMARY KEY   AUTOINCREMENT,SDate Text,Message Text,SendBy TEXT,SendTo TEXT,HasSyncedUp TEXT)";
     private static final String SyncUPQueue ="CREATE TABLE SyncUPQueue(Id INTEGER,Type TEXT,SyncPriority TEXT,Time TEXT)";
-//    private static final String Attendance ="CREATE TABLE Attendance(AttendanceId INTEGER PRIMARY KEY   AUTOINCREMENT,attendanceDate TEXT,SchoolCode TEXT,Std TEXT,Div TEXT,AttendanceBy TEXT,Attendees TEXT,Absenties TEXT,AttendanceCnt INTEGER,AbsentCnt TEXT,HasSyncedUp TEXT)";
-private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY KEY   AUTOINCREMENT,msgId TEXT,FromUserId TEXT,FromName TEXT,msg TEXT,sentTime TEXT,profUrl Text,sentDate INTEGER,HasSyncedUp TEXT)";
+    //    private static final String Attendance ="CREATE TABLE Attendance(AttendanceId INTEGER PRIMARY KEY   AUTOINCREMENT,attendanceDate TEXT,SchoolCode TEXT,Std TEXT,Div TEXT,AttendanceBy TEXT,Attendees TEXT,Absenties TEXT,AttendanceCnt INTEGER,AbsentCnt TEXT,HasSyncedUp TEXT)";
+    private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY KEY   AUTOINCREMENT,msgId TEXT,FromUserId TEXT,FromName TEXT,touserId TEXT,msg TEXT,sentTime TEXT,profUrl Text,sentDate INTEGER,HasSyncedUp TEXT)";
 
-//    private static final String Holiday ="CREATE TABLE Holiday(Id INTEGER PRIMARY KEY   AUTOINCREMENT,holiday TEXT,hsdate TEXT,hedate TEXT)";
+    //    private static final String Holiday ="CREATE TABLE Holiday(Id INTEGER PRIMARY KEY   AUTOINCREMENT,holiday TEXT,hsdate TEXT,hedate TEXT)";
 //    private static final String GiveStar ="CREATE TABLE GiveStar(GiveStarId INTEGER PRIMARY KEY   AUTOINCREMENT,TeacherLoginId TEXT,StudentLoginId TEXT,Comment TEXT,star TEXT,StarDate TEXT,Subject TEXT,Std TEXT,Div TEXT,StarTime TEXT,HasSyncedUp TEXT)";
     private static final String Homework ="CREATE TABLE Homework(HomeworkId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,subject TEXT,textlst TEXT,Imglst TEXT,Givenby TEXT,hwDate TEXT,HasSyncedUp TEXT,Work TEXT)";
     private static final String ExceptionHandler = "CREATE TABLE Exception(ExceptionId INTEGER PRIMARY KEY   AUTOINCREMENT,UserId TEXT,ExceptionDetails TEXT,DeviceModel TEXT,AndroidVersion TEXT,ApplicationSource TEXT,DeviceBrand TEXT,HasSyncedUp TEXT)";
@@ -61,11 +61,11 @@ private static final String Query ="CREATE TABLE Query(QueryId INTEGER PRIMARY K
 
     //private static final String Classwork ="CREATE TABLE Classwork(ClassworkId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,subject TEXT,textlst TEXT,Imglst TEXT,Givenby TEXT,hwDate TEXT,HasSyncedUp TEXT)";
     private static final String InitiatedChat ="CREATE TABLE InitiatedChat(Id INTEGER,Useranme TEXT,Initiated TEXT,STD TEXT,Div TEXT,Uid TEXT,UnreadCount INTEGER,ThumbnailURL TEXT)";
-//    private static final String TIMETABLE ="CREATE TABLE TimeTable(TTId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,TmTbleName TEXT,Imglst TEXT,Givenby TEXT,TTDate TEXT,HasSyncedUp TEXT,Description TEXT)";
+    //    private static final String TIMETABLE ="CREATE TABLE TimeTable(TTId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,TmTbleName TEXT,Imglst TEXT,Givenby TEXT,TTDate TEXT,HasSyncedUp TEXT,Description TEXT)";
 //    private static final String FunCenter ="CREATE TABLE EventMaster(Class TEXT,Div TEXT,Event_Id INTEGER PRIMARY KEY   AUTOINCREMENT,Event TEXT,Date TEXT,Thumbnail TEXT,Create_Date TEXT,HasSyncedUp TEXT,AcademicYear INTEGER,EvntuuId TEXT,FileName TEXT)";
 //    private static final String FunCenter1 ="CREATE TABLE EventImages(Image_id INTEGER PRIMARY KEY   AUTOINCREMENT,Eventid INTEGER ,Image TEXT,Upload_Date  TEXT,Is_Uploaded TEXT,HasSyncedUp TEXT,AcademicYear INTEGER,SrNo INTEGER,ImageCaption TEXT,Imguuid TEXT,File_Name TEXT)";
 //    private static final String TEACHERFULLINFO ="CREATE TABLE TeacherFullInfo(ActiveDate TEXT,ClassTeacherOn TEXT,Name TEXT,Qualification TEXT,ThumbnailURL TEXT,UserId TEXT,ContactNo TEXT,DOB TEXT,EmailId TEXT,IsActive TEXT)";
-private static final String Notification ="CREATE TABLE Notification(ID INTEGER PRIMARY KEY   AUTOINCREMENT,NotificationId INTEGER,Type TEXT,Message TEXT,Date TEXT,AdditionalData1 TEXT,AdditionalData2 TEXT,IsRead TEXT)";
+    private static final String Notification ="CREATE TABLE Notification(ID INTEGER PRIMARY KEY   AUTOINCREMENT,NotificationId INTEGER,Type TEXT,Message TEXT,Date TEXT,AdditionalData1 TEXT,AdditionalData2 TEXT,IsRead TEXT)";
 
     public SqliteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -78,8 +78,8 @@ private static final String Notification ="CREATE TABLE Notification(ID INTEGER 
     public void onCreate(SQLiteDatabase db) {
 
         db.execSQL(STUDINFO);
-          db.execSQL(STDSUBALLOCATE);
-          db.execSQL(STUDLIST);
+        db.execSQL(STDSUBALLOCATE);
+        db.execSQL(STUDLIST);
         db.execSQL(ExceptionHandler);
 //        db.execSQL(STDSUBJECT);
 //        db.execSQL(Announcement);

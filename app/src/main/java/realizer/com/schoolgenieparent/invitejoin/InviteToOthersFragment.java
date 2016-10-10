@@ -8,13 +8,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+
 import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.Html;
@@ -57,7 +61,7 @@ import realizer.com.schoolgenieparent.invitejoin.model.ContactModel;
 public class InviteToOthersFragment extends Fragment implements OnBackPressFragment
 {
     ListView lst;
-    String htext;
+    String htext,std,div;
     EditText edtmessage;
     TextView textView,noContact;
     String mobno;
@@ -72,6 +76,7 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
     //    Button btnOK = null;
     RelativeLayout rlPBContainer = null;
     StringBuffer sb = new StringBuffer();
+    SharedPreferences sharedpreferences;
     StringBuffer sb2=new StringBuffer();
     String s;
     @Nullable
@@ -81,13 +86,10 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
         setHasOptionsMenu(true);
         Bundle b = getArguments();
         htext = b.getString("HEADERTEXT");
-      /*  StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());*/
+        //StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskWrites().penaltyLog().penaltyDeath().build());
+        sharedpreferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
+        std=sharedpreferences.getString("STANDARD", "");
+        div=sharedpreferences.getString("DIVISION", "");
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
         context=getActivity();
@@ -232,6 +234,7 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
             }
         };
         thread.start();
+
     }
     void showPB() {
         getActivity().runOnUiThread(new Runnable() {
@@ -255,7 +258,6 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
             }
         });
     }
-
     @Override
     public void OnBackPress() {
         Intent intent=new Intent(getActivity(),DrawerActivity.class);
@@ -270,6 +272,7 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
+                edtSearch.setText("");
                 getSelectedContacts();
                 final Typeface face= Typeface.createFromAsset(getActivity().getAssets(), "fonts/font.ttf");
 
@@ -326,22 +329,18 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
                                     mobno = sb1.toString();
                                     //Toast.makeText(getActivity(), sb1.toString(), Toast.LENGTH_SHORT).show();
                                     String allmobno[] = mobno.split(";");
-                                    String smss = edtmessage.getText().toString() + " \n" + textView.getText().toString();
+                                    String smss = edtmessage.getText().toString() + " \n" +"Standard : "+std+"\nDivision : "+div+ " \n" + textView.getText().toString();
                                     sendSMS(allmobno, smss);
                                     Toast.makeText(getActivity(), "Message sent" , Toast.LENGTH_SHORT).show();
                                     sb1 = null;
                                     edtmessage.setText("");
                                     alertDialog.dismiss();
-                                    Intent intent=new Intent(getActivity(),DrawerActivity.class);
-                                    startActivity(intent);
-                                    //lstInviteNumber.setAdapter(new contact_list_adapter(getActivity(), namelist,cnum));
                                 } else {
                                     Toast.makeText(getActivity(), "Enter Mobile Number", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
                     });
-
                     cancel.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -357,65 +356,11 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
     }
     public void sendSMS(String phoneNumber[], String message)
     {
-        PendingIntent sentPI = PendingIntent.getBroadcast(getActivity(), 0,
-                new Intent(SENT), 0);
-
-        PendingIntent deliveredPI = PendingIntent.getBroadcast(getActivity(), 0,
-                new Intent(DELIVERED), 0);
-
-//---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(getActivity(), "SMS sent",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        Toast.makeText(getActivity(), "Generic failure",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        Toast.makeText(getActivity(), "No service",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        Toast.makeText(getActivity(), "Null PDU",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Toast.makeText(getActivity(), "Radio off",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        }, new IntentFilter(SENT));
-
-//---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(getActivity(), "SMS delivered",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        Toast.makeText(getActivity(), "SMS not delivered",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        }, new IntentFilter(DELIVERED));
         SmsManager sms = SmsManager.getDefault();
         for(String number : phoneNumber) {
-            sms.sendTextMessage(number, null, message, sentPI, deliveredPI);
+            sms.sendTextMessage(number, null, message, null, null);
         }
-
     }
-
     private void registerReceiver(BroadcastReceiver broadcastReceiver, IntentFilter intentFilter) {
     }
-
 }

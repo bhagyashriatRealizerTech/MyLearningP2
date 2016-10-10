@@ -42,6 +42,7 @@ import realizer.com.schoolgenieparent.communication.asynctask.TeacherQueryAsyncT
 import realizer.com.schoolgenieparent.communication.model.TeacherQuerySendModel;
 import realizer.com.schoolgenieparent.communication.model.TeacherQueryViewListModel;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
+import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 
 /**
@@ -57,6 +58,7 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
     int qid;
     int mCurrentX ;
     int  mCurrentY;
+    ProgressWheel loading;
     TextView send;
     EditText msg;
     int lstsize;
@@ -74,7 +76,7 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(getActivity()));
         //StrictMode for smooth list scroll
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build());
+        //StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectNetwork().penaltyLog().build());
         View rootView = inflater.inflate(R.layout.teacher_queryview_layout, container, false);
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE| WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         qr =new DatabaseQueries(getActivity());
@@ -83,6 +85,7 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
         lsttname = (ListView) rootView.findViewById(R.id.lstviewquery);
         msg = (EditText) rootView.findViewById(R.id.edtmsgtxt);
         send = (TextView) rootView.findViewById(R.id.btnSendText);
+        loading = (ProgressWheel) rootView.findViewById(R.id.loading);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         stdC=preferences.getString("SyncStd", "");
         divC = preferences.getString("SyncDiv", "");
@@ -97,7 +100,7 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
         Bundle b = getArguments();
         //sname = b.getString("HEADERTEXT");
         htext=b.getString("HEADERTEXT");
-        urlImag=b.getString("UrlImage");
+        urlImag=preferences.getString("ThumbnailID","");
 
         ((DrawerActivity) getActivity()).getSupportActionBar().setTitle(Config.actionBarTitle(htext, getActivity()));
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
@@ -145,8 +148,10 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
                     uuid= UUID.randomUUID().toString();
                     SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     String stud = sharedpreferences.getString("UidName", "");
+                    String deviceid=sharedpreferences.getString("DWEVICEID","");
+                    String accesstoken=sharedpreferences.getString("AccessToken","");
 
-                    long n = qr.insertQuery(uuid,userId, username, msg.getText().toString(),urlImag, date, "true",sendDate);
+                    long n = qr.insertQuery(uuid,userId, username,userId, msg.getText().toString(),urlImag, date, "true",sendDate);
                     if (n > 0) {
                         // Toast.makeText(getActivity(), "Query Inserted Successfully", Toast.LENGTH_SHORT).show();
                         n = -1;
@@ -159,8 +164,9 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
 
                             msg.setText("");
                             if(isConnectingToInternet()) {
+                                loading.setVisibility(View.VISIBLE);
                                 TeacherQuerySendModel obj = qr.GetQuery(qid);
-                                TeacherQueryAsyncTaskPost asyncobj = new TeacherQueryAsyncTaskPost(obj,getActivity(), TeacherQueryViewFragment.this);
+                                TeacherQueryAsyncTaskPost asyncobj = new TeacherQueryAsyncTaskPost(obj,getActivity(), TeacherQueryViewFragment.this,deviceid,accesstoken);
                                 asyncobj.execute();
                             }
                             else
@@ -183,9 +189,8 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
 
     private ArrayList<TeacherQueryViewListModel> GetQuery()
     {
-
-        Bundle b = this.getArguments();
-        String uid = b.getString("USERID");
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String uid = sharedpreferences.getString("UidName", "");
         ArrayList<TeacherQueryViewListModel> results = new ArrayList<>();
         String tp="AM";
         ArrayList<TeacherQuerySendModel> qlst = qr.GetQueuryData(uid);
@@ -243,6 +248,7 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
 
     @Override
     public void onTaskCompleted(String s) {
+        loading.setVisibility(View.GONE);
         if(s.equals("trueQuery"))
         {
             long n = qr.deleteQueueRow(qid, "Query");
@@ -293,6 +299,12 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
         startActivity(intent);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
     class UpdateUI implements Runnable {
         String update;
 
