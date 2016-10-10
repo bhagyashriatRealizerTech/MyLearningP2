@@ -50,6 +50,7 @@ import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.homework.newhomework.NewHomeworkActivity;
 import realizer.com.schoolgenieparent.view.FullImageViewActivity;
+import realizer.com.schoolgenieparent.view.FullImageViewPager;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
 /**
@@ -185,33 +186,10 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Object o = listHomewrok.getItemAtPosition(position);
-
-                TeacherHomeworkListModel homeworkObj = (TeacherHomeworkListModel) o;
-
-                String path = homeworkObj.getImage();
-                String hwText = homeworkObj.getHomework();
-                if (path.equals("NoImage")) {
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    SharedPreferences.Editor editor = preferences.edit();
-                    JSONArray jsonArray=new JSONArray();
-                    try {
-                        jsonArray.put(0,"http://farmaciileremedia.ro/image/cache/data/Produse/cosmetice/No_available_image-500x505.gif");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    editor.putString("HomeworkImage", jsonArray.toString());
-                    editor.putString("HomeworkText", hwText);
-                    editor.commit();
-
-                } else {
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("HomeworkImage", path);
-                    editor.putString("HomeworkText", hwText);
-                    editor.commit();
-                }
-                loadPhoto(0);
+                Intent i = new Intent(getActivity(),FullImageViewPager.class);
+                i.putExtra("HEADERTEXT",htext);
+                i.putExtra("POSITION",position);
+                startActivity(i);
             }
         });
         return rootView;
@@ -251,14 +229,6 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
         }
 
         return results;
-    }
-
-    private void loadPhoto(int pos) {
-        Intent i = new Intent(getActivity(),FullImageViewActivity.class);
-        i.putExtra("FLAG", 1);
-        i.putExtra("HEADERTEXT",htext);
-        i.putExtra("POSITION",pos);
-        startActivity(i);
     }
 
     @Override

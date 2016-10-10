@@ -20,15 +20,8 @@
         android:textSize="15dp"
         android:textColor="#ffffff"
         android:text="test"
+        android:scrollbars="vertical"
+        android:maxLines="3"
         android:padding="5dp"/>
-   <!-- <realizer.com.schoolgenieparent.view.ProgressWheel
-        android:id="@+id/loading"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:visibility="visible"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"
-        app:matProg_barColor="@color/colorAccent"
-        app:matProg_progressIndeterminate="true"
-        />-->
+
 </LinearLayout>

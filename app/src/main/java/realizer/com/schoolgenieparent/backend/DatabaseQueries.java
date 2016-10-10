@@ -1002,4 +1002,40 @@ public class DatabaseQueries {
         return result;
     }
 
+    public ArrayList<TeacherHomeworkModel> GetHomeworkAllImages(String work) {
+
+        Cursor c = db.rawQuery("SELECT * FROM Homework WHERE Work='"+work+"'", null);
+
+
+        ArrayList<TeacherHomeworkModel> result = new ArrayList<>();
+
+        int cnt = 1;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                System.out.print("while moving  - C != null");
+                do {
+
+                    TeacherHomeworkModel o = new TeacherHomeworkModel();
+                    o.setHid(c.getInt(c.getColumnIndex("HomeworkId")));
+                    o.setSubject(c.getString(c.getColumnIndex("subject")));
+                    o.setStd(c.getString(c.getColumnIndex("Std")));
+                    o.setDiv(c.getString(c.getColumnIndex("Div")));
+                    o.setHwTxtLst(c.getString(c.getColumnIndex("textlst")));
+                    o.setHwImage64Lst(c.getString(c.getColumnIndex("Imglst")));
+                    o.setGivenBy(c.getString(c.getColumnIndex("Givenby")));
+                    o.setHwDate(c.getString(c.getColumnIndex("hwDate")));
+                    o.setWork(c.getString(c.getColumnIndex("Work")));
+                    o.setIsSync(c.getString(c.getColumnIndex("HasSyncedUp")));
+                    result.add(o);
+                    cnt = cnt+1;
+                }
+                while (c.moveToNext());
+            }
+        } else {
+            // mToast("Table Has No contain");
+        }
+        c.close();
+        //dbClose(db);
+        return result;
+    }
 }
