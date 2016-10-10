@@ -7,7 +7,6 @@
     >
 
     <LinearLayout
-        android:background="@drawable/border_line"
         android:orientation="vertical"
         android:layout_weight="1.5"
         android:layout_width="match_parent"
