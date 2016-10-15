@@ -548,7 +548,15 @@ public class LoginActivity extends Activity implements OnTaskCompleted {
                     }
                 }
                 else
+                if (validate.equals("valid")) {
+//                            Config.alertDialog(this,"Alert","Login Successfully");
+                    Toast.makeText(LoginActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                     recoverPasswordByMagicWord("FirstLogin", b, s);
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Invalid credentials, Pls Try again!", Toast.LENGTH_LONG).show();
+                }
+                //recoverPasswordByMagicWord("FirstLogin", b, s);
             }
         }
         else if (onTaskResult[1].contains("SetMagicWord")) {

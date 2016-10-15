@@ -77,8 +77,7 @@ public class ContactsAdapter extends BaseAdapter {
             view.setTag(R.id.contactname, holder.name);
             view.setTag(R.id.contactno, holder.number);
             view.setTag(R.id.contactcheck, holder.check);
-            holder.check
-                    .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            holder.check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton vw,
                                                      boolean isChecked) {
@@ -91,20 +90,20 @@ public class ContactsAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
         holder.check.setTag(position);
-
         holder.name.setText(mainDataList.get(position).getName());
         holder.number.setText(mainDataList.get(position).getNumber());
 
-        if(getByteContactPhoto(mainDataList.get(position).getImage())==null){
+//        if(getByteContactPhoto(mainDataList.get(position).getImage())==null){
             holder.image.setBackgroundColor(Color.LTGRAY);
             String name1[]=holder.name.getText().toString().split(" ");
             String fname = name1[0].trim().toUpperCase().charAt(0)+"";
             holder.image.setVisibility(View.GONE);
             holder.imgText.setText(fname);
-        }else{
-            holder.imgText.setVisibility(View.GONE);
-            holder.image.setImageBitmap(getByteContactPhoto(mainDataList.get(position).getImage()));
-        }
+//        }
+//        else{
+//            holder.imgText.setVisibility(View.GONE);
+//            holder.image.setImageBitmap(getByteContactPhoto(mainDataList.get(position).getImage()));
+//        }
 
         holder.check.setChecked(mainDataList.get(position).isSelected());
         return view;

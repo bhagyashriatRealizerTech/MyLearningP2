@@ -33,6 +33,7 @@ import realizer.com.schoolgenieparent.Utils.GetImages;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
 import realizer.com.schoolgenieparent.Utils.Singleton;
+import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
@@ -114,29 +115,20 @@ public class MyPupilInfoFragment extends Fragment implements OnBackPressFragment
             profile_init.setVisibility(View.GONE);
             profile_pic.setVisibility(View.VISIBLE);
             String urlString = stud[14];
-            StringBuilder sb=new StringBuilder();
-            for(int j=0;j<urlString.length();j++)
-            {
-                char c='\\';
-                if (urlString.charAt(j) =='\\')
-                {
-                    urlString.replace("\"","");
-                    sb.append("/");
+            if (urlString.contains("http")) {
+                String newURL = new Utility().getURLImage(urlString);
+                if (!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                    new GetImages(newURL,profile_pic,profile_init,stud[0]+" "+stud[2],newURL.split("/")[newURL.split("/").length-1]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,newURL);
+                else {
+                    File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                    //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                    profile_pic.setImageBitmap(bitmap);
                 }
-                else
-                {
-                    sb.append(urlString.charAt(j));
-                }
-            }
-            String newURL=sb.toString();
-            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                new GetImages(newURL,profile_pic,profile_init,stud[0]+" "+stud[2],newURL.split("/")[newURL.split("/").length-1]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,newURL);
-            else
-            {
-                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length-1]);
+            } else {
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                Bitmap bitmap = BitmapFactory.decodeFile(urlString, bmOptions);
                 profile_pic.setImageBitmap(bitmap);
             }
         }

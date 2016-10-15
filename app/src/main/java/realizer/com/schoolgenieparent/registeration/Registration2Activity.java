@@ -189,6 +189,15 @@ public class Registration2Activity extends Activity implements OnTaskCompleted
                     Config.alertDialog(Registration2Activity.this,"Error","Please enter confirm password");
                     //Toast.makeText(Registration2Activity.this, "Enter Confirm Password", Toast.LENGTH_SHORT).show();
                 }
+                else if(userId.trim().length()>10 || userId.trim().length()<6)
+                {
+                    Config.alertDialog(Registration2Activity.this,"Error","Userid must be 6 characters");
+                }
+                else if(pass.trim().length()>10||pass.trim().length()<6)
+                {
+                    Config.alertDialog(Registration2Activity.this,"Error","Password must be 6 characters or digits");
+                }
+
                 else if (pass.equals(conpass))
                 {
                     RegistrationModel rgm=new RegistrationModel();
