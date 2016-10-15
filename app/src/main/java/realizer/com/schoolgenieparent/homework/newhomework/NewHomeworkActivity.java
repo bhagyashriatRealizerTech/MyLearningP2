@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 import realizer.com.schoolgenieparent.DrawerActivity;
 import realizer.com.schoolgenieparent.R;
@@ -238,7 +239,7 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-        String sub = "All Sub";
+        String sub = "All_Sub";
         JSONArray imglstbase64;
         String txtlst;
         if(homeworktext.getText().toString().trim().length()>0)
@@ -254,9 +255,10 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
         tempImageList = Singleton.getFialbitmaplist();
 
         String encodedImage="";
+        String hwUUID= String.valueOf(UUID.randomUUID());
         for (int i=0;i<tempImageList.size();i++)
         {
-             imglstbase64 = new JSONArray();
+            imglstbase64 = new JSONArray();
             encodedImage = ImageStorage.saveEventToSdCard(tempImageList.get(i).getPic(), "P2P", getActivity());
 
             try {
@@ -266,17 +268,17 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
             }
 
 
-        String[] dateArr=date.split("/");
-        String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-        long n = qr.insertHomework(givenby, sub, newDate, txtlst, imglstbase64.toString(), sharedpreferences.getString("STANDARD", ""), sharedpreferences.getString("DIVISION", ""), htext);
-        if (n > 0) {
-            // Toast.makeText(getActivity(), "Homework Inserted Successfully", Toast.LENGTH_SHORT).show();
-            n = -1;
+            String[] dateArr=date.split("/");
+            String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
+            long n = qr.insertHomework(givenby, sub, newDate, txtlst, imglstbase64.toString(), sharedpreferences.getString("STANDARD", ""), sharedpreferences.getString("DIVISION", ""), htext,hwUUID);
+            if (n > 0) {
+                // Toast.makeText(getActivity(), "Homework Inserted Successfully", Toast.LENGTH_SHORT).show();
+                n = -1;
 
-            hid = qr.getHomeworkId();
-            SimpleDateFormat df1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-            n = qr.insertQueue(hid, htext, "1", df1.format(calendar.getTime()));
-        }
+                hid = qr.getHomeworkId();
+                SimpleDateFormat df1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+                n = qr.insertQueue(hid, htext, "1", df1.format(calendar.getTime()));
+            }
 
         }
 

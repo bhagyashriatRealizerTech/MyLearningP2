@@ -10,7 +10,8 @@
         android:orientation="vertical"
         android:layout_weight="1.5"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="9dp">
 
         <ListView
             android:layout_width="match_parent"
@@ -91,9 +92,9 @@
         android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_margin="3dp"
         android:layout_gravity="bottom"
         android:gravity="center"
+        android:layout_marginLeft="10dp"
         android:layout_height="fill_parent">
 
         <ScrollView
@@ -103,7 +104,6 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="3dp"
                 >
 
                 <LinearLayout
@@ -133,7 +133,7 @@
                             android:layout_weight="1"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/newmyclass"
+                            android:drawableTop="@drawable/iconinvi"
                             android:text="Invite"/>
                         <Button
                             android:layout_width="90dp"
@@ -167,7 +167,7 @@
                             android:layout_weight="1"
                             android:textAllCaps="false"
                             android:textStyle="normal"
-                            android:drawableTop="@drawable/newmyclass"
+                            android:drawableTop="@drawable/newmypupilicon"
                             android:text="My Pupil"/>
 
                     </LinearLayout>
@@ -243,7 +243,7 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:background="@color/white"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="#C0C0C0"
                             android:layout_weight="1"
                             android:enabled="false"
                             android:textAllCaps="false"
@@ -277,7 +277,7 @@
                             android:layout_marginRight="2dp"
                             android:layout_marginLeft="2dp"
                             android:background="@color/white"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="#C0C0C0"
                             android:layout_weight="1"
                             android:enabled="false"
                             android:textAllCaps="false"
@@ -305,7 +305,7 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:enabled="false"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="#C0C0C0"
                             android:background="@color/white"
                             android:layout_weight="1"
                             android:drawableTop="@drawable/newalerts"
@@ -320,7 +320,7 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:background="@color/white"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="#C0C0C0"
                             android:drawablePadding="5dip"
                             android:layout_weight="1"
                             android:drawableTop="@drawable/newstar"
@@ -339,7 +339,7 @@
                             android:background="@color/white"
                             android:enabled="false"
                             android:layout_weight="1"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="#C0C0C0"
                             android:drawableTop="@drawable/newholiday"
                             android:text="Holiday"/>
 

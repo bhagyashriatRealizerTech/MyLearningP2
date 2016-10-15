@@ -61,6 +61,8 @@ import realizer.com.schoolgenieparent.invitejoin.InviteToOthersFragment;
 import realizer.com.schoolgenieparent.myclass.MyClassStudentFragment;
 import realizer.com.schoolgenieparent.myclass.MyPupilInfoFragment;
 import realizer.com.schoolgenieparent.service.ManualSyncupService;
+import realizer.com.schoolgenieparent.trackpupil.TrackingDialogBoxActivity;
+import realizer.com.schoolgenieparent.trackpupil.asynctask.TrackingAsyckTaskGet;
 
 //import com.realizer.schoolgenie.chat.TeacherQueryFragment1;
 //import com.realizer.schoolgenie.funcenter.TeacherFunCenterFolderFragment;
@@ -261,10 +263,6 @@ public class DrawerActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             fragment = new ParentDashboardFragment();
         }
-//        else if (id == R.id.nav_myclass)
-//        {
-//            fragment = MyClass(1);
-//        }
         else if (id == R.id.nav_homework) {
             fragment = HomeworkList("Homework");
         } else if (id == R.id.nav_timetable) {
@@ -272,14 +270,12 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_classwork) {
             fragment = HomeworkList("Classwork");
         } else if (id == R.id.nav_communication) {
-            fragment = Communication("Communication");
-            //           Toast.makeText(DrawerActivity.this, "In Progress..!", Toast.LENGTH_SHORT).show();
+            fragment = Communication("Chat");
         }
         else if (id == R.id.nav_mypupil) {
             fragment = MyPupil();
         } else if (id == R.id.nav_myclass) {
             fragment = MyClassList();
-            //           Toast.makeText(DrawerActivity.this, "In Progress..!", Toast.LENGTH_SHORT).show();
         }
         else if (id == R.id.nav_manual_sync)
         {
@@ -289,26 +285,32 @@ public class DrawerActivity extends AppCompatActivity
             Singleton.setManualserviceIntent(service);
             startService(service);
         }
-//        else if (id == R.id.nav_alert)
-//        {
-//            fragment = GeneralCommunicationList();
-//        }
-//        else if (id == R.id.nav_funcenter)
-//        {
-//            //fragment = FunCenter();
-//        }
-//        else if (id == R.id.nav_star)
-//        {
-//            fragment = GiveStar();
-//        }
         else if (id == R.id.nav_logout) {
             Logout();
         }
+        else if(id==R.id.nav_tracking)
+        {
+            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor edit = sharedpreferences.edit();
 
-//        else if (id == R.id.nav_holiday)
-//        {
-//            fragment = PublicHoliday();
-//        }
+            String isfirsttime = sharedpreferences.getString("Tracking","");
+            if (isfirsttime.equals("true") || isfirsttime.equals(""))
+            {
+                TrackPupil("b");
+            }
+            else
+            {
+
+                String drivername = sharedpreferences.getString("USERNAME","");
+                String driverid = sharedpreferences.getString("USERID","");
+                String accessToken=sharedpreferences.getString("AccessToken","");
+                String deviceid=sharedpreferences.getString("DWEVICEID","");
+                String userId=sharedpreferences.getString("StudentUserID","");
+                TrackingAsyckTaskGet obj = new TrackingAsyckTaskGet(drivername,driverid, this,accessToken,deviceid,userId,this);
+                obj.execute();
+            }
+        }
+
         if (fragment != null) {
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
@@ -333,6 +335,12 @@ public class DrawerActivity extends AppCompatActivity
         return fragment;
     }
 
+    public void TrackPupil(String res) {
+        FragmentManager fragmentManager = getFragmentManager();
+        TrackingDialogBoxActivity fragment = new TrackingDialogBoxActivity();
+        fragment.setCancelable(true);
+        fragment.show(fragmentManager, "Dialog!");
+    }
 
     // for My Class List
     public Fragment MyClass(int i) {
@@ -591,6 +599,8 @@ public class DrawerActivity extends AppCompatActivity
         edit.putString("Login", "false");
         edit.putString("LogChk", "true");
         edit.commit();
+        Intent intent = new Intent(DrawerActivity.this,LoginActivity.class);
+        startActivity(intent);
         finish();
     }
    /* // for View Star List
@@ -904,6 +914,7 @@ public class DrawerActivity extends AppCompatActivity
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
+        //finish();
     }
 
     public boolean isConnectingToInternet(){

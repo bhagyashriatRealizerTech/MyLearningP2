@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +23,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.UUID;
 
 import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.ProfilePicAsyncTaskPost;
@@ -185,7 +185,8 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                             }
                         }
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
-                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
+                        String hwUUID= String.valueOf(UUID.randomUUID());
+                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1],hwUUID);
                         if (n>0)
                         {
                            // Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
@@ -199,7 +200,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                             notification1.setNotificationtype("Homework");
                             notification1.setMessage(subject);
                             notification1.setIsRead("false");
-                            notification1.setAdditionalData1(givenby);
+                            notification1.setAdditionalData1(std+" "+division);
                             qr.InsertNotification(notification1);
                             if(Singleton.getResultReceiver() != null)
                                 Singleton.getResultReceiver().send(1,null);
@@ -262,8 +263,8 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
 
                         //long n=0;
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, onTaskString[1], student);
-
-                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
+                        String hwUUID= String.valueOf(UUID.randomUUID());
+                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1],hwUUID);
                         if (n>0)
                         {
                             //Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
@@ -567,17 +568,17 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
             if (SyncHomeworkDownload)
             {
                 //homework
-                for (int k = 0; k < subjects.size(); k++) {
+               // for (int k = 0; k < subjects.size(); k++) {
 
                     ParentHomeworkListModel home = new ParentHomeworkListModel();
                     home.setSchoolcode(UserData[2]);
                     home.setStandard(UserData[0]);
                     home.setDivision(UserData[1]);
                     home.setHwdate(currentDate);
-                    home.setSubject(subjects.get(k));
+                    home.setSubject("All_Sub");
                     HomeworkAsyncTaskPost obj = new HomeworkAsyncTaskPost(home, ManualSyncupService.this, ManualSyncupService.this);
                     obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                }
+              //  }
 
                 SyncHomeworkDownload=false;
                 SyncClassworkDownload=true;
@@ -585,17 +586,17 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
             else if (SyncClassworkDownload)
             {
                 //classwork
-                for (int k = 0; k < subjects.size(); k++) {
+               // for (int k = 0; k < subjects.size(); k++) {
 
                     ParentHomeworkListModel home = new ParentHomeworkListModel();
                     home.setSchoolcode(UserData[2]);
                     home.setStandard(UserData[0]);
                     home.setDivision(UserData[1]);
                     home.setHwdate(currentDate);
-                    home.setSubject(subjects.get(k));
+                    home.setSubject("All_Sub");
                     ClassworkAsyncTaskPost obj = new ClassworkAsyncTaskPost(home, ManualSyncupService.this, ManualSyncupService.this);
                     obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                }
+                //}
 
                 SyncClassworkDownload=false;
             }

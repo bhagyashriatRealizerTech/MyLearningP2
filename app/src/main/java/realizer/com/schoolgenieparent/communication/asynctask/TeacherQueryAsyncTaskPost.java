@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -39,7 +37,7 @@ public class TeacherQueryAsyncTaskPost extends AsyncTask<Void, Void,StringBuilde
     String accessToken;
     private OnTaskCompleted callback;
 
-    public TeacherQueryAsyncTaskPost(TeacherQuerySendModel o, Context myContext, OnTaskCompleted cb,String deviceid,String accessToken) {
+    public TeacherQueryAsyncTaskPost(TeacherQuerySendModel o, Context myContext, OnTaskCompleted cb, String deviceid, String accessToken) {
         this.myContext = myContext;
         this.callback = cb;
         this.deviceid=deviceid;

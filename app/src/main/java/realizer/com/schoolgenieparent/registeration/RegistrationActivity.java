@@ -368,8 +368,8 @@ public class RegistrationActivity extends Activity implements OnTaskCompleted {
                                         loading.setVisibility(View.GONE);
                                         SchoolRegistrationModel obj = new SchoolRegistrationModel();
                                         obj.setCode(scode);
-                                        obj.setStd(standardedt.getText().toString().trim());
-                                        obj.setDiv(divisionedt.getText().toString().trim());
+                                        obj.setDiv(standardedt.getText().toString().trim());
+                                        obj.setStd(divisionedt.getText().toString().trim());
                                         new StandardRegistrationAsyncTaskPost(obj,RegistrationActivity.this,RegistrationActivity.this).execute();
                                     }
                                     alertDialog.dismiss();

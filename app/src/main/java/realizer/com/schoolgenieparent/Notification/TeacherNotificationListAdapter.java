@@ -104,23 +104,37 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
             DALQueris dbQ=new DALQueris(context1);
             ParentQueriesTeacherNameListModel result=dbQ.GetQueryTableData(notifications.get(position).getAdditionalData1());
             notificationData = "Downloaded "+notifications.get(position).getNotificationtype()+" For "+
-                    notifications.get(position).getMessage()+" From "+result.getName();
+                    notifications.get(position).getAdditionalData1();
             holder.notificationImage.setImageResource(R.drawable.homework_icon);
-           /* notificationData = notifications.get(position).getAdditionalData1().split("@@@")[2]+" "+
-                    notifications.get(position).getNotificationtype()+" "+notifications.get(position).getMessage()
-                    +" "+notifications.get(position).getAdditionalData1().split("@@@")[0]+" "+
-                    notifications.get(position).getAdditionalData1().split("@@@")[1];
+            date = notifications.get(position).getNotificationDate().trim().split(" ")[0];
+            String sdate[]=date.split("/");
+            String newDate=sdate[1]+"/"+sdate[0]+"/"+sdate[2];
 
-            holder.notificationImage.setImageResource(R.drawable.homework_icon);*/
+            holder.type.setText(notifications.get(position).getNotificationtype()+" Downloaded");
+            holder.notificationDate.setText(Config.getDate(newDate, "D"));
+            holder.notificationText.setText(notificationData);
         }
         else  if(notifications.get(position).getNotificationtype().equalsIgnoreCase("HomeworkUpload") || notifications.get(position).getNotificationtype().equalsIgnoreCase("ClassworkUpload"))
         {
             holder.outerLayer.setVisibility(View.VISIBLE);
-            notificationData = notifications.get(position).getAdditionalData1().split("@@@")[2]+" "+
-                    notifications.get(position).getNotificationtype()+" "+notifications.get(position).getMessage()
+
+            String work="";
+            if (notifications.get(position).getNotificationtype().equalsIgnoreCase("HomeworkUpload"))
+                work="Homework";
+            else
+                work="Classwork";
+
+            notificationData = work+" "+notifications.get(position).getMessage()
                     +" "+notifications.get(position).getAdditionalData1().split("@@@")[0]+" "+
                     notifications.get(position).getAdditionalData1().split("@@@")[1];
 
+            date = notifications.get(position).getNotificationDate().trim().split(" ")[0];
+            String sdate[]=date.split("/");
+            String newDate=sdate[0]+"/"+sdate[1]+"/"+sdate[2];
+
+            holder.type.setText(work+" Uploaded");
+            holder.notificationDate.setText(Config.getDate(newDate, "D"));
+            holder.notificationText.setText(notificationData);
             holder.notificationImage.setImageResource(R.drawable.homework_icon);
         }
         else if(notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
@@ -175,11 +189,6 @@ public class TeacherNotificationListAdapter extends BaseAdapter {
                 holder.outerLayer.setVisibility(View.GONE);
                 qr.deleteNotificationRow(notifications.get(position).getId());
             }
-
-          /*  if (notifications.size()>1 && notifications.get(position).getNotificationtype().equalsIgnoreCase("Message"))
-            {
-                qr.deleteNotificationRow(notifications.get(notifications.size()-1).getId());
-            }*/
         }
 
         return convertView;

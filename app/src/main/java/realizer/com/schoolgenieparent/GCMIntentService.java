@@ -36,6 +36,7 @@ import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.communication.model.TeacherQuery1model;
+import realizer.com.schoolgenieparent.communication.model.TeacherQuerySendModel;
 
 
 /**
@@ -124,55 +125,29 @@ public class GCMIntentService extends GCMBaseIntentService {
      * Issues a notification to inform the user that server has sent a message.
      */
     private static void generateNotification(Context context, String message) {
-        DatabaseQueries qr  = new DatabaseQueries(context);
+        DatabaseQueries qr = new DatabaseQueries(context);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         String date = df.format(calendar.getTime());
         int icon = R.mipmap.ic_launcher;
-        String[] msg=message.split("@@@");
-
-        long when = System.currentTimeMillis();
-        /*NotificationManager notificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(icon, message, when);
-        Log.d("Message=",message);
-        String title = context.getString(R.string.app_name);
-        Intent notificationIntent = new Intent(context, LoginActivity.class);
-        // set intent so it does not start a new activity
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent intent =
-                PendingIntent.getActivity(context, 0, notificationIntent, 0);
-        notification.setLatestEventInfo(context, title, msg[4], intent);
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notification.defaults |= Notification.DEFAULT_SOUND;
-        notification.defaults |= Notification.DEFAULT_VIBRATE;
-        notificationManager.notify(0, notification);*/
-        //splitting of msg to store in sqlite Conversion database
+        String[] msg = message.split("@@@");
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(context);
-       /*
-        //int nid = sharedpreferences.getInt("NID",0);
-       // nid =nid+1;
-        SharedPreferences.Editor edit = sharedpreferences.edit();
-        edit.putInt("NID",notificatinID );
-        edit.commit();*/
-
         Log.d("Feature Type=", msg[0]);
 
 
-        if(msg[0].equals("GroupConversation")) {
+        if (msg[0].equals("GroupConversation")) {
             DatabaseQueries qr1 = new DatabaseQueries(context);
             sharedpreferences = PreferenceManager.getDefaultSharedPreferences(context);
             SharedPreferences.Editor edit = sharedpreferences.edit();
-            edit.putString("ReceiverId",msg[2]);
-            edit.putString("ReceiverName",msg[3]);
-            edit.putString("ReceiverUrl",msg[5]);
+            edit.putString("ReceiverId", msg[2]);
+            edit.putString("ReceiverName", msg[3]);
+            edit.putString("ReceiverUrl", msg[5]);
 
-            Bundle b=new Bundle();
-            b.putString("ReceiverId",msg[2]);
-            b.putString("ReceiverName",msg[3]);
-            b.putString("ReceiverUrl",msg[5]);
-            String std=sharedpreferences.getString("SyncStd", "");
+            Bundle b = new Bundle();
+            b.putString("ReceiverId", msg[2]);
+            b.putString("ReceiverName", msg[3]);
+            b.putString("ReceiverUrl", msg[5]);
+            String std = sharedpreferences.getString("SyncStd", "");
             String div = sharedpreferences.getString("SyncDiv", "");
 
 
@@ -185,130 +160,92 @@ public class GCMIntentService extends GCMBaseIntentService {
                 e.printStackTrace();
             }
 
-            String stud = sharedpreferences.getString("Firstname", "");
+            String studid = sharedpreferences.getString("UidName", "");
 
-            if (!msg[3].equals(stud))
-            {
-                long n = qr1.insertQuery(msg[1],msg[2],msg[3],msg[6],msg[4],msg[5],date1,"true",sendDate);
-                if (n >= 0) {
-                    ArrayList<TeacherQuery1model> temp = qr.GetInitiatedChat("true");
-                    //int unread = qr1.GetUnreadCount(msg[2]);
-                    //n = qr1.insertInitiatechat(msg[3],"true",msg[2],unread+1,msg[5]);
-                    boolean isPresent=false;
-                    for (int i=0;i<temp.size();i++)
-                    {
-                        if (temp.get(i).getUid().equals(msg[2]))
-                        {
-                            isPresent=true;
-                            break;
-                        }
+            if (msg[6].equals(studid)) {
+                ArrayList<TeacherQuerySendModel> allChat = qr.GetQueuryData(msg[2]);
+                boolean isPresentNot = false;
+                for (int i = 0; i < allChat.size(); i++) {
+                    if (allChat.get(i).getText().equals(msg[4])) {
+                        isPresentNot = true;
+                        break;
+                    } else {
+                        isPresentNot = false;
                     }
-                    int unread = qr1.GetUnreadCount(msg[2]);
-                    if (isPresent)
-                    {
-                        qr1.updateInitiatechat(std,div,msg[3],"true",msg[2],unread+1,msg[5]);
-                    }
-                    else
-                    {
-                        long m=0;
-                        m=qr1.insertInitiatechat(msg[3],"true",msg[2],0,msg[5]);
-                        if (m>0)
-                            Log.d("Group Conversation", " Done!!!");
-                        else
-                            Log.d("Group Conversation", "Not Done!!!");
-                    }
-
-                    if(n>0)
-                    {
-                        NotificationModel obj = qr.GetNotificationByUserId(msg[2]);
-                        if(obj.getId() == 0)
-                        {
-                            n =0;
-                            NotificationModel notification1 = new NotificationModel();
-                            notification1.setNotificationId(9);
-                            notification1.setNotificationDate(date);
-                            notification1.setNotificationtype("Message");
-                            notification1.setMessage(msg[4]);
-                            notification1.setIsRead("false");
-                            notification1.setAdditionalData2(msg[3]);
-                            notification1.setAdditionalData1(msg[5]+"@@@"+(unread+1));
-                            n = qr.InsertNotification(notification1);
-                            if(Singleton.getResultReceiver() != null)
-                                Singleton.getResultReceiver().send(1,null);
-                        }
-                        else
-                        {
-                            n =0;
-                            obj.setMessage(msg[4]);
-                            obj.setNotificationDate(date);
-                            obj.setAdditionalData1(msg[5]+"@@@"+(unread+1));
-
-                            n = qr.UpdateNotification(obj);
-
-                            Bundle b1 = new Bundle();
-                            b1.putInt("NotificationId",1);
-                            b1.putString("NotificationDate", date);
-                            b1.putString("NotificationType", "Query");
-                            b1.putString("NotificationMessage", msg[4]);
-                            b1.putString("IsNotificationread", "false");
-                            b1.putString("AdditionalData1",msg[5]+"@@@"+(unread+1));
-                            b1.putString("AdditionalData2",msg[3]);
-
-                            if(Singleton.getResultReceiver() != null)
-                                Singleton.getResultReceiver().send(1,b);
-                        }
-                    }
-                    Log.d("Conversation", " Done!!!");
-                } else {
-                    Log.d("Conversation", " Not Done!!!");
                 }
+                long n = 0;
+                if (!isPresentNot) {
+                    n = qr1.insertQuery(msg[1], msg[2], msg[3], msg[6], msg[4], msg[5], date1, "true", sendDate);
+                    if (n >= 0) {
+                        ArrayList<TeacherQuery1model> temp = qr.GetInitiatedChat("true");
+
+                        boolean isPresent = false;
+                        for (int i = 0; i < temp.size(); i++) {
+                            if (temp.get(i).getUid().equals(msg[2])) {
+                                isPresent = true;
+                                break;
+                            }
+                        }
+                        int unread = qr1.GetUnreadCount(msg[2]);
+                        if (isPresent) {
+                            qr1.updateInitiatechat(std, div, msg[3], "true", msg[2], unread + 1, msg[5]);
+                        } else {
+                            long m = 0;
+                            m = qr1.insertInitiatechat(msg[3], "true", msg[2], 0, msg[5]);
+                            if (m > 0)
+                                Log.d("Group Conversation", " Done!!!");
+                            else
+                                Log.d("Group Conversation", "Not Done!!!");
+                        }
+
+                        if (n > 0) {
+                            NotificationModel obj = qr.GetNotificationByUserId(msg[2]);
+                            if (obj.getId() == 0) {
+                                n = 0;
+                                NotificationModel notification1 = new NotificationModel();
+                                notification1.setNotificationId(9);
+                                notification1.setNotificationDate(date);
+                                notification1.setNotificationtype("Message");
+                                notification1.setMessage(msg[4]);
+                                notification1.setIsRead("false");
+                                notification1.setAdditionalData2(msg[3]);
+                                notification1.setAdditionalData1(msg[5] + "@@@" + (unread + 1));
+                                n = qr.InsertNotification(notification1);
+                                if (Singleton.getResultReceiver() != null)
+                                    Singleton.getResultReceiver().send(1, null);
+                            } else {
+                                n = 0;
+                                obj.setMessage(msg[4]);
+                                obj.setNotificationDate(date);
+                                obj.setAdditionalData1(msg[5] + "@@@" + (unread + 1));
+
+                                n = qr.UpdateNotification(obj);
+
+                                Bundle b1 = new Bundle();
+                                b1.putInt("NotificationId", 1);
+                                b1.putString("NotificationDate", date);
+                                b1.putString("NotificationType", "Query");
+                                b1.putString("NotificationMessage", msg[4]);
+                                b1.putString("IsNotificationread", "false");
+                                b1.putString("AdditionalData1", msg[5] + "@@@" + (unread + 1));
+                                b1.putString("AdditionalData2", msg[3]);
+
+                                if (Singleton.getResultReceiver() != null)
+                                    Singleton.getResultReceiver().send(1, b);
+                            }
+                        }
+                        Log.d("Conversation", " Done!!!");
+                    } else {
+                        Log.d("Conversation", " Not Done!!!");
+                    }
+                }
+
             }
 
             Singleton obj = Singleton.getInstance();
-            if(obj.getResultReceiver() != null)
-            {
+            if (obj.getResultReceiver() != null) {
                 obj.getResultReceiver().send(100, b);
             }
         }
-
-
-
-//            builder.setSmallIcon(icon);
-//            builder.setContentIntent(intent);
-//            builder.setOngoing(false);  //API level 16
-//            builder.setNumber(num);
-//            builder.setDefaults(Notification.DEFAULT_SOUND);
-//            builder.setDefaults(Notification.DEFAULT_VIBRATE);
-//            builder.build();
-//            notification = builder.getNotification();
-//            /*notification.setLatestEventInfo(context, title, msg[0], intent);
-//            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-//            notification.defaults |= Notification.DEFAULT_SOUND;
-//            notification.defaults |= Notification.DEFAULT_VIBRATE;*/
-//            notificationManager.notify(notificatinAnnouncementID, notification);
-
-
-
     }
-
-    public void setCountZero(String notifyFragment)
-    {
-        if (notifyFragment.equals("Announcement"))
-        {
-            numAnnouncementMessages=0;
-        }
-        else  if (notifyFragment.equals("ViewStar"))
-        {
-            numStarMessages=0;
-        }
-        else  if (notifyFragment.equals("Attendance"))
-        {
-            numAttendanceMessages=0;
-        }
-        else  if (notifyFragment.equals("ConverSation"))
-        {
-            numChatMessages=0;
-        }
-    }
-
 }

@@ -258,7 +258,7 @@ public class TrackShowMap extends AppCompatActivity implements OnTaskCompleted {
             case R.id.item_switch:
                 TrackingDialogBoxActivity fragment = new TrackingDialogBoxActivity();
                 FragmentManager fragmentManager = getFragmentManager();
-                fragment.setCancelable(false);
+                fragment.setCancelable(true);
                 fragment.show(fragmentManager, "Dialog!");
 
             default :

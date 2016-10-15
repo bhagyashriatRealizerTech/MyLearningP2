@@ -182,16 +182,17 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                             @Override
                             public void run() {
 
-                                DatabaseQueries qr = new DatabaseQueries(getActivity());
-                                qr.deleteNotificationRow(notificationData.get(position).getId());
-                                // new GetNotificationList().execute();
-                                if(notificationData.size() ==1)
-                                    new GetNotificationList().execute();
-                                else {
-                                    notificationData.remove(position);
-                                    notificationAdapter.notifyDataSetChanged();
+                                if (notificationData.size() > 0)
+                                {
+                                    DatabaseQueries qr = new DatabaseQueries(getActivity());
+                                    qr.deleteNotificationRow(notificationData.get(position).getId());
+                                    if(notificationData.size() ==1)
+                                        new GetNotificationList().execute();
+                                    else {
+                                        notificationData.remove(position);
+                                        notificationAdapter.notifyDataSetChanged();
+                                    }
                                 }
-
                             }
                         }, 500);
 
@@ -250,17 +251,10 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.replace(R.id.frame_container, fragment);
                         fragmentTransaction.commit();
-
-                        //Communication("Communication");
-                       /* FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                        TeacherQueryViewFragment fragment = new TeacherQueryViewFragment();
                         Singleton.setSelectedFragment(fragment);
-                        fragment.setArguments(bundle);
-                        transaction.replace(R.id.frame_container, fragment);
-                        transaction.addToBackStack(null);
-                        transaction.commit();*/
-                    }
+                        Singleton.setMainFragment(fragment);
 
+                    }
                 }
             }
         });
@@ -339,7 +333,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     //FunCenter("FunCenter");
                     break;
                 case R.id.txtpdashcommunication:
-                    Communication("Communication");
+                    Communication("Chat");
 //                    Toast.makeText(getActivity(), "In Progress..!", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.txtpdashpublicholiday:
@@ -369,7 +363,6 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     }
                     else
                     {
-
                         String drivername = sharedpreferences.getString("USERNAME","");
                         String driverid = sharedpreferences.getString("USERID","");
                         String accessToken=sharedpreferences.getString("AccessToken","");
@@ -515,7 +508,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
     public void TrackPupil(String res) {
         FragmentManager fragmentManager = getFragmentManager();
         TrackingDialogBoxActivity fragment = new TrackingDialogBoxActivity();
-        fragment.setCancelable(false);
+        fragment.setCancelable(true);
         fragment.show(fragmentManager, "Dialog!");
     }
 
@@ -657,9 +650,25 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if(notificationData.size()>0) {
+                ArrayList<NotificationModel> FilteredData=new ArrayList<>();
+                int count=0;
+                for (int i=0;i<notificationData.size();i++)
+                {
+                    if (notificationData.get(i).getNotificationtype().equalsIgnoreCase("Message"))
+                    {
+                        count++;
+                        if (count==1)
+                            FilteredData.add(notificationData.get(i));
+                    }
+                    else
+                    {
+                        FilteredData.add(notificationData.get(i));
+                    }
+                }
+
                 notificationList.setVisibility(View.VISIBLE);
                 userInfoLayout.setVisibility(View.GONE);
-                notificationAdapter = new TeacherNotificationListAdapter(getActivity(), notificationData);
+                notificationAdapter = new TeacherNotificationListAdapter(getActivity(), FilteredData);
                 notificationList.setAdapter(notificationAdapter);
                 //Utility.setListViewHeightBasedOnChildren(notificationList);
                 notificationAdapter.notifyDataSetChanged();
@@ -718,8 +727,6 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     }
                 }
             }
-
         }
-
     }
 }

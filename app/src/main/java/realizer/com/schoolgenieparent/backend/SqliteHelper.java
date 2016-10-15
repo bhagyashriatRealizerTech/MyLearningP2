@@ -4,15 +4,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
-
 
 /**
  * Created by Win on 12/21/2015.
  */
 public class SqliteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SchoolGeniePToP";
-    private static final int DATABASE_VERSION =25;
+    private static final int DATABASE_VERSION =26;
     Context mycontext;
     private static final String STUDINFO =
             "CREATE TABLE StudentInfo(  UserId TEXT," +
@@ -55,7 +53,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
     //    private static final String Holiday ="CREATE TABLE Holiday(Id INTEGER PRIMARY KEY   AUTOINCREMENT,holiday TEXT,hsdate TEXT,hedate TEXT)";
 //    private static final String GiveStar ="CREATE TABLE GiveStar(GiveStarId INTEGER PRIMARY KEY   AUTOINCREMENT,TeacherLoginId TEXT,StudentLoginId TEXT,Comment TEXT,star TEXT,StarDate TEXT,Subject TEXT,Std TEXT,Div TEXT,StarTime TEXT,HasSyncedUp TEXT)";
-    private static final String Homework ="CREATE TABLE Homework(HomeworkId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,subject TEXT,textlst TEXT,Imglst TEXT,Givenby TEXT,hwDate TEXT,HasSyncedUp TEXT,Work TEXT)";
+    private static final String Homework ="CREATE TABLE Homework(HomeworkId INTEGER PRIMARY KEY   AUTOINCREMENT,Std Text,Div Text,subject TEXT,textlst TEXT,Imglst TEXT,Givenby TEXT,hwDate TEXT,HasSyncedUp TEXT,Work TEXT,HomeworkUUID TEXT)";
     private static final String ExceptionHandler = "CREATE TABLE Exception(ExceptionId INTEGER PRIMARY KEY   AUTOINCREMENT,UserId TEXT,ExceptionDetails TEXT,DeviceModel TEXT,AndroidVersion TEXT,ApplicationSource TEXT,DeviceBrand TEXT,HasSyncedUp TEXT)";
     private static final String HOMEWORKINFO = "CREATE TABLE HomeworkInfo(SchoolCode TEXT,Standard TEXT,Division TEXT,GivenBy TEXT,HomeworkDate TEXT,HwImage64Lst TEXT,HwTxtLst TEXT,Subject TEXT,Work TEXT)";
 
@@ -69,7 +67,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
     public SqliteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(context));
+        Thread.setDefaultUncaughtExceptionHandler(new realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler(context));
         this.mycontext = context;
     }
 

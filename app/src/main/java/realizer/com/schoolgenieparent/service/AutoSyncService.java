@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
@@ -246,7 +247,8 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                             }
                         }
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
-                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
+                        String hwUUID= String.valueOf(UUID.randomUUID());
+                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1],hwUUID);
                         if (n>0)
                         {
                             Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
@@ -323,8 +325,8 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
 
                         //long n=0;
                         //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, onTaskString[1], student);
-
-                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1]);
+                        String hwUUID= String.valueOf(UUID.randomUUID());
+                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1],hwUUID);
                         if (n>0)
                         {
                             Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();

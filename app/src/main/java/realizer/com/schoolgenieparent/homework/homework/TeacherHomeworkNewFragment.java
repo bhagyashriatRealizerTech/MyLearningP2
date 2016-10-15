@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 import realizer.com.schoolgenieparent.DrawerActivity;
 import realizer.com.schoolgenieparent.R;
@@ -261,7 +262,8 @@ public class TeacherHomeworkNewFragment extends Fragment implements View.OnClick
             }*/
             String[] dateArr=date.split("/");
             String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-            long n = qr.insertHomework(givenby, sub, newDate, txtlst, imglstbase64.toString(), txtstd.getText().toString(), txtclss.getText().toString(), htext);
+            String hwUUID= String.valueOf(UUID.randomUUID());
+            long n = qr.insertHomework(givenby, sub, newDate, txtlst, imglstbase64.toString(), txtstd.getText().toString(), txtclss.getText().toString(), htext,hwUUID);
             if (n > 0) {
                 // Toast.makeText(getActivity(), "Homework Inserted Successfully", Toast.LENGTH_SHORT).show();
                 n = -1;

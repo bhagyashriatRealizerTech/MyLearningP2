@@ -41,7 +41,6 @@ import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.Utils.StoreBitmapImages;
 import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
-import realizer.com.schoolgenieparent.backend.DALQueris;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.homework.adapter.ParentHomeworkListAdapter;
 import realizer.com.schoolgenieparent.homework.backend.DALHomework;
@@ -49,7 +48,6 @@ import realizer.com.schoolgenieparent.homework.model.ParentHomeworkListModel;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkListModel;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.homework.newhomework.NewHomeworkActivity;
-import realizer.com.schoolgenieparent.view.FullImageViewActivity;
 import realizer.com.schoolgenieparent.view.FullImageViewPager;
 import realizer.com.schoolgenieparent.view.ProgressWheel;
 
@@ -110,8 +108,8 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
         datespinner.setAdapter(adapter);
         datespinner.setSelection(datespin.size() - 1);
 
-        DALQueris qrt = new DALQueris(getActivity());
-        final ArrayList<String> subjects = qrt.GetAllSub();
+      /*  DALQueris qrt = new DALQueris(getActivity());
+        final ArrayList<String> subjects = qrt.GetAllSub();*/
 
         newHomework.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -203,28 +201,63 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
 
         ArrayList<TeacherHomeworkListModel> results = new ArrayList<>();
 
+        String prevUUID="";
+        String currentUUID="";
         for(int i=0;i<hwlst.size();i++)
         {
-            TeacherHomeworkListModel hDetail = new TeacherHomeworkListModel();
-            TeacherHomeworkModel obj = hwlst.get(i);
-            hDetail.setSubject(obj.getSubject());
-            hDetail.setGivenBy(obj.getGivenBy());
-            hDetail.setHasSync(obj.getIsSync());
-            try {
+            if (i==0)
+            {
+                prevUUID=hwlst.get(i).getHwUUID();
+                TeacherHomeworkListModel hDetail = new TeacherHomeworkListModel();
+                TeacherHomeworkModel obj = hwlst.get(i);
+                hDetail.setSubject(obj.getSubject());
+                hDetail.setGivenBy(obj.getGivenBy());
+                hDetail.setHasSync(obj.getIsSync());
+                try {
 
-                if(obj.getHwTxtLst().length()==0)
-                    hDetail.setHomework("NoText");
-                else
-                    hDetail.setHomework(obj.getHwTxtLst());
+                    if(obj.getHwTxtLst().length()==0)
+                        hDetail.setHomework("NoText");
+                    else
+                        hDetail.setHomework(obj.getHwTxtLst());
 
-                JSONArray jarr1 = new JSONArray(obj.getHwImage64Lst());
-                if(jarr1.length()==0)
-                    hDetail.setImage("NoImage");
-                else
-                    hDetail.setImage(obj.getHwImage64Lst());
-                results.add(hDetail);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                    JSONArray jarr1 = new JSONArray(obj.getHwImage64Lst());
+                    if(jarr1.length()==0)
+                        hDetail.setImage("NoImage");
+                    else
+                        hDetail.setImage(obj.getHwImage64Lst());
+                    results.add(hDetail);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                currentUUID=hwlst.get(i).getHwUUID();
+                if (!prevUUID.equals(currentUUID))
+                {
+                    TeacherHomeworkListModel hDetail = new TeacherHomeworkListModel();
+                    TeacherHomeworkModel obj = hwlst.get(i);
+                    hDetail.setSubject(obj.getSubject());
+                    hDetail.setGivenBy(obj.getGivenBy());
+                    hDetail.setHasSync(obj.getIsSync());
+                    try {
+
+                        if(obj.getHwTxtLst().length()==0)
+                            hDetail.setHomework("NoText");
+                        else
+                            hDetail.setHomework(obj.getHwTxtLst());
+
+                        JSONArray jarr1 = new JSONArray(obj.getHwImage64Lst());
+                        if(jarr1.length()==0)
+                            hDetail.setImage("NoImage");
+                        else
+                            hDetail.setImage(obj.getHwImage64Lst());
+                        results.add(hDetail);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    prevUUID=currentUUID;
+                }
             }
         }
 

@@ -20,6 +20,7 @@ public class TeacherHomeworkModel {
     public String Work="";
     public String isSync="";
     public Bitmap pic;
+    public String hwUUID="";
 
     public String getSchoolCode() {
         return SchoolCode;
@@ -115,5 +116,13 @@ public class TeacherHomeworkModel {
 
     public void setPic(Bitmap pic) {
         this.pic = pic;
+    }
+
+    public String getHwUUID() {
+        return hwUUID;
+    }
+
+    public void setHwUUID(String hwUUID) {
+        this.hwUUID = hwUUID;
     }
 }

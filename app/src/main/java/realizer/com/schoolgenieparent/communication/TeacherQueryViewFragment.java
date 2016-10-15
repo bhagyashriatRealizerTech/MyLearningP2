@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.os.ResultReceiver;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -165,6 +164,7 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
                             msg.setText("");
                             if(isConnectingToInternet()) {
                                 loading.setVisibility(View.VISIBLE);
+                                msg.setEnabled(false);
                                 TeacherQuerySendModel obj = qr.GetQuery(qid);
                                 TeacherQueryAsyncTaskPost asyncobj = new TeacherQueryAsyncTaskPost(obj,getActivity(), TeacherQueryViewFragment.this,deviceid,accesstoken);
                                 asyncobj.execute();
@@ -242,13 +242,12 @@ public class TeacherQueryViewFragment extends Fragment implements AbsListView.On
         mCurrentY = view.getScrollY();
         currentPosition = lsttname.getSelectedItemPosition();
         Log.d("Position", "" + currentPosition);
-
     }
-
 
     @Override
     public void onTaskCompleted(String s) {
         loading.setVisibility(View.GONE);
+        msg.setEnabled(true);
         if(s.equals("trueQuery"))
         {
             long n = qr.deleteQueueRow(qid, "Query");

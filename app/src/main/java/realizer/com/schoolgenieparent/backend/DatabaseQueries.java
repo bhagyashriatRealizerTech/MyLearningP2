@@ -7,8 +7,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+import realizer.com.schoolgenieparent.Notification.NotificationModel;
+import realizer.com.schoolgenieparent.communication.model.TeacherQuery1model;
+import realizer.com.schoolgenieparent.communication.model.TeacherQuerySendModel;
+import realizer.com.schoolgenieparent.exceptionhandler.ExceptionModel;
+import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
+import realizer.com.schoolgenieparent.queue.QueueListModel;
 
 //import com.realizer.schoolgenie.chat.model.TeacherQuerySendModel;
 //import com.realizer.schoolgenie.funcenter.model.TeacherFunCenterEventModel;
@@ -23,16 +31,6 @@ import android.widget.Toast;
 //import com.realizer.schoolgenie.selectstudentdialog.model.TeacherQuery1model;
 //import com.realizer.schoolgenie.star.model.TeacherGiveStarModel;
 //import com.realizer.schoolgenie.timetable.model.TeacherTimeTableExamListModel;
-
-import java.util.ArrayList;
-import java.util.Date;
-
-import realizer.com.schoolgenieparent.Notification.NotificationModel;
-import realizer.com.schoolgenieparent.communication.model.TeacherQuery1model;
-import realizer.com.schoolgenieparent.communication.model.TeacherQuerySendModel;
-import realizer.com.schoolgenieparent.exceptionhandler.ExceptionModel;
-import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
-import realizer.com.schoolgenieparent.queue.QueueListModel;
 
 /**
  * Created by Win on 12/21/2015.
@@ -443,7 +441,7 @@ public class DatabaseQueries {
         return newRowUpdate;
     }
     //Insert Homework data
-    public long insertHomework(String givenby,String subject,String hdate,String txtlst,String imglst,String std,String div,String work)
+    public long insertHomework(String givenby,String subject,String hdate,String txtlst,String imglst,String std,String div,String work,String msguuid)
     {
 
         ContentValues conV = new ContentValues();
@@ -456,6 +454,7 @@ public class DatabaseQueries {
         conV.put("hwDate", hdate);
         conV.put("HasSyncedUp","false");
         conV.put("Work", work);
+        conV.put("HomeworkUUID", work);
         long newRowInserted = db.insert("Homework", null, conV);
 
         return newRowInserted;
@@ -505,6 +504,7 @@ public class DatabaseQueries {
                     o.setGivenBy(c.getString(c.getColumnIndex("Givenby")));
                     o.setHwDate(c.getString(c.getColumnIndex("hwDate")));
                     o.setWork(c.getString(c.getColumnIndex("Work")));
+                    o.setHwUUID(c.getString(c.getColumnIndex("HomeworkUUID")));
                     cnt = cnt+1;
 
                 }
@@ -545,6 +545,7 @@ public class DatabaseQueries {
                     o.setHwDate(c.getString(c.getColumnIndex("hwDate")));
                     o.setWork(c.getString(c.getColumnIndex("Work")));
                     o.setIsSync(c.getString(c.getColumnIndex("HasSyncedUp")));
+                    o.setHwUUID(c.getString(c.getColumnIndex("HomeworkUUID")));
                     result.add(o);
                     cnt = cnt+1;
                 }

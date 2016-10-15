@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Locale;
 
 import realizer.com.schoolgenieparent.DrawerActivity;
+import realizer.com.schoolgenieparent.ParentDashboardFragment;
 import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnBackPressFragment;
@@ -331,10 +332,18 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
                                     String allmobno[] = mobno.split(";");
                                     String smss = edtmessage.getText().toString() + " \n" +"Standard : "+std+"\nDivision : "+div+ " \n" + textView.getText().toString();
                                     sendSMS(allmobno, smss);
-                                    Toast.makeText(getActivity(), "Message sent" , Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getActivity(), "Message sent" , Toast.LENGTH_SHORT).show();
                                     sb1 = null;
                                     edtmessage.setText("");
                                     alertDialog.dismiss();
+
+                                    ParentDashboardFragment fragment = new ParentDashboardFragment();
+                                    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                                    Singleton.setSelectedFragment(fragment);
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentTransaction.replace(R.id.frame_container, fragment);
+                                    fragmentTransaction.commit();
+
                                 } else {
                                     Toast.makeText(getActivity(), "Enter Mobile Number", Toast.LENGTH_SHORT).show();
                                 }
