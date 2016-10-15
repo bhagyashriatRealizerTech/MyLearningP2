@@ -262,20 +262,34 @@ public class DrawerActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             fragment = new ParentDashboardFragment();
+            Singleton.setSelectedFragment(fragment);
+            Singleton.setMainFragment(fragment);
         }
         else if (id == R.id.nav_homework) {
             fragment = HomeworkList("Homework");
+            Singleton.setSelectedFragment(fragment);
+            Singleton.setMainFragment(fragment);
         } else if (id == R.id.nav_timetable) {
             fragment = InviteTojoin("Invite to Join");
+            Singleton.setSelectedFragment(fragment);
+            Singleton.setMainFragment(fragment);
         } else if (id == R.id.nav_classwork) {
             fragment = HomeworkList("Classwork");
+            Singleton.setSelectedFragment(fragment);
+            Singleton.setMainFragment(fragment);
         } else if (id == R.id.nav_communication) {
             fragment = Communication("Chat");
+            Singleton.setSelectedFragment(fragment);
+            Singleton.setMainFragment(fragment);
         }
         else if (id == R.id.nav_mypupil) {
             fragment = MyPupil();
+            Singleton.setSelectedFragment(fragment);
+            Singleton.setMainFragment(fragment);
         } else if (id == R.id.nav_myclass) {
             fragment = MyClassList();
+            Singleton.setSelectedFragment(fragment);
+            Singleton.setMainFragment(fragment);
         }
         else if (id == R.id.nav_manual_sync)
         {
@@ -318,8 +332,6 @@ public class DrawerActivity extends AppCompatActivity
 
         }
 
-        Singleton.setSelectedFragment(fragment);
-        Singleton.setMainFragment(fragment);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

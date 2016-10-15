@@ -311,44 +311,46 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
             {
                 case R.id.txtpdashinviteother:
                     frag = InviteOther("Invite to Join");
+                    Singleton.setSelectedFragment(frag);
+                    Singleton.setMainFragment(frag);
                     break;
 
                 case R.id.txtpdashhomework:
                     frag =GetHomework("Homework");
+                    Singleton.setSelectedFragment(frag);
+                    Singleton.setMainFragment(frag);
                     break;
                 case R.id.txtpdashviewstar:
                     Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
-                    //ViewStar("b");
                     break;
                 case R.id.txtpdashtimetable:
                     Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
-                    //TimeTable("b");
                     break;
                 case R.id.txtpdashalert:
                     Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
-                    //Queries("b");
                     break;
                 case R.id.txtpdashfuncenter:
                     Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
-                    //FunCenter("FunCenter");
                     break;
                 case R.id.txtpdashcommunication:
-                    Communication("Chat");
-//                    Toast.makeText(getActivity(), "In Progress..!", Toast.LENGTH_SHORT).show();
+                    frag =Communication("Chat");
+                    Singleton.setSelectedFragment(frag);
+                    Singleton.setMainFragment(frag);
                     break;
                 case R.id.txtpdashpublicholiday:
-                    //PublicHoliday("b");
                     Toast.makeText(getActivity(), "In Progress..", Toast.LENGTH_SHORT).show();
                     break;
 
                 case R.id.txtpdashpupilinfo:
-                    //frag = Homework("Classwork");
                     frag =MyPupil();
+                    Singleton.setSelectedFragment(frag);
+                    Singleton.setMainFragment(frag);
                     break;
 
                 case R.id.txtpdashstudentlist:
-                    //frag = Homework("Classwork");
                     frag =MyClassList();
+                    Singleton.setSelectedFragment(frag);
+                    Singleton.setMainFragment(frag);
                     break;
 
                 case R.id.txtpdashtrack:
@@ -375,14 +377,11 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     break;
 
                 case R.id.txtpdashclasswork:
-                    //frag = Homework("Classwork");
                     frag =GetHomework("Classwork");
+                    Singleton.setSelectedFragment(frag);
+                    Singleton.setMainFragment(frag);
                     break;
             }
-            Singleton.setSelectedFragment(frag);
-            Singleton.setMainFragment(frag);
-
-
         }
 
     public void Controls(View v)
@@ -468,7 +467,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         fragmentTransaction.commit();
         return fragment;
     }
-    public void Communication(String res) {
+    public Fragment Communication(String res) {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String userId=preferences.getString("UidName", "");
@@ -488,6 +487,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.frame_container, fragment);
         fragmentTransaction.commit();
+        return  fragment;
     }
     public Fragment InviteOther(String res) {
         // Get Output as

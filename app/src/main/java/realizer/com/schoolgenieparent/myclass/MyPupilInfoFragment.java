@@ -1,6 +1,7 @@
 package realizer.com.schoolgenieparent.myclass;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -148,16 +149,8 @@ public class MyPupilInfoFragment extends Fragment implements OnBackPressFragment
             profile_init.setText( String.valueOf(firstName.charAt(0)).toUpperCase()+ String.valueOf(lastName.charAt(0)).toUpperCase());
         }
 
-
         return rootView;
     }
-
-  /*  @Override
-    public void onFragmentBackPressed() {
-        Singlton.setSelectedFragment(Singlton.getMainFragment());
-        if (getFragmentManager().getBackStackEntryCount() > 0)
-            getFragmentManager().popBackStack();
-    }*/
 
     @Override
     public void onResume() {
@@ -168,8 +161,7 @@ public class MyPupilInfoFragment extends Fragment implements OnBackPressFragment
 
     @Override
     public void OnBackPress() {
-        Singleton.setSelectedFragment(Singleton.getMainFragment());
-        if (getFragmentManager().getBackStackEntryCount() > 0)
-            getFragmentManager().popBackStack();
+        Intent intent=new Intent(getActivity(),DrawerActivity.class);
+        startActivity(intent);
     }
 }
