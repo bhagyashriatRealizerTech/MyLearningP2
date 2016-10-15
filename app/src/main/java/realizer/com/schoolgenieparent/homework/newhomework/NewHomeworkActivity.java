@@ -116,7 +116,6 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(),CustomPhotoGalleryActivity.class);
                 getActivity().startActivity(intent);
-
             }
         });
     }
@@ -253,7 +252,13 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
 
         ArrayList<TeacherHomeworkModel>tempImageList = new ArrayList<>();
         tempImageList = Singleton.getFialbitmaplist();
-
+        for (int i=0;i<tempImageList.size();i++)
+        {
+            if (tempImageList.get(i).getHwTxtLst().equals("NoIcon"))
+            {
+                tempImageList.remove(i);
+            }
+        }
         String encodedImage="";
         String hwUUID= String.valueOf(UUID.randomUUID());
         for (int i=0;i<tempImageList.size();i++)

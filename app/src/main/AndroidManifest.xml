@@ -103,7 +103,7 @@
             android:name=".DrawerActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:label=""
+            android:noHistory="false"
             android:theme="@style/AppTheme.NoActionBar"
             />
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for

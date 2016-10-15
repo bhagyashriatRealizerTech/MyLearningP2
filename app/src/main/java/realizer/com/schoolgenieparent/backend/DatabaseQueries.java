@@ -454,7 +454,7 @@ public class DatabaseQueries {
         conV.put("hwDate", hdate);
         conV.put("HasSyncedUp","false");
         conV.put("Work", work);
-        conV.put("HomeworkUUID", work);
+        conV.put("HomeworkUUID", msguuid);
         long newRowInserted = db.insert("Homework", null, conV);
 
         return newRowInserted;

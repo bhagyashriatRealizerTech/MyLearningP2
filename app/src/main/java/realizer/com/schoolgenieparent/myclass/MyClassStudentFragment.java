@@ -132,6 +132,7 @@ public class MyClassStudentFragment extends Fragment implements OnTaskCompleted,
 
 
         loading.setVisibility(View.VISIBLE);
+        ((DrawerActivity) getActivity()).lockDrawer();
         if(isConnectingToInternet())
         new StudentListAsyncTaskGet(txtstd.getText().toString(),txtclss.getText().toString(),schoolCode,getActivity(),MyClassStudentFragment.this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         else
@@ -641,6 +642,7 @@ public class MyClassStudentFragment extends Fragment implements OnTaskCompleted,
             sideIndex.setVisibility(View.VISIBLE);
             updateList();
             loading.setVisibility(View.GONE);
+            ((DrawerActivity) getActivity()).unlockDrawer();
            // loading.setVisibility(View.GONE);
         }
     }

@@ -163,67 +163,7 @@ public class CustomPhotoGalleryActivity extends AppCompatActivity  {
         }
         else
             Singleton.setImageList(selectedItems);
-/*        if (cnt == 0) {
-
-        } else {
-
-            UUID imguuid = UUID.randomUUID();
-            c = Calendar.getInstance();
-            System.out.println("Current time => " + c.getTime());
-            df = new SimpleDateFormat("MM/dd/yyyy");
-            upload = df.format(c.getTime());
-
-            isupload = "false";
-
-            for (int i = 0; i < selectedItems.size(); i++) {
-                grid = String.valueOf(selectedItems.get(i));
-                imguuid = UUID.randomUUID();
-                File f=new File(grid);
-                Bitmap bitmap = BitmapFactory.decodeFile(grid);
-
-               image1 = ImageStorage.saveEventToSdCard(bitmap, eventName, CustomPhotoGalleryActivity.this);
-                String f2[] = image1.split(File.separator);
-                String filename=f.getName();
-
-                acadmicyear = Calendar.getInstance().get(Calendar.YEAR);
-                imagecaption = caption;
-
-                m = qr.InsertImage(evntgetid, image1, upload, isupload, acadmicyear, i, imagecaption, imguuid.toString(),filename,eventuuid.toString());
-                if (m > 0)
-                {
-                    imgId = qr.getImageId();
-                    SimpleDateFormat df1 = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                    m = qr.insertQueue(imgId, "EventImages", "7", df1.format(Calendar.getInstance().getTime()));
-
-
-                    *//*try {
-                        if (m  > 0)
-                        {
-                            m  = -1;
-
-                            if (Config.isConnectingToInternet(CustomPhotoGalleryActivity.this))
-                            {
-
-                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(CustomPhotoGalleryActivity.this);
-                                TeacherFunCenterImageModel o = qr. getImageById(imgId);
-                                TeacherFunCenterImageAsynckPost objasync = new TeacherFunCenterImageAsynckPost(o,preferences.getString("STANDARD", ""),preferences.getString("DIVISION", ""), CustomPhotoGalleryActivity.this, CustomPhotoGalleryActivity.this,"true");
-                                objasync.execute();
-
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }*//*
-                }
-
-            }
-
-        }*/
     }
-
-    /**
-     * Class method
-     */
 
     /**
      * This method used to set bitmap.

@@ -64,14 +64,6 @@ import realizer.com.schoolgenieparent.service.ManualSyncupService;
 import realizer.com.schoolgenieparent.trackpupil.TrackingDialogBoxActivity;
 import realizer.com.schoolgenieparent.trackpupil.asynctask.TrackingAsyckTaskGet;
 
-//import com.realizer.schoolgenie.chat.TeacherQueryFragment1;
-//import com.realizer.schoolgenie.funcenter.TeacherFunCenterFolderFragment;
-//import com.realizer.schoolgenie.generalcommunication.TeacherGeneralCommunicationFragment;
-//import com.realizer.schoolgenie.holiday.TeacherPublicHolidayFragment;
-//import com.realizer.schoolgenie.homework.TeacherHomeworkFragment;
-//import com.realizer.schoolgenie.myclass.TeacherMyClassStudentFragment;
-//import com.realizer.schoolgenie.star.TeacherGiveStarFragment;
-//import com.realizer.schoolgenie.timetable.TeacherTimeTableFragment;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnTaskCompleted {
@@ -121,8 +113,27 @@ public class DrawerActivity extends AppCompatActivity
         });
 */
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
+                super.onDrawerClosed(drawerView);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
+                super.onDrawerOpened(drawerView);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        };
+
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -219,11 +230,10 @@ public class DrawerActivity extends AppCompatActivity
 
         if (Singleton.getSelectedFragment() instanceof ParentDashboardFragment) {
             moveTaskToBack(true);
-            finish();
+            finishAffinity();
         } else if (Singleton.getSelectedFragment() != null && Singleton.getSelectedFragment() instanceof OnBackPressFragment) {
             ((OnBackPressFragment) Singleton.getSelectedFragment()).OnBackPress();
         }
-
     }
 
     @Override
@@ -909,6 +919,12 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
+     protected void onResume() {
+
+        super.onResume();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
 
@@ -926,7 +942,7 @@ public class DrawerActivity extends AppCompatActivity
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
-        //finish();
+        //fragment=null;
     }
 
     public boolean isConnectingToInternet(){
