@@ -172,11 +172,7 @@ public final class ServerUtilities {
     }
 
     private static StringBuilder postUnregister(String EmpId,String did) {
-        //String my = "http://104.217.254.180/RestWCF/svcEmp.svc/registerDevice/" + EmpId + "/" + regID;
-       /* SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
-        String did = sharedpreferences.getString("DWEVICEID", "");*/
 
-        //String my = "http://192.168.1.14/SJRestWCF/registerDevice/" + EmpId + "/" + regID;
         String my = "http://104.217.254.180/SJRestWCF/svcEmp.svc/deregisterStudentDevice/" + EmpId + "/" + did;
         Log.d("GCMDID", my);
         builder = new StringBuilder();
@@ -206,10 +202,10 @@ public final class ServerUtilities {
         }
         catch (Exception e) {
             e.printStackTrace();
-        }/*finally {
+        }finally {
             client.getConnectionManager().closeExpiredConnections();
             client.getConnectionManager().shutdown();
-        }*/
+        }
 
         return builder;
     }
