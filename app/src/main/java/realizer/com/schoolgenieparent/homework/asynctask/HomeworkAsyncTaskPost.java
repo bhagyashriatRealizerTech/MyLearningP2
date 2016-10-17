@@ -1,13 +1,17 @@
 package realizer.com.schoolgenieparent.homework.asynctask;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -49,36 +53,27 @@ public class HomeworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
-        HttpClient httpclient = new DefaultHttpClient();
-        String url = Config.URL+"fetchHomeWork";
-        HttpPost httpPost = new HttpPost(url);
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(myContext);
+        String userid = sharedpreferences.getString("UidName", "");
+        String deviceid = sharedpreferences.getString("DWEVICEID", "");
+        String accesstoken = sharedpreferences.getString("AccessToken", "");
 
-        System.out.println(url);
-        String json = "";
-        StringEntity se = null;
-        JSONObject jsonobj = new JSONObject();
-        try {
-            jsonobj.put("schoolCode",obj.getSchoolcode());
-            jsonobj.put("hwDate",obj.getHwdate());
-            jsonobj.put("std",obj.getStandard());
-            jsonobj.put("division",obj.getDivision());
-            jsonobj.put("subject",obj.getSubject());
-
-            json = jsonobj.toString();
-                Log.d("RES", json);
-            se = new StringEntity(json);
-            httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("Content-type", "application/json");
-
-            httpPost.setEntity(se);
-            HttpResponse httpResponse = httpclient.execute(httpPost);
-            StatusLine statusLine = httpResponse.getStatusLine();
+        String date = obj.getHwdate();
+        String date1[] = date.split("/");
+        String url = Config.URL+"fetchP2PHomework/"+obj.getSchoolcode()+"/"+obj.getStandard()+"/"+obj.getDivision()+"/"+obj.getHwdate().split("/")[2]+"/"+
+                obj.getHwdate().split("/")[0]+"/"+obj.getHwdate().split("/")[1]+"/"+userid+"/"+deviceid;
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("AccessToken", accesstoken);
+        HttpClient client = new DefaultHttpClient();
+        try
+        {
+            HttpResponse response = client.execute(httpGet);
+            StatusLine statusLine = response.getStatusLine();
 
             int statusCode = statusLine.getStatusCode();
-            Log.d("StatusCode", "" + statusCode);
             if(statusCode == 200)
             {
-                HttpEntity entity = httpResponse.getEntity();
+                HttpEntity entity = response.getEntity();
                 InputStream content = entity.getContent();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(content));
                 String line;
@@ -89,13 +84,21 @@ public class HomeworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
             }
             else
             {
-                // Log.e("Error", "Failed to Login");
+                Log.e("Error", "Failed to Login");
             }
-        } catch (JSONException e) {
+        }
+        catch(ClientProtocolException e)
+        {
             e.printStackTrace();
         }
-        catch (IOException e) {
+        catch(IOException e)
+        {
             e.printStackTrace();
+        }
+        finally
+        {
+            client.getConnectionManager().closeExpiredConnections();
+            client.getConnectionManager().shutdown();
         }
         return resultLogin;
     }

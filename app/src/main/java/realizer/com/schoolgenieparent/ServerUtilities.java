@@ -107,12 +107,15 @@ public final class ServerUtilities {
      */
     static void unregister(final Context context, final String regId) {
         Log.i(Config.TAG, "unregistering device (regId = " + regId + ")");
-        String serverUrl = Config.URL + "/unregister";
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("regId", regId);
+        //String serverUrl = Config.URL + "/deregisterStudentDevice/" + studentID + "/" + regId;
+        // Map<String, String> params = new HashMap<String, String>();
+        //params.put("regId", regId);
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String did = sharedpreferences.getString("DWEVICEID", "");
+        String userid = sharedpreferences.getString("UidName", "");
         try {
-            //post(serverUrl, params);
-            GCMRegistrar.setRegisteredOnServer(context, false);
+            postUnregister(userid, did);
+            //GCMRegistrar.setRegisteredOnServer(context, false);
             String message = context.getString(R.string.server_unregistered);
             Config.displayMessage(context, message);
         } catch (Exception e) {
@@ -164,6 +167,49 @@ public final class ServerUtilities {
             client.getConnectionManager().closeExpiredConnections();
             client.getConnectionManager().shutdown();
         }
+
+        return builder;
+    }
+
+    private static StringBuilder postUnregister(String EmpId,String did) {
+        //String my = "http://104.217.254.180/RestWCF/svcEmp.svc/registerDevice/" + EmpId + "/" + regID;
+       /* SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String did = sharedpreferences.getString("DWEVICEID", "");*/
+
+        //String my = "http://192.168.1.14/SJRestWCF/registerDevice/" + EmpId + "/" + regID;
+        String my = "http://104.217.254.180/SJRestWCF/svcEmp.svc/deregisterStudentDevice/" + EmpId + "/" + did;
+        Log.d("GCMDID", my);
+        builder = new StringBuilder();
+        HttpGet httpGet = new HttpGet(my);
+        HttpClient client = new DefaultHttpClient();
+        try {
+            HttpResponse response = client.execute(httpGet);
+            StatusLine statusLine = response.getStatusLine();
+
+            int statusCode = statusLine.getStatusCode();
+            Log.d("GCMSTATUS", "" + statusCode);
+            if (statusCode == 200) {
+                HttpEntity entity = response.getEntity();
+                InputStream content = entity.getContent();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line);
+                }
+            } else {
+                Log.e("Error", "Failed to Login");
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }/*finally {
+            client.getConnectionManager().closeExpiredConnections();
+            client.getConnectionManager().shutdown();
+        }*/
 
         return builder;
     }

@@ -415,7 +415,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         final ArrayList<QueueListModel> lst = qr.GetQueueData();
                         Log.d("TIMER", " " + Calendar.getInstance().getTime() + ": " + lst.size());
 
-                        for(int i=0;i<lst.size();i++)
+                        /*for(int i=0;i<lst.size();i++)
                         {
                             id = lst.get(i).getId();
                             type = lst.get(i).getType();
@@ -452,7 +452,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                     uploadimage.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
                             }
-                        }
+                        }*/
 
                         downloadData();
                     } });
@@ -466,79 +466,6 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
 
             }
         });
-
-
-       /*
-
-       *//* if(lst.size()>0)
-        {*//*
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    adbdialog = new AlertDialog.Builder(Singleton.getContext());
-                    adbdialog.setTitle("Manual Sync");
-                    adbdialog.setMessage("Sync will be Performed in Background, you will be Notified once sync is Completed.");
-                    //adbdialog.setIcon(android.R.drawable.ic_dialog_info);
-                    adbdialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            final ArrayList<QueueListModel> lst = qr.GetQueueData();
-                            Log.d("TIMER", " " + Calendar.getInstance().getTime() + ": " + lst.size());
-                            for(int i=0;i<lst.size();i++)
-                            {
-                                id = lst.get(i).getId();
-                                type = lst.get(i).getType();
-                                if(type.equals("Homework"))
-                                {
-
-                                    TeacherHomeworkModel o = qr.GetHomework(id);
-                                    if(o.getWork().equalsIgnoreCase("Homework")) {
-                                        TeacherHomeworkAsyncTaskPost obj = new TeacherHomeworkAsyncTaskPost(o, ManualSyncupService.this, ManualSyncupService.this, "false");
-                                        obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                    }
-
-                                }
-                                else  if(type.equals("Classwork"))
-                                {
-                                    TeacherHomeworkModel o = qr.GetHomework(id);
-                                    if(o.getWork().equalsIgnoreCase("Classwork"))
-                                    {
-                                        TeacherClassworkAsyncTaskPost obj = new TeacherClassworkAsyncTaskPost(o, ManualSyncupService.this, ManualSyncupService.this, "false");
-                                        obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                    }
-                                }
-                            }
-
-                            downloadData();
-
-                        } });
-
-
-                    adbdialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            stopService(Singleton.getManualserviceIntent());
-                        } });
-                    adbdialog.show();
-                }
-            });
-            //Toast.makeText(this,"Sync Start...",Toast.LENGTH_SHORT).show();
-
-       *//* }
-        else
-        {
-            *//**//*runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Config.alertDialog(Singleton.getContext(), "Manual Sync", "There is No Data to Sync");
-                    //Toast.makeText(Singlton.getContext(), "No Data to Sync", Toast.LENGTH_SHORT).show();
-
-                }
-            });*//**//*
-            downloadData();
-
-        }*/
     }
 
     public boolean isConnectingToInternet(){

@@ -79,11 +79,10 @@ public class GCMIntentService extends GCMBaseIntentService {
         //displayMessage(context, getString(R.string.gcm_unregistered));
         //SharedPreferences Pref =
         if (GCMRegistrar.isRegisteredOnServer(context)) {
-            //ServerUtilities.unregister(context, registrationId);  commented today
+            ServerUtilities.unregister(context, registrationId);
+            Log.d("GCMUnregister","Done");
         } else {
-            // This callback results from the call to unregister made on
-            // ServerUtilities when the registration to the server failed.
-            // Log.i(TAG, "Ignoring unregister callback");
+            Log.d("GCMUnregister","Not Done");
         }
     }
 
