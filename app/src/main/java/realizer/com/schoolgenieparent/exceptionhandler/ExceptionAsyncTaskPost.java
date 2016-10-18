@@ -108,6 +108,8 @@ public class ExceptionAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
        // dialog.dismiss();
         Log.d("RESULTASYNC", stringBuilder.toString());
         //Pass here result of async task
-        callback.onTaskCompleted(stringBuilder.toString());
+        String s = stringBuilder.toString()+"@@@"+"Exception"+"@@@"+obj.getExceptionID();
+        callback.onTaskCompleted(s);
+
     }
 }
