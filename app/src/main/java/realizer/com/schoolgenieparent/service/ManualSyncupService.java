@@ -36,6 +36,8 @@ import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
 import realizer.com.schoolgenieparent.backend.DALQueris;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
+import realizer.com.schoolgenieparent.exceptionhandler.ExceptionAsyncTaskPost;
+import realizer.com.schoolgenieparent.exceptionhandler.ExceptionModel;
 import realizer.com.schoolgenieparent.homework.asynctask.ClassworkAsyncTaskPost;
 import realizer.com.schoolgenieparent.homework.asynctask.HomeworkAsyncTaskPost;
 import realizer.com.schoolgenieparent.homework.asynctask.TeacherClassworkAsyncTaskPost;
@@ -134,8 +136,17 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
         Log.d("String", s);
         //s =s.replace("\"","");
         final String[] onTaskString=s.split("@@@");
-
-        if (onTaskString[1].equalsIgnoreCase("Homework"))
+        if(onTaskString[1].equalsIgnoreCase("Exception"))
+        {
+            if (onTaskString[0].equalsIgnoreCase("true")) {
+                long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]), "Exception");
+                if (n >= 0) {
+                    ExceptionModel obj = qr.GetException(Integer.valueOf(onTaskString[2]));
+                    n = qr.updateException(obj);
+                }
+            }
+        }
+       else if (onTaskString[1].equalsIgnoreCase("Homework"))
         {
             DALHomework dla = new DALHomework(this);
             JSONObject rootObj = null;
@@ -485,6 +496,12 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                     ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(ManualSyncupService.this,ManualSyncupService.this,preferences.getString("StudentUserID",""),bitmapImg,accessToken,deviceid);
                                     uploadimage.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
+                            }
+                            else if(type.equals("Exception"))
+                            {
+                                ExceptionModel o = qr.GetException(id);
+                                ExceptionAsyncTaskPost obj = new ExceptionAsyncTaskPost(o, ManualSyncupService.this, ManualSyncupService.this);
+                                obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                             }
                         }
 

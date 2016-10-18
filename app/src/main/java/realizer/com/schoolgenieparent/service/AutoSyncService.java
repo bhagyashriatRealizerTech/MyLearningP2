@@ -34,7 +34,9 @@ import realizer.com.schoolgenieparent.Utils.Utility;
 import realizer.com.schoolgenieparent.backend.DALMyPupilInfo;
 import realizer.com.schoolgenieparent.backend.DALQueris;
 import realizer.com.schoolgenieparent.backend.DatabaseQueries;
+import realizer.com.schoolgenieparent.exceptionhandler.ExceptionAsyncTaskPost;
 import realizer.com.schoolgenieparent.exceptionhandler.ExceptionHandler;
+import realizer.com.schoolgenieparent.exceptionhandler.ExceptionModel;
 import realizer.com.schoolgenieparent.homework.autosyncasynctask.ClasswrokAutoAsyncTask;
 import realizer.com.schoolgenieparent.homework.autosyncasynctask.HomewrokAutoAsyncTask;
 import realizer.com.schoolgenieparent.homework.autosyncasynctask.UploadClassworkAutoAsyncTask;
@@ -161,6 +163,12 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                         uploadimage.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                     }
                 }
+                else if(type.equals("Exception"))
+                {
+                    ExceptionModel o = qr.GetException(id);
+                    ExceptionAsyncTaskPost obj = new ExceptionAsyncTaskPost(o, AutoSyncService.this, AutoSyncService.this);
+                    obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                }
             }
         }
 
@@ -212,7 +220,17 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
 
         final String[] onTaskString=s.split("@@@");
 
-        if (onTaskString[1].equalsIgnoreCase("Homework"))
+        if(onTaskString[1].equalsIgnoreCase("Exception"))
+        {
+            if (onTaskString[0].equalsIgnoreCase("true")) {
+                long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]), "Exception");
+                if (n >= 0) {
+                    ExceptionModel obj = qr.GetException(Integer.valueOf(onTaskString[2]));
+                    n = qr.updateException(obj);
+                }
+            }
+        }
+        else  if (onTaskString[1].equalsIgnoreCase("Homework"))
         {
             DALHomework dla = new DALHomework(this);
             JSONObject rootObj = null;
