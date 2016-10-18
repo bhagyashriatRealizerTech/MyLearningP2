@@ -16,7 +16,8 @@ public class FullImageViewPager extends FragmentActivity {
 
 	public Context mContext;
 	// Declare Variable
-	int position;
+	String uuid;
+    int position=0;
 	FullImageViewPagerAdapter pageradapter;
 	String activityName;
     DatabaseQueries db;
@@ -31,13 +32,22 @@ public class FullImageViewPager extends FragmentActivity {
         db=new DatabaseQueries(FullImageViewPager.this);
 		// Retrieve data from MainActivity on item click event
         Bundle bundle = getIntent().getExtras();
-		position = bundle.getInt("POSITION");
+        uuid = bundle.getString("HWUUID");
         activityName = bundle.getString("HEADERTEXT");
 		mContext = FullImageViewPager.this;
 
 		final ViewPager viewpager = (ViewPager) findViewById(R.id.pager1);
 
 		chatDownloadedThumbnailList=db.GetHomeworkAllImages(activityName);
+      //getting current image position
+        for (int i=0;i<chatDownloadedThumbnailList.size();i++)
+        {
+            if (uuid.equals(chatDownloadedThumbnailList.get(i).getHwUUID()))
+            {
+                position=i;
+                break;
+            }
+        }
 		// Set the images into ViewPager
 		pageradapter = new FullImageViewPagerAdapter(mContext, chatDownloadedThumbnailList);
 		viewpager.setAdapter(pageradapter);

@@ -1028,6 +1028,7 @@ public class DatabaseQueries {
                     o.setHwDate(c.getString(c.getColumnIndex("hwDate")));
                     o.setWork(c.getString(c.getColumnIndex("Work")));
                     o.setIsSync(c.getString(c.getColumnIndex("HasSyncedUp")));
+                    o.setHwUUID(c.getString(c.getColumnIndex("HomeworkUUID")));
                     result.add(o);
                     cnt = cnt+1;
                 }

@@ -178,15 +178,15 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
             }
         });
 
-
-
         listHomewrok.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object o = listHomewrok.getItemAtPosition(position);
+                TeacherHomeworkListModel tmodel = (TeacherHomeworkListModel) o;
 
                 Intent i = new Intent(getActivity(),FullImageViewPager.class);
                 i.putExtra("HEADERTEXT",htext);
-                i.putExtra("POSITION",position);
+                i.putExtra("HWUUID",tmodel.getHwUUID());
                 startActivity(i);
             }
         });
@@ -213,6 +213,7 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                 hDetail.setSubject(obj.getSubject());
                 hDetail.setGivenBy(obj.getGivenBy());
                 hDetail.setHasSync(obj.getIsSync());
+                hDetail.setHwUUID(obj.getHwUUID());
                 hDetail.setHomework(obj.getHwTxtLst());
                 if(obj.getHwImage64Lst().equals("[]"))
                     hDetail.setImage("NoImage");
@@ -243,6 +244,7 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                     hDetail.setSubject(obj.getSubject());
                     hDetail.setGivenBy(obj.getGivenBy());
                     hDetail.setHasSync(obj.getIsSync());
+                    hDetail.setHwUUID(obj.getHwUUID());
                     hDetail.setHomework(obj.getHwTxtLst());
                     if(obj.getHwImage64Lst().equals("[]"))
                         hDetail.setImage("NoImage");

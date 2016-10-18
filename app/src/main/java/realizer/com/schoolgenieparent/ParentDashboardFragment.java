@@ -259,50 +259,6 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
             }
         });
 
-        //payment.setOnClickListener(this);
-//        Tab.setOnPageChangeListener(
-//                new ViewPager.SimpleOnPageChangeListener() {
-//                    @Override
-//                    public void onPageSelected(int position) {
-//
-//                        actionBar = getActivity().getActionBar();
-//                        actionBar.setSelectedNavigationItem(position);
-//                    }
-//                });
-
-//        actionBar = getActivity().getActionBar();
-//        //Enable Tabs on Action Bar
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//        ActionBar.TabListener tabListener = new ActionBar.TabListener(){
-//
-//            @Override
-//            public void onTabReselected(android.app.ActionBar.Tab tab,
-//                                        FragmentTransaction ft) {
-//                // TODO Auto-generated method stub
-//
-//            }
-//
-//            @Override
-//            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-//
-//                Tab.setCurrentItem(tab.getPosition());
-//            }
-//
-//            @Override
-//            public void onTabUnselected(android.app.ActionBar.Tab tab,
-//                                        FragmentTransaction ft) {
-//                // TODO Auto-generated method stub
-//
-//            }};
-////        Add New Tab
-//        actionBar.addTab(actionBar.newTab().setText("Homework").setTabListener(tabListener));
-//        actionBar.addTab(actionBar.newTab().setText("Classwork").setTabListener(tabListener));
-//        actionBar.addTab(actionBar.newTab().setText("Chat").setTabListener(tabListener));
-
-            Intent i2 = new Intent(getActivity(), UninstallIntentReceiver.class);
-        i2.putExtra("PackageName","realizer.com.schoolgenieparent");
-         getActivity().sendBroadcast(i2);
-
         return rootview;
     }
 
