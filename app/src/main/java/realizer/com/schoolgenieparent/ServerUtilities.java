@@ -113,8 +113,9 @@ public final class ServerUtilities {
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
         String did = sharedpreferences.getString("DWEVICEID", "");
         String userid = sharedpreferences.getString("UidName", "");
+        String accesstoken = sharedpreferences.getString("AccessToken", "");
         try {
-            postUnregister(userid, did);
+            postUnregister(userid, did,accesstoken);
             //GCMRegistrar.setRegisteredOnServer(context, false);
             String message = context.getString(R.string.server_unregistered);
             Config.displayMessage(context, message);
@@ -171,13 +172,14 @@ public final class ServerUtilities {
         return builder;
     }
 
-    private static StringBuilder postUnregister(String EmpId,String did) {
+    private static StringBuilder postUnregister(String EmpId,String did,String access) {
 
         String my = "http://104.217.254.180/SJRestWCF/svcEmp.svc/deregisterStudentDevice/" + EmpId + "/" + did;
         Log.d("GCMDID", my);
         builder = new StringBuilder();
         HttpGet httpGet = new HttpGet(my);
         HttpClient client = new DefaultHttpClient();
+        httpGet.setHeader("AccessToken",access);
         try {
             HttpResponse response = client.execute(httpGet);
             StatusLine statusLine = response.getStatusLine();

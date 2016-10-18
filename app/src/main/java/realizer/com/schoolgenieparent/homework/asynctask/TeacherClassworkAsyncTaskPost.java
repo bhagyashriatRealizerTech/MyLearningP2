@@ -62,12 +62,11 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
             JSONArray arr = new JSONArray(obj.getHwImage64Lst());
             if(arr.length()>0) {
                 for (int i = 0; i < arr.length(); i++) {
-                    JSONObject obj = arr.getJSONObject(i);
-                    File file = ImageStorage.getEventImage(obj.get("" + i).toString());
+                    File file = ImageStorage.getEventImage(arr.getString(i).toString());
                     String imagebse64 = "";
                     if (file != null) {
                         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                        Bitmap bitmap = BitmapFactory.decodeFile(obj.get("" + i).toString(), bmOptions);
+                        Bitmap bitmap = BitmapFactory.decodeFile(arr.getString(i), bmOptions);
                         ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos1); //bm is the bitmap object
                         byte[] b1 = baos1.toByteArray();
@@ -125,7 +124,7 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
 
             JSONArray arr1 = new JSONArray();
             arr1.put(0,obj.getHwTxtLst());
-            jobj.put("CwTxtLst",arr1);
+            jobj.put("cwTxtLst",arr1);
 
 
 

@@ -60,12 +60,12 @@ public class DatabaseQueries {
 
         deleterow = db.delete("StudentInfo",null, null);
         deleterow = db.delete("QueryInfo",null, null);
-        deleterow = db.delete("HomeworkInfo",null, null);
+        deleterow = db.delete("Homework",null, null);
         deleterow = db.delete("Query", null, null);
         deleterow = db.delete("SyncUPQueue", null, null);
-
-        //deleterow = db.delete("InitiatedChat",null, null);
-        //deleterow = db.delete("RememberME",null, null);
+        deleterow = db.delete("Exception", null, null);
+        deleterow = db.delete("InitiatedChat",null, null);
+        deleterow = db.delete("Notification",null, null);
         deleterow = db.delete("StdDivSub", null, null);
     }
 

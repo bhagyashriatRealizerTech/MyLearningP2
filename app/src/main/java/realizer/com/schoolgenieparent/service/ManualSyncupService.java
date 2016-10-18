@@ -162,17 +162,31 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
                         ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
                         boolean isPresent=false;
-                        for (int i = 0; i < img.length(); i++) {
-                            IMG[i] = img.getString(i);
+                        if (results.size() > 0)
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                IMG[i] = img.getString(i);
 
-                            for (int k=0;k<results.size();k++)
-                            {
-                                    if (results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
+                                for (int k=0;k<results.size();k++)
+                                {
+                                    if (givenby.equals(results.get(k).getGivenBy()) && results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
                                     {
                                         isPresent=true;
                                         break;
                                     }
+                                    else
+                                    {
+                                        isPresent=false;
+                                    }
+                                }
                             }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                IMG[i] = img.getString(i);
+                            }
+                            isPresent=false;
                         }
                         long n =0;
                         if (!isPresent)
@@ -185,7 +199,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                     new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
                                 }
 
-                                 qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
+                                n= qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
                             }
                             //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
                             if (n>0)
@@ -208,7 +222,6 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                             }
                         }
                     }
-
                 }
 
             } catch (JSONException e) {
@@ -232,7 +245,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                     String givenby= ob.getString("givenBy");
                     String hwdate= ob.getString("cwDate");
                     JSONArray img  = ob.getJSONArray("cwImage64Lst");
-                    JSONArray text  = ob.getJSONArray("CwTxtLst");
+                    JSONArray text  = ob.getJSONArray("cwTxtLst");
                     String subject= ob.getString("subject");
 
                     if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
@@ -243,18 +256,33 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                         //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
                         ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
                         boolean isPresent=false;
-                        for (int i = 0; i < img.length(); i++) {
-                            IMG[i] = img.getString(i);
+                        if (results.size() > 0)
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                IMG[i] = img.getString(i);
 
-                            for (int k=0;k<results.size();k++)
-                            {
-                                if (results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
+                                for (int k=0;k<results.size();k++)
                                 {
-                                    isPresent=true;
-                                    break;
+                                    if (givenby.equals(results.get(k).getGivenBy()) && results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
+                                    {
+                                        isPresent=true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        isPresent=false;
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                IMG[i] = img.getString(i);
+                            }
+                            isPresent=false;
+                        }
+
                         long n =0;
                         if (!isPresent)
                         {
@@ -266,7 +294,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                     new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
                                 }
 
-                                qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
+                               n= qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
                             }
                             //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
                             if (n>0)

@@ -43,7 +43,6 @@
                 android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:visibility="visible"
-                android:background="@drawable/chat_icon"
                 android:id="@+id/iv_uImage" />
 
             <TextView android:layout_width="100dp"
@@ -66,7 +65,7 @@
                 android:textStyle="normal"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:layout_marginBottom="0dp"
-                android:text="Farhan Bodale"
+                android:text=""
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"/>
 
@@ -80,7 +79,7 @@
                 android:textColor="#808080"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:layout_marginBottom="0dp"
-                android:text="LKG A"
+                android:text=""
                 android:textSize="18sp"/>
 
         </LinearLayout>
