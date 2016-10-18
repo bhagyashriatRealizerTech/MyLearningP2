@@ -97,36 +97,6 @@ public class FullImageViewPagerAdapter extends PagerAdapter {
             }
 
         }
-
-           // JSONArray jarr = new JSONArray(attachmentList.get(position).getHwImage64Lst());
-
-          /*  for(int i=0;i<attachmentList.size();i++)
-            {
-                IMG[i] = attachmentList.get(i).getHwImage64Lst();
-                if (IMG[i].contains("http"))
-                {
-                    String newURL=new Utility().getURLImage(IMG[i]);
-                    if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
-                        new GetImages(newURL,holder.imgview,null,null,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
-                    else
-                    {
-                        File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
-                        BitmapFactory.Options bmOptions1 = new BitmapFactory.Options();
-                        Bitmap decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions1);
-                        holder.imgview.setImageBitmap(decodedByte);
-                    }
-                }
-                else
-                {
-                    String newURL=new Utility().getURLImage(IMG[i]);
-                    File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
-                    BitmapFactory.Options bmOptions1 = new BitmapFactory.Options();
-                    Bitmap decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions1);
-                    holder.imgview.setImageBitmap(decodedByte);
-                }
-
-            }*/
-
         // Add viewpager_item.xml to ViewPager
         (container).addView(itemView);
 

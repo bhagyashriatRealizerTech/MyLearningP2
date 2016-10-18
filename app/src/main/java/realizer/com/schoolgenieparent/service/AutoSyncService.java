@@ -25,6 +25,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import realizer.com.schoolgenieparent.Notification.NotificationModel;
+import realizer.com.schoolgenieparent.ProfilePicAsyncTaskPost;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.Utils.Singleton;
@@ -146,6 +147,20 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                         obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                     }
                 }
+                else  if(type.equals("ProfilePic") && id==1010)
+                {
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AutoSyncService.this);
+                    String oldPath=preferences.getString("ThumbnailID","");
+                    String newPath=preferences.getString("NewThumbnailID","");
+                    String bitmapImg=preferences.getString("ProfilePicPath","");
+                    String accessToken=preferences.getString("AccessToken","");
+                    String deviceid=preferences.getString("DWEVICEID","");
+                    if (!oldPath.equals(newPath))
+                    {
+                        ProfilePicAsyncTaskPost uploadimage=new ProfilePicAsyncTaskPost(AutoSyncService.this,AutoSyncService.this,preferences.getString("StudentUserID",""),bitmapImg,accessToken,deviceid);
+                        uploadimage.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    }
+                }
             }
         }
 
@@ -156,17 +171,17 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
             if (SyncHomeworkDownload)
             {
                 //homework
-                for (int k = 0; k < subjects.size(); k++) {
+               // for (int k = 0; k < subjects.size(); k++) {
 
-                    ParentHomeworkListModel home = new ParentHomeworkListModel();
-                    home.setSchoolcode(UserData[2]);
-                    home.setStandard(UserData[0]);
-                    home.setDivision(UserData[1]);
-                    home.setHwdate(currentDate);
-                    home.setSubject(subjects.get(k));
-                    HomewrokAutoAsyncTask obj = new HomewrokAutoAsyncTask(home, AutoSyncService.this, AutoSyncService.this);
-                    obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                }
+                ParentHomeworkListModel home = new ParentHomeworkListModel();
+                home.setSchoolcode(UserData[2]);
+                home.setStandard(UserData[0]);
+                home.setDivision(UserData[1]);
+                home.setHwdate(currentDate);
+                home.setSubject("All_Sub");
+                HomewrokAutoAsyncTask obj = new HomewrokAutoAsyncTask(home, AutoSyncService.this, AutoSyncService.this);
+                obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                //}
 
                 SyncHomeworkDownload=false;
                 SyncClassworkDownload=true;
@@ -174,17 +189,17 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
             else if (SyncClassworkDownload)
             {
                 //classwork
-                for (int k = 0; k < subjects.size(); k++) {
+                //for (int k = 0; k < subjects.size(); k++) {
 
                     ParentHomeworkListModel home = new ParentHomeworkListModel();
                     home.setSchoolcode(UserData[2]);
                     home.setStandard(UserData[0]);
                     home.setDivision(UserData[1]);
                     home.setHwdate(currentDate);
-                    home.setSubject(subjects.get(k));
+                    home.setSubject("All_Sub");
                     ClasswrokAutoAsyncTask obj = new ClasswrokAutoAsyncTask(home, AutoSyncService.this, AutoSyncService.this);
                     obj.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                }
+                //}
 
                 SyncClassworkDownload=false;
             }
@@ -195,7 +210,7 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
     public void onTaskCompleted(String s) {
         Log.d("String", s);
 
-        String[] onTaskString=s.split("@@@");
+        final String[] onTaskString=s.split("@@@");
 
         if (onTaskString[1].equalsIgnoreCase("Homework"))
         {
@@ -203,71 +218,74 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
             JSONObject rootObj = null;
             try {
                 rootObj = new JSONObject(onTaskString[0]);
-                JSONObject obj=rootObj.getJSONObject("fetchHomeWorkResult");
-                String schoolCode= obj.getString("SchoolCode");
-                String std= obj.getString("Std");
-                String division= obj.getString("div");
-                String givenby= obj.getString("givenBy");
-                String hwdate= obj.getString("hwDate");
-                JSONArray img  = obj.getJSONArray("hwImage64Lst");
-                JSONArray text  = obj.getJSONArray("hwTxtLst");
-                String subject= obj.getString("subject");
-
-                if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
+                JSONArray obj=rootObj.getJSONArray("fetchP2PHomeworkResult");
+                for (int j=0;j<obj.length();j++)
                 {
-                    String[] IMG=new String[img.length()];
-                    String[] dateArr=hwdate.split("/");
-                    String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-                    //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
-                    ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
-                    boolean isPresent=false;
+                    JSONObject ob = obj.getJSONObject(j);
+                    String schoolCode= ob.getString("SchoolCode");
+                    String std= ob.getString("Std");
+                    String division= ob.getString("div");
+                    String givenby= ob.getString("givenBy");
+                    String hwdate= ob.getString("hwDate");
+                    JSONArray img  = ob.getJSONArray("hwImage64Lst");
+                    JSONArray text  = ob.getJSONArray("hwTxtLst");
+                    String subject= ob.getString("subject");
 
-                    for (int j=0;j<results.size();j++)
+                    if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
                     {
-                        if (!text.toString().equals("") )
-                        {
-                            if (results.get(j).getHwTxtLst().equalsIgnoreCase(text.toString()))
-                            {
-                                isPresent=true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!isPresent)
-                    {
+                        String[] IMG=new String[img.length()];
+                        String[] dateArr=hwdate.split("/");
+                        String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
+                        //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
+                        ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
+                        boolean isPresent=false;
                         for (int i = 0; i < img.length(); i++) {
                             IMG[i] = img.getString(i);
-                        }
 
-                        for (int i = 0; i < IMG.length; i++) {
-                            String newPath = new Utility().getURLImage(IMG[i]);
-                            if (!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
-                                new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
+                            for (int k=0;k<results.size();k++)
+                            {
+                                if (results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
+                                {
+                                    isPresent=true;
+                                    break;
+                                }
                             }
                         }
-                        //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
-                        String hwUUID= String.valueOf(UUID.randomUUID());
-                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1],hwUUID);
-                        if (n>0)
+                        long n =0;
+                        if (!isPresent)
                         {
-                            Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
-                            Calendar calendar = Calendar.getInstance();
-                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                            String date = df.format(calendar.getTime());
 
-                            NotificationModel notification1 = new NotificationModel();
-                            notification1.setNotificationId(2);
-                            notification1.setNotificationDate(date);
-                            notification1.setNotificationtype("Homework");
-                            notification1.setMessage(subject);
-                            notification1.setIsRead("false");
-                            notification1.setAdditionalData1(givenby);
-                            qr.InsertNotification(notification1);
-                            if(Singleton.getResultReceiver() != null)
-                                Singleton.getResultReceiver().send(1,null);
+                            String hwUUID= String.valueOf(UUID.randomUUID());
+                            for (int i = 0; i < IMG.length; i++) {
+                                String newPath = new Utility().getURLImage(IMG[i]);
+                                if (!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
+                                    new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
+                                }
+
+                                qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
+                            }
+                            //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
+                            if (n>0)
+                            {
+                                // Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                                Calendar calendar = Calendar.getInstance();
+                                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                                String date = df.format(calendar.getTime());
+
+                                NotificationModel notification1 = new NotificationModel();
+                                notification1.setNotificationId(2);
+                                notification1.setNotificationDate(date);
+                                notification1.setNotificationtype("Homework");
+                                notification1.setMessage(subject);
+                                notification1.setIsRead("false");
+                                notification1.setAdditionalData1(std+" "+division);
+                                qr.InsertNotification(notification1);
+                                if(Singleton.getResultReceiver() != null)
+                                    Singleton.getResultReceiver().send(1,null);
+                            }
                         }
                     }
+
                 }
 
             } catch (JSONException e) {
@@ -280,72 +298,75 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
             JSONObject rootObj = null;
             try {
                 rootObj = new JSONObject(onTaskString[0]);
-                JSONObject obj = rootObj.getJSONObject("fetchClassWorkResult");
-                String schoolCode = obj.getString("SchoolCode");
-                String std = obj.getString("Std");
-                String division = obj.getString("div");
-                String givenby = obj.getString("givenBy");
-                String hwdate = obj.getString("cwDate");
-                JSONArray img = obj.getJSONArray("cwImage64Lst");
-                JSONArray text = obj.getJSONArray("CwTxtLst");
-                String subject = obj.getString("subject");
 
-                if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null")) {
-                    String[] IMG=new String[img.length()];
-                    //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
-                    String[] dateArr=hwdate.split("/");
-                    String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-                    ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
-                    boolean isPresent=false;
+                JSONArray obj=rootObj.getJSONArray("fetchP2PClassworkResult");
+                for (int j=0;j<obj.length();j++)
+                {
+                    JSONObject ob = obj.getJSONObject(j);
+                    String schoolCode= ob.getString("SchoolCode");
+                    String std= ob.getString("Std");
+                    String division= ob.getString("div");
+                    String givenby= ob.getString("givenBy");
+                    String hwdate= ob.getString("cwDate");
+                    JSONArray img  = ob.getJSONArray("cwImage64Lst");
+                    JSONArray text  = ob.getJSONArray("CwTxtLst");
+                    String subject= ob.getString("subject");
 
-                    for (int j=0;j<results.size();j++)
+                    if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
                     {
-                        if (!text.toString().equals("") )
-                        {
-                            if (results.get(j).getHwTxtLst().equalsIgnoreCase(text.toString()))
-                            {
-                                isPresent=true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!isPresent)
-                    {
+                        String[] IMG=new String[img.length()];
+                        String[] dateArr=hwdate.split("/");
+                        String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
+                        //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
+                        ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
+                        boolean isPresent=false;
                         for (int i = 0; i < img.length(); i++) {
                             IMG[i] = img.getString(i);
-                        }
 
-                        for (int i = 0; i < IMG.length; i++) {
-                            String newPath = new Utility().getURLImage(IMG[i]);
-                            if (!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
-                                new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
+                            for (int k=0;k<results.size();k++)
+                            {
+                                if (results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
+                                {
+                                    isPresent=true;
+                                    break;
+                                }
                             }
                         }
-
-                        //long n=0;
-                        //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject, onTaskString[1], student);
-                        String hwUUID= String.valueOf(UUID.randomUUID());
-                        long n = qr.insertHomework(givenby, subject, hwdate, text.toString(), img.toString(),std, division, onTaskString[1],hwUUID);
-                        if (n>0)
+                        long n =0;
+                        if (!isPresent)
                         {
-                            Toast.makeText(this, "Classwork Downloaded Successfully...", Toast.LENGTH_LONG).show();
-                            Calendar calendar = Calendar.getInstance();
-                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                            String date = df.format(calendar.getTime());
 
-                            NotificationModel notification1 = new NotificationModel();
-                            notification1.setNotificationId(3);
-                            notification1.setNotificationDate(date);
-                            notification1.setNotificationtype("Classwork");
-                            notification1.setMessage(subject);
-                            notification1.setIsRead("false");
-                            notification1.setAdditionalData1(givenby);
-                            qr.InsertNotification(notification1);
-                            if(Singleton.getResultReceiver() != null)
-                                Singleton.getResultReceiver().send(1,null);
+                            String hwUUID= String.valueOf(UUID.randomUUID());
+                            for (int i = 0; i < IMG.length; i++) {
+                                String newPath = new Utility().getURLImage(IMG[i]);
+                                if (!ImageStorage.checkifImageExists(newPath.split("/")[newPath.split("/").length - 1])) {
+                                    new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
+                                }
+
+                                qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
+                            }
+                            //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
+                            if (n>0)
+                            {
+                                // Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
+                                Calendar calendar = Calendar.getInstance();
+                                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                                String date = df.format(calendar.getTime());
+
+                                NotificationModel notification1 = new NotificationModel();
+                                notification1.setNotificationId(2);
+                                notification1.setNotificationDate(date);
+                                notification1.setNotificationtype("Classwork");
+                                notification1.setMessage(subject);
+                                notification1.setIsRead("false");
+                                notification1.setAdditionalData1(std+" "+division);
+                                qr.InsertNotification(notification1);
+                                if(Singleton.getResultReceiver() != null)
+                                    Singleton.getResultReceiver().send(1,null);
+                            }
                         }
                     }
+
                 }
             }
             catch (JSONException e)
@@ -353,23 +374,43 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                 e.printStackTrace();
             }
         }
+        else if (onTaskString[1].equalsIgnoreCase("ProfilePic"))
+        {
+            if (onTaskString[0].equalsIgnoreCase("true"))
+            {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AutoSyncService.this);
+                DALMyPupilInfo dp=new DALMyPupilInfo(AutoSyncService.this);
+                String[] student=dp.GetAllTableData(preferences.getString("StudentUserID",""));
+                String newPath=preferences.getString("NewThumbnailID","");
+                long n=0;
+                n=dp.updateStudentInfo(student[15], student[16], student[3], student[4], student[17], student[5], student[0], student[1], student[2], student[6], student[8], student[9], student[18], student[10],
+                        student[19], student[11], student[7], student[20], student[21], student[22],student[23],student[13],student[12],newPath,student[24]);
+
+                if(n>0)
+                {
+                    SharedPreferences.Editor edit = sharedpreferences.edit();
+                    edit.putString("ThumbnailID", newPath);
+                    edit.commit();
+                }
+            }
+        }
         else {
-            s = s.replace("\"", "");
-            if (onTaskString[0].equals("success")) {
-                long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]), onTaskString[3]);
+            if(onTaskString[0].replace("\"","").equals("success"))
+            {
+                long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]),onTaskString[3]);
                 TeacherHomeworkModel homeworkObj = new TeacherHomeworkModel();
-                if (n > 0) {
-                    n = 0;
+                if(n>0) {
+                    n =0;
                     homeworkObj = qr.GetHomework(Integer.valueOf(onTaskString[2]));
                     n = qr.updateHomeworkSyncFlag(homeworkObj);
                     NotificationModel obj = new NotificationModel();
                     obj.setNotificationId(homeworkObj.getHid());
-                    obj.setNotificationDate(homeworkObj.getHwDate()+"Upload");
-                    obj.setNotificationtype(homeworkObj.getWork());
+                    obj.setNotificationDate(homeworkObj.getHwDate());
+                    obj.setNotificationtype(homeworkObj.getWork()+"Upload");
                     obj.setMessage("Uploaded Successfully for");
                     obj.setIsRead("false");
                     obj.setAdditionalData2("");
-                    obj.setAdditionalData1(homeworkObj.getStd() + "@@@" + homeworkObj.getDiv() + "@@@" +
+                    obj.setAdditionalData1(homeworkObj.getStd()+"@@@"+homeworkObj.getDiv()+"@@@"+
                             homeworkObj.getSubject());
                     qr.InsertNotification(obj);
                     Bundle b = new Bundle();
@@ -378,12 +419,12 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                     b.putString("NotificationType", homeworkObj.getWork()+"Upload");
                     b.putString("NotificationMessage", "Uploaded Successfully for");
                     b.putString("IsNotificationread", "false");
-                    b.putString("AdditionalData1", homeworkObj.getStd() + "@@@" + homeworkObj.getDiv() + "@@@" +
+                    b.putString("AdditionalData1", homeworkObj.getStd()+"@@@"+homeworkObj.getDiv()+"@@@"+
                             homeworkObj.getSubject());
-                    b.putString("AdditionalData2", "");
+                    b.putString("AdditionalData2","");
 
-                    if (Singleton.getResultReceiver() != null)
-                        Singleton.getResultReceiver().send(1, null);
+                    if(Singleton.getResultReceiver() != null)
+                        Singleton.getResultReceiver().send(1,null);
                 }
             }
         }

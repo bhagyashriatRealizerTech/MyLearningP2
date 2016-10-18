@@ -174,7 +174,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                     }
                             }
                         }
-
+                        long n =0;
                         if (!isPresent)
                         {
 
@@ -188,7 +188,6 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                  qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
                             }
                             //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
-                            long n =1;
                             if (n>0)
                             {
                                 // Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
@@ -256,7 +255,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                 }
                             }
                         }
-
+                        long n =0;
                         if (!isPresent)
                         {
 
@@ -270,7 +269,6 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                                 qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
                             }
                             //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
-                            long n =1;
                             if (n>0)
                             {
                                 // Toast.makeText(this, "Homework Downloaded Successfully...", Toast.LENGTH_LONG).show();
