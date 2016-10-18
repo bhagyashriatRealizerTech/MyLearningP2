@@ -98,7 +98,7 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
         HttpClient httpclient = new DefaultHttpClient();
-        String url = Config.URL + "uploadClassWork";
+        String url = Config.URL + "uploadP2PClassWork";
         HttpPost httpPost = new HttpPost(url);
 
         System.out.println(url);
@@ -108,13 +108,14 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
 
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(myContext);
         String scode = sharedpreferences.getString("SchoolCode", "");
+        String accesstoken = sharedpreferences.getString("AccessToken", "");
 
         JSONObject jobj = new JSONObject();
         try {
             jobj.put("SchoolCode",scode);
             String date = obj.getHwDate();
             String date1[] = date.split("/");
-            String resdate = date1[1] + "/" + date1[0] + "/" + date1[2];
+            String resdate = date1[0] + "/" + date1[1] + "/" + date1[2];
             jobj.put("cwDate",resdate);
             jobj.put("Std",obj.getStd());
             jobj.put("div",obj.getDiv());
@@ -134,7 +135,7 @@ public class TeacherClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBu
             se = new StringEntity(json);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-
+            httpPost.setHeader("AccessToken", accesstoken);
             httpPost.setEntity(se);
             HttpResponse httpResponse = httpclient.execute(httpPost);
             StatusLine statusLine = httpResponse.getStatusLine();

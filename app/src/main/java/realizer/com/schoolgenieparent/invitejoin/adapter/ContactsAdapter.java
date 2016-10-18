@@ -63,6 +63,17 @@ public class ContactsAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
+
+    @Override
+    public int getViewTypeCount() {
+        return mainDataList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
     public View getView(final int position, View view, ViewGroup parent) {
         final ViewHolder holder;
         if (view == null) {

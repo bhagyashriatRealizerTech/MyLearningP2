@@ -1,7 +1,9 @@
 package realizer.com.schoolgenieparent.homework.asynctask;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -49,8 +51,12 @@ public class ClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
     @Override
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(myContext);
+        String userid = sharedpreferences.getString("UidName", "");
+        String deviceid = sharedpreferences.getString("DWEVICEID", "");
+        String accesstoken = sharedpreferences.getString("AccessToken", "");
         HttpClient httpclient = new DefaultHttpClient();
-        String url = Config.URL+"fetchClassWork";
+        String url = Config.URL+"fetchP2PClasswork";
         HttpPost httpPost = new HttpPost(url);
 
         System.out.println(url);
@@ -62,14 +68,15 @@ public class ClassworkAsyncTaskPost extends AsyncTask<Void, Void,StringBuilder>
             jsonobj.put("cwDate",obj.getHwdate());
             jsonobj.put("std",obj.getStandard());
             jsonobj.put("division",obj.getDivision());
-            jsonobj.put("subject",obj.getSubject());
+            jsonobj.put("UserId",userid);
+            jsonobj.put("DeviceId",deviceid);
 
             json = jsonobj.toString();
             Log.d("RES", json);
             se = new StringEntity(json);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-
+            httpPost.setHeader("AccessToken", accesstoken);
             httpPost.setEntity(se);
             HttpResponse httpResponse = httpclient.execute(httpPost);
             StatusLine statusLine = httpResponse.getStatusLine();

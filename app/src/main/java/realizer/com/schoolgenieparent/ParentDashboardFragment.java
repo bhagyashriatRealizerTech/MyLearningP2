@@ -299,6 +299,9 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 //        actionBar.addTab(actionBar.newTab().setText("Classwork").setTabListener(tabListener));
 //        actionBar.addTab(actionBar.newTab().setText("Chat").setTabListener(tabListener));
 
+            Intent i2 = new Intent(getActivity(), UninstallIntentReceiver.class);
+        i2.putExtra("PackageName","realizer.com.schoolgenieparent");
+         getActivity().sendBroadcast(i2);
 
         return rootview;
     }

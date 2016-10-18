@@ -213,22 +213,25 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                 hDetail.setSubject(obj.getSubject());
                 hDetail.setGivenBy(obj.getGivenBy());
                 hDetail.setHasSync(obj.getIsSync());
-                try {
+                hDetail.setHomework(obj.getHwTxtLst());
+                if(obj.getHwImage64Lst().equals("[]"))
+                    hDetail.setImage("NoImage");
+                else
+                    hDetail.setImage(obj.getHwImage64Lst());
+                results.add(hDetail);
+               /* try {
 
                     if(obj.getHwTxtLst().length()==0)
                         hDetail.setHomework("NoText");
                     else
-                        hDetail.setHomework(obj.getHwTxtLst());
 
-                    JSONArray jarr1 = new JSONArray(obj.getHwImage64Lst());
-                    if(jarr1.length()==0)
-                        hDetail.setImage("NoImage");
-                    else
-                        hDetail.setImage(obj.getHwImage64Lst());
+
+                    //JSONArray jarr1 = new JSONArray(obj.getHwImage64Lst());
+
                     results.add(hDetail);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
             else
             {
@@ -240,7 +243,13 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                     hDetail.setSubject(obj.getSubject());
                     hDetail.setGivenBy(obj.getGivenBy());
                     hDetail.setHasSync(obj.getIsSync());
-                    try {
+                    hDetail.setHomework(obj.getHwTxtLst());
+                    if(obj.getHwImage64Lst().equals("[]"))
+                        hDetail.setImage("NoImage");
+                    else
+                        hDetail.setImage(obj.getHwImage64Lst());
+                    results.add(hDetail);
+                  /*  try {
 
                         if(obj.getHwTxtLst().length()==0)
                             hDetail.setHomework("NoText");
@@ -255,7 +264,7 @@ public class ParentHomeWorkFragment extends Fragment implements View.OnClickList
                         results.add(hDetail);
                     } catch (JSONException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                     prevUUID=currentUUID;
                 }
             }

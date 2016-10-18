@@ -80,6 +80,7 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
     SharedPreferences sharedpreferences;
     StringBuffer sb2=new StringBuffer();
     String s;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -129,7 +130,9 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
                 // TODO Auto-generated method stub
             }
         });
-        addContactsInList();
+       // addContactsInList();
+        GetContact g=new GetContact();
+        g.execute();
         return rootview;
     }
 
@@ -158,117 +161,19 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
 //                    Toast.LENGTH_SHORT).show();
         }
     }
-    private void addContactsInList() {
-        // TODO Auto-generated method stub
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                showPB();
-                try {
-                    Cursor phones = getActivity().getContentResolver().query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null, null, null, null);
-                    try {
-                        ContactsListClass.phoneList.clear();
-                    } catch (Exception e) {
-                    }
-                    while (phones.moveToNext()) {
-                        String phoneName = phones
-                                .getString(phones
-                                        .getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                        String phoneNumber = phones
-                                .getString(phones
-                                        .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        String phoneImage = phones
-                                .getString(phones
-                                        .getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
 
-                        ContactModel cp = new ContactModel();
-
-
-                        cp.setName(phoneName);
-                        cp.setNumber(phoneNumber);
-                        cp.setImage(phoneImage);
-                        ContactsListClass.phoneList.add(cp);
-                    }
-                    phones.close();
-                    lv = new ListView(context);
-                    lv.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.MATCH_PARENT));
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // TODO Auto-generated method stub
-                            llContainer.addView(lv);
-                        }
-                    });
-                    Collections.sort(ContactsListClass.phoneList,
-                            new Comparator<ContactModel>() {
-                                @Override
-                                public int compare(ContactModel lhs,
-                                                   ContactModel rhs) {
-                                    return lhs.getName().compareTo(
-                                            rhs.getName());
-                                }
-                            });
-                    objAdapter = new ContactsAdapter(getActivity(), ContactsListClass.phoneList);
-                    lv.setAdapter(objAdapter);
-                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            CheckBox chk = (CheckBox) view.findViewById(R.id.contactcheck);
-                            ContactModel bean = ContactsListClass.phoneList.get(position);
-                            if (bean.isSelected()) {
-                                bean.setSelected(false);
-                                chk.setChecked(false);
-                            } else {
-                                bean.setSelected(true);
-                                chk.setChecked(true);
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                hidePB();
-            }
-        };
-        thread.start();
-
-    }
-    void showPB() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                rlPBContainer.setVisibility(View.VISIBLE);
-                edtSearch.setVisibility(View.GONE);
-                //btnOK.setVisibility(View.GONE);
-            }
-        });
-    }
-    void hidePB() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                rlPBContainer.setVisibility(View.GONE);
-                edtSearch.setVisibility(View.VISIBLE);
-                //btnOK.setVisibility(View.VISIBLE);
-            }
-        });
-    }
     @Override
     public void OnBackPress() {
         Intent intent=new Intent(getActivity(),DrawerActivity.class);
         startActivity(intent);
     }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_sendmessage, menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -363,6 +268,7 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
                 return super.onOptionsItemSelected(item);
         }
     }
+
     public void sendSMS(String phoneNumber[], String message)
     {
         SmsManager sms = SmsManager.getDefault();
@@ -370,6 +276,83 @@ public class InviteToOthersFragment extends Fragment implements OnBackPressFragm
             sms.sendTextMessage(number, null, message, null, null);
         }
     }
-    private void registerReceiver(BroadcastReceiver broadcastReceiver, IntentFilter intentFilter) {
+
+    public class GetContact extends AsyncTask<Void, Void, Void>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            rlPBContainer.setVisibility(View.VISIBLE);
+            edtSearch.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Cursor phones = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+            try {
+                ContactsListClass.phoneList.clear();
+            } catch (Exception e) {
+            }
+            while (phones.moveToNext()) {
+                String phoneName = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                String phoneImage = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+
+                ContactModel cp = new ContactModel();
+
+
+                cp.setName(phoneName);
+                cp.setNumber(phoneNumber);
+                cp.setImage(phoneImage);
+                ContactsListClass.phoneList.add(cp);
+            }
+            phones.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //super.onPostExecute(aVoid);
+            lv = new ListView(context);
+            lv.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT));
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                    llContainer.addView(lv);
+                }
+            });
+            Collections.sort(ContactsListClass.phoneList,
+                    new Comparator<ContactModel>() {
+                        @Override
+                        public int compare(ContactModel lhs,
+                                           ContactModel rhs) {
+                            return lhs.getName().compareTo(
+                                    rhs.getName());
+                        }
+                    });
+            objAdapter = new ContactsAdapter(getActivity(), ContactsListClass.phoneList);
+            lv.setAdapter(objAdapter);
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    CheckBox chk = (CheckBox) view.findViewById(R.id.contactcheck);
+                    ContactModel bean = ContactsListClass.phoneList.get(position);
+                    if (bean.isSelected()) {
+                        bean.setSelected(false);
+                        chk.setChecked(false);
+                    } else {
+                        bean.setSelected(true);
+                        chk.setChecked(true);
+                    }
+                }
+            });
+
+            rlPBContainer.setVisibility(View.GONE);
+            edtSearch.setVisibility(View.VISIBLE);
+        }
     }
 }

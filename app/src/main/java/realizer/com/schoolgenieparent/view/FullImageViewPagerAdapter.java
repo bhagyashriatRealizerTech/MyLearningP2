@@ -19,6 +19,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import realizer.com.schoolgenieparent.R;
@@ -65,11 +67,42 @@ public class FullImageViewPagerAdapter extends PagerAdapter {
         holder.txtcnt.setMovementMethod(new ScrollingMovementMethod());
         //holder.txtcnt.setText("" + (position + 1) + " / " + attachmentList.size());
         holder.txtcnt.setText(attachmentList.get(position).getHwTxtLst());
-        try {
-            JSONArray jarr = new JSONArray(attachmentList.get(position).getHwImage64Lst());
-            for(int i=0;i<jarr.length();i++)
+        if (attachmentList.get(position).getHwImage64Lst().contains("http"))
+        {
+            String newURL=new Utility().getURLImage(attachmentList.get(position).getHwImage64Lst());
+            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                new GetImages(newURL,holder.imgview,null,null,newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+            else
             {
-                IMG[i] = jarr.getString(i);
+                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
+                BitmapFactory.Options bmOptions1 = new BitmapFactory.Options();
+                Bitmap decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions1);
+                holder.imgview.setImageBitmap(decodedByte);
+            }
+        }
+        else
+        {
+            try {
+                JSONArray jarr = new JSONArray(attachmentList.get(position).getHwImage64Lst());
+                IMG = new String[jarr.length()];
+                for(int i=0;i<jarr.length();i++)
+                {
+                    IMG[i] = jarr.getString(i);
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    Bitmap decodedByte = BitmapFactory.decodeFile(IMG[i], bmOptions);
+                    holder.imgview.setImageBitmap(decodedByte);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+           // JSONArray jarr = new JSONArray(attachmentList.get(position).getHwImage64Lst());
+
+          /*  for(int i=0;i<attachmentList.size();i++)
+            {
+                IMG[i] = attachmentList.get(i).getHwImage64Lst();
                 if (IMG[i].contains("http"))
                 {
                     String newURL=new Utility().getURLImage(IMG[i]);
@@ -79,21 +112,20 @@ public class FullImageViewPagerAdapter extends PagerAdapter {
                     {
                         File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
                         BitmapFactory.Options bmOptions1 = new BitmapFactory.Options();
-                        Bitmap decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions1);
+                        Bitmap decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions1);
                         holder.imgview.setImageBitmap(decodedByte);
                     }
                 }
                 else
                 {
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    Bitmap decodedByte = BitmapFactory.decodeFile(IMG[i], bmOptions);
+                    String newURL=new Utility().getURLImage(IMG[i]);
+                    File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
+                    BitmapFactory.Options bmOptions1 = new BitmapFactory.Options();
+                    Bitmap decodedByte = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions1);
                     holder.imgview.setImageBitmap(decodedByte);
                 }
 
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            }*/
 
         // Add viewpager_item.xml to ViewPager
         (container).addView(itemView);
