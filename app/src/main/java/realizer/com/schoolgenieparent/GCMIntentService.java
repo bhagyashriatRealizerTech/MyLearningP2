@@ -15,11 +15,15 @@
  */
 package realizer.com.schoolgenieparent;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -135,9 +139,47 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 
         if (msg[0].equals("GroupConversation")) {
-            DatabaseQueries qr1 = new DatabaseQueries(context);
-            sharedpreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+            NotificationManagerCompat notificationManager =
+                    NotificationManagerCompat.from(context);
+            Log.d("Message=", message);
+            Notification notification ;
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+            String title = context.getString(R.string.app_name);
+            Intent notificationIntent = new Intent(context, DrawerActivity.class);
+           //// notificationIntent.putExtra("FragName","Chat");
+            // set intent so it does not start a new activity
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             SharedPreferences.Editor edit = sharedpreferences.edit();
+            edit.putString("FragName", "Chat");
+            edit.commit();
+
+            PendingIntent intent =
+                    PendingIntent.getActivity(context, notificatinViewStarID, notificationIntent, 0);
+            int num=++numStarMessages;
+            builder.setAutoCancel(true);
+            builder.setContentTitle("Chat");
+            if (num==1) {
+                builder.setContentText(msg[6]);
+            }
+            else {
+                builder.setContentText("You have received "+num+" Messages.");
+            }
+
+            builder.setSmallIcon(icon);
+            builder.setContentIntent(intent);
+            builder.setOngoing(false);  //API level 16
+            builder.setNumber(num);
+            builder.setDefaults(Notification.DEFAULT_SOUND);
+            builder.setDefaults(Notification.DEFAULT_VIBRATE);
+            builder.build();
+            notification = builder.getNotification();
+
+            notificationManager.notify(notificatinViewStarID, notification);
+
+
+            DatabaseQueries qr1 = new DatabaseQueries(context);
             edit.putString("ReceiverId", msg[2]);
             edit.putString("ReceiverName", msg[3]);
             edit.putString("ReceiverUrl", msg[5]);

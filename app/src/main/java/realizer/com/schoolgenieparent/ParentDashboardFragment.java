@@ -76,7 +76,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
     TeacherNotificationListAdapter notificationAdapter;
     MessageResultReceiver resultReceiver;
     DatabaseQueries qr;
-
+    ArrayList<NotificationModel> FilteredData;
 
     @Nullable
     @Override
@@ -159,7 +159,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
         },1500);
 
 
-        new GetNotificationList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new GetNotificationList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,1);
 
         notificationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -182,17 +182,18 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                             @Override
                             public void run() {
 
-                                if (notificationData.size() > 0)
+                                if (FilteredData.size() > 0)
                                 {
                                     DatabaseQueries qr = new DatabaseQueries(getActivity());
-                                    qr.deleteNotificationRow(notificationData.get(position).getId());
-                                    if(notificationData.size() ==1)
-                                        new GetNotificationList().execute();
+                                    qr.deleteNotificationRow(FilteredData.get(position).getId());
+                                    if(FilteredData.size() ==1)
+                                        new GetNotificationList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,3);
                                     else {
-                                        notificationData.remove(position);
+                                        FilteredData.remove(position);
                                         notificationAdapter.notifyDataSetChanged();
                                     }
                                 }
+
                             }
                         }, 500);
 
@@ -539,12 +540,12 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 
             if (update.equals("UpdateNotification")) {
 
-                new GetNotificationList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new GetNotificationList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,2);
             }
         }
     }
 
-    public class GetNotificationList extends AsyncTask<Void, Void,Void>
+    public class GetNotificationList extends AsyncTask<Integer, Void,Integer>
     {
 
         @Override
@@ -599,41 +600,96 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Integer doInBackground(Integer... params) {
             DatabaseQueries qr = new DatabaseQueries(getActivity());
             notificationData = qr.GetNotificationsData();
-            return null;
+            return params[0];
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if(notificationData.size()>0) {
-                ArrayList<NotificationModel> FilteredData=new ArrayList<>();
-                int count=0;
-                for (int i=0;i<notificationData.size();i++)
-                {
-                    if (notificationData.get(i).getNotificationtype().equalsIgnoreCase("Message"))
+        protected void onPostExecute(Integer type) {
+            super.onPostExecute(type);
+            if (type == 1 || type ==2) {
+                if(notificationData.size()>0) {
+                    FilteredData=new ArrayList<>();
+                    int count=0;
+                    for (int i=0;i<notificationData.size();i++)
                     {
-                        count++;
-                        if (count==1)
+                        if (notificationData.get(i).getNotificationtype().equalsIgnoreCase("Message"))
+                        {
+                            count++;
+                            if (count==1)
+                                FilteredData.add(notificationData.get(i));
+                        }
+                        else
+                        {
                             FilteredData.add(notificationData.get(i));
+                        }
+                    }
+
+                    notificationList.setVisibility(View.VISIBLE);
+                    userInfoLayout.setVisibility(View.GONE);
+                    notificationAdapter = new TeacherNotificationListAdapter(getActivity(), FilteredData);
+                    notificationList.setAdapter(notificationAdapter);
+                    //Utility.setListViewHeightBasedOnChildren(notificationList);
+                    notificationAdapter.notifyDataSetChanged();
+                }
+                else
+                {
+                    notificationList.setVisibility(View.GONE);
+                    userInfoLayout.setVisibility(View.VISIBLE);
+                    Typeface face= Typeface.createFromAsset(getActivity().getAssets(), "fonts/font.ttf");
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    nameUSer.setText(preferences.getString("DisplayName", ""));
+                    nameUSer.setTypeface(face);
+                    textStdDiv.setText(preferences.getString("SyncStd", "")+"   "+preferences.getString("SyncDiv", ""));
+                    textStdDiv.setTypeface(face);
+                    String urlString = preferences.getString("ThumbnailID","");
+                    Log.d("Image URL", urlString);
+
+                    if(urlString.equals("") || urlString.equalsIgnoreCase("null"))
+                    {
+                        picUser.setVisibility(View.GONE);
+                        userInitials.setVisibility(View.VISIBLE);
+                        String name[]=nameUSer.getText().toString().split(" ");
+                        String fname = name[0].trim().toUpperCase().charAt(0)+"";
+                        if(name.length>1)
+                        {
+                            String lname = name[1].trim().toUpperCase().charAt(0)+"";
+                            userInitials.setText(fname+lname);
+                        }
+                        else
+                            userInitials.setText(fname);
+
                     }
                     else
                     {
-                        FilteredData.add(notificationData.get(i));
+                        picUser.setVisibility(View.VISIBLE);
+                        userInitials.setVisibility(View.GONE);
+                        if (urlString.contains("http"))
+                        {
+                            String newURL=new Utility().getURLImage(urlString);
+                            if(!ImageStorage.checkifImageExists(newURL.split("/")[newURL.split("/").length - 1]))
+                                new GetImages(newURL,picUser,userInitials,nameUSer.getText().toString(),newURL.split("/")[newURL.split("/").length-1]).execute(newURL);
+                            else
+                            {
+                                File image = ImageStorage.getImage(newURL.split("/")[newURL.split("/").length - 1]);
+                                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                                Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
+                                //  bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
+                                picUser.setImageBitmap(bitmap);
+                            }
+                        }
+                        else
+                        {
+                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                            Bitmap bitmap = BitmapFactory.decodeFile(urlString, bmOptions);
+                            picUser.setImageBitmap(bitmap);
+                        }
                     }
                 }
-
-                notificationList.setVisibility(View.VISIBLE);
-                userInfoLayout.setVisibility(View.GONE);
-                notificationAdapter = new TeacherNotificationListAdapter(getActivity(), FilteredData);
-                notificationList.setAdapter(notificationAdapter);
-                //Utility.setListViewHeightBasedOnChildren(notificationList);
-                notificationAdapter.notifyDataSetChanged();
             }
-            else
-            {
+            else  if (type == 3) {
                 notificationList.setVisibility(View.GONE);
                 userInfoLayout.setVisibility(View.VISIBLE);
                 Typeface face= Typeface.createFromAsset(getActivity().getAssets(), "fonts/font.ttf");
