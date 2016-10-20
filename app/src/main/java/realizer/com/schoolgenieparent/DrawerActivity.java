@@ -325,7 +325,6 @@ public class DrawerActivity extends AppCompatActivity
             }
             else
             {
-
                 String drivername = sharedpreferences.getString("USERNAME","");
                 String driverid = sharedpreferences.getString("USERID","");
                 String accessToken=sharedpreferences.getString("AccessToken","");

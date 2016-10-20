@@ -100,6 +100,7 @@
                     android:gravity="left"
                     android:layout_gravity="left|center_vertical"
                     android:textSize="15sp"
+                    android:maxLines="1"
                     android:textColor="@color/black"
                     />
 
