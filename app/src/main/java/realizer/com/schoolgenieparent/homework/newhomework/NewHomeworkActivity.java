@@ -44,6 +44,7 @@ import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.homework.newhomework.adapter.NewHomeworkGalleryAdapter;
+import realizer.com.schoolgenieparent.homework.newhomework.customgallery.multiselectgallery.PhotoAlbumActivity;
 
 /**
  * Created by Bhagyashri on 10/6/2016.
@@ -114,7 +115,7 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
         addImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),CustomPhotoGalleryActivity.class);
+                Intent intent = new Intent(getActivity(),PhotoAlbumActivity.class);
                 getActivity().startActivity(intent);
             }
         });

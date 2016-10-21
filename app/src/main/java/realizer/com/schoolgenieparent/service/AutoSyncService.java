@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.ProfilePicAsyncTaskPost;
+import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.Utils.Singleton;
@@ -217,9 +218,8 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
     @Override
     public void onTaskCompleted(String s) {
         Log.d("String", s);
-
+        //s =s.replace("\"","");
         final String[] onTaskString=s.split("@@@");
-
         if(onTaskString[1].equalsIgnoreCase("Exception"))
         {
             if (onTaskString[0].equalsIgnoreCase("true")) {
@@ -230,7 +230,7 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                 }
             }
         }
-        else  if (onTaskString[1].equalsIgnoreCase("Homework"))
+        else if (onTaskString[1].equalsIgnoreCase("Homework"))
         {
             DALHomework dla = new DALHomework(this);
             JSONObject rootObj = null;
@@ -252,22 +252,36 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                     if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
                     {
                         String[] IMG=new String[img.length()];
-                        String[] dateArr=hwdate.split("/");
-                        String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-                        //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
-                        ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
-                        boolean isPresent=false;
+                        String[] TEXT=new String[text.length()];
                         for (int i = 0; i < img.length(); i++) {
                             IMG[i] = img.getString(i);
+                        }
+                        for (int i = 0; i < text.length(); i++) {
+                            TEXT[i] = text.getString(i);
+                        }
 
-                            for (int k=0;k<results.size();k++)
-                            {
-                                if (results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
+                        ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
+                        boolean isPresent=false;
+                        if (results.size() > 0)
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                for (int k=0;k<results.size();k++)
                                 {
-                                    isPresent=true;
-                                    break;
+                                    if (givenby.equals(results.get(k).getGivenBy()) && results.get(k).getHwTxtLst().equalsIgnoreCase(TEXT[0]))
+                                    {
+                                        isPresent=true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        isPresent=false;
+                                    }
                                 }
                             }
+                        }
+                        else
+                        {
+                            isPresent=false;
                         }
                         long n =0;
                         if (!isPresent)
@@ -280,7 +294,7 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                                     new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
                                 }
 
-                                qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
+                                n= qr.insertHomework(givenby, subject, hwdate, TEXT[0], IMG[i].toString(),std, division, onTaskString[1],hwUUID);
                             }
                             //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
                             if (n>0)
@@ -303,7 +317,6 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                             }
                         }
                     }
-
                 }
 
             } catch (JSONException e) {
@@ -327,28 +340,42 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                     String givenby= ob.getString("givenBy");
                     String hwdate= ob.getString("cwDate");
                     JSONArray img  = ob.getJSONArray("cwImage64Lst");
-                    JSONArray text  = ob.getJSONArray("CwTxtLst");
+                    JSONArray text  = ob.getJSONArray("cwTxtLst");
                     String subject= ob.getString("subject");
 
                     if (!std.equalsIgnoreCase("null") && !givenby.equalsIgnoreCase("null"))
                     {
                         String[] IMG=new String[img.length()];
-                        String[] dateArr=hwdate.split("/");
-                        String newDate=dateArr[1]+"/"+dateArr[0]+"/"+dateArr[2];
-                        //ArrayList<ParentHomeworkListModel> results=dh.GetHomeworkAllInfoData(hwdate);
-                        ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
-                        boolean isPresent=false;
+                        String[] TEXT=new String[text.length()];
                         for (int i = 0; i < img.length(); i++) {
                             IMG[i] = img.getString(i);
+                        }
+                        for (int i = 0; i < text.length(); i++) {
+                            TEXT[i] = text.getString(i);
+                        }
 
-                            for (int k=0;k<results.size();k++)
-                            {
-                                if (results.get(k).getHwImage64Lst().equalsIgnoreCase(img.getString(i)))
+                        ArrayList<TeacherHomeworkModel> results = qr.GetHomeworkData(hwdate, onTaskString[1], std, division);
+                        boolean isPresent=false;
+                        if (results.size() > 0)
+                        {
+                            for (int i = 0; i < img.length(); i++) {
+                                for (int k=0;k<results.size();k++)
                                 {
-                                    isPresent=true;
-                                    break;
+                                    if (givenby.equals(results.get(k).getGivenBy()) && results.get(k).getHwTxtLst().equalsIgnoreCase(TEXT[0]))
+                                    {
+                                        isPresent=true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        isPresent=false;
+                                    }
                                 }
                             }
+                        }
+                        else
+                        {
+                            isPresent=false;
                         }
                         long n =0;
                         if (!isPresent)
@@ -361,7 +388,7 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                                     new StoreBitmapImages(newPath, newPath.split("/")[newPath.split("/").length - 1]).execute(newPath);
                                 }
 
-                                qr.insertHomework(givenby, subject, hwdate, text.toString(), IMG[i].toString(),std, division, onTaskString[1],hwUUID);
+                                n= qr.insertHomework(givenby, subject, hwdate, TEXT[0], IMG[i].toString(),std, division, onTaskString[1],hwUUID);
                             }
                             //n=dla.insertHomeworkInfo(schoolCode, std, division, givenby, hwdate, img.toString(), text.toString(), subject,onTaskString[1],student);
                             if (n>0)
@@ -412,7 +439,8 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                 }
             }
         }
-        else {
+        else
+        {
             if(onTaskString[0].replace("\"","").equals("success"))
             {
                 long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]),onTaskString[3]);

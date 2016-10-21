@@ -18,6 +18,7 @@ import realizer.com.schoolgenieparent.R;
 import realizer.com.schoolgenieparent.Utils.Singleton;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.homework.newhomework.CustomPhotoGalleryActivity;
+import realizer.com.schoolgenieparent.homework.newhomework.customgallery.multiselectgallery.PhotoAlbumActivity;
 
 /**
  * Created by Win on 08/04/2016.
@@ -71,7 +72,7 @@ public class NewHomeworkGalleryAdapter extends BaseAdapter
                 @Override
                 public void onClick(View v) {
                     Singleton.setImageList(imageList);
-                    Intent intent = new Intent(context, CustomPhotoGalleryActivity.class);
+                    Intent intent = new Intent(context, PhotoAlbumActivity.class);
                     context.startActivity(intent);
                 }
             });
