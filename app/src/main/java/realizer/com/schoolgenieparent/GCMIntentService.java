@@ -139,6 +139,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 
         if (msg[0].equals("GroupConversation")) {
+            Bundle b = new Bundle();
+            String studid = sharedpreferences.getString("UidName", "");
+            if (msg[6].equals(studid)) {
 
             NotificationManagerCompat notificationManager =
                     NotificationManagerCompat.from(context);
@@ -184,7 +187,7 @@ public class GCMIntentService extends GCMBaseIntentService {
             edit.putString("ReceiverName", msg[3]);
             edit.putString("ReceiverUrl", msg[5]);
 
-            Bundle b = new Bundle();
+
             b.putString("ReceiverId", msg[2]);
             b.putString("ReceiverName", msg[3]);
             b.putString("ReceiverUrl", msg[5]);
@@ -201,9 +204,6 @@ public class GCMIntentService extends GCMBaseIntentService {
                 e.printStackTrace();
             }
 
-            String studid = sharedpreferences.getString("UidName", "");
-
-            if (msg[6].equals(studid)) {
                 ArrayList<TeacherQuerySendModel> allChat = qr.GetQueuryData(msg[2]);
                 boolean isPresentNot = false;
                 for (int i = 0; i < allChat.size(); i++) {

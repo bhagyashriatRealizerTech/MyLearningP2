@@ -216,20 +216,20 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     DatabaseQueries qr = new DatabaseQueries(getActivity());
 
-                    if(notificationData.get(position).getNotificationtype().equalsIgnoreCase("Homework")
-                            || notificationData.get(position).getNotificationtype().equalsIgnoreCase("Classwork") ||
-                            notificationData.get(position).getNotificationtype().equalsIgnoreCase("HomeworkUpload")
-                            || notificationData.get(position).getNotificationtype().equalsIgnoreCase("ClassworkUpload")) {
+                    if(FilteredData.get(position).getNotificationtype().equalsIgnoreCase("Homework")
+                            || FilteredData.get(position).getNotificationtype().equalsIgnoreCase("Classwork") ||
+                            FilteredData.get(position).getNotificationtype().equalsIgnoreCase("HomeworkUpload")
+                            || FilteredData.get(position).getNotificationtype().equalsIgnoreCase("ClassworkUpload")) {
 
-                        qr.deleteNotificationRow(notificationData.get(position).getId());
+                        qr.deleteNotificationRow(FilteredData.get(position).getId());
 
-                        GetHomework(notificationData.get(position).getNotificationtype());
+                        GetHomework(FilteredData.get(position).getNotificationtype());
                     }
-                    else if(notificationData.get(position).getNotificationtype().equalsIgnoreCase("Message"))
+                    else if(FilteredData.get(position).getNotificationtype().equalsIgnoreCase("Message"))
                     {
-                        String uid = notificationData.get(position).getAdditionalData2();
+                        String uid = FilteredData.get(position).getAdditionalData2();
                         String urlImage = null;
-                        String userData[] = notificationData.get(position).getAdditionalData1().trim().split("@@@");
+                        String userData[] = FilteredData.get(position).getAdditionalData1().trim().split("@@@");
                         if(userData.length >2 )
                             urlImage = userData[2];
 
@@ -241,7 +241,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
                         bundle.putString("Divi",preferences.getString("SyncDiv",""));
                         bundle.putString("UrlImage",urlImage);
 
-                        qr.deleteNotificationRow(notificationData.get(position).getId());
+                        qr.deleteNotificationRow(FilteredData.get(position).getId());
 
                         TeacherQueryViewFragment fragment = new TeacherQueryViewFragment();
 
