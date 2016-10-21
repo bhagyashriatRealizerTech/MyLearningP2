@@ -247,7 +247,7 @@ public class ParentDashboardFragment extends Fragment implements View.OnClickLis
 
                         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                         //bundle.putString("HomeworkList", homewrklist);
-                        bundle.putString("HEADERTEXT", "Communication");
+                        bundle.putString("HEADERTEXT", "Chat");
                         fragment.setArguments(bundle);
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.replace(R.id.frame_container, fragment);
