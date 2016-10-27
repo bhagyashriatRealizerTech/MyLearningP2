@@ -98,7 +98,6 @@ public class TrackingAsyncTaskAuto extends AsyncTask<Void, Void,StringBuilder> {
         {
             client.getConnectionManager().closeExpiredConnections();
             client.getConnectionManager().shutdown();
-
         }
         return resultLogin;
     }

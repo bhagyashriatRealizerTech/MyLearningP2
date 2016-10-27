@@ -107,7 +107,7 @@ public class MyPupilInfoFragment extends Fragment implements OnBackPressFragment
         else
             dob.setText("No Birthday Found");
 
-        parentname.setText(stud[9]+" "+stud[2]);
+        parentname.setText(stud[2]);
         contactno.setText(stud[10]);
 
         if (stud[14]!=null && !stud[14].equalsIgnoreCase("null"))
