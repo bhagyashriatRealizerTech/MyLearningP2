@@ -149,6 +149,15 @@
             android:label="select_photo"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".homework.newhomework.customgallery.multiselectgallery.PhotoAlbumActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".homework.newhomework.customgallery.multiselectgallery.SelectPhotoActivity"
+            android:label="select_photo"
+            android:screenOrientation="portrait" />
+
       <!--  <activity
             android:name=".trackpupil.MapsActivity"
             android:label="Map"

@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import realizer.com.schoolgenieparent.Notification.NotificationModel;
 import realizer.com.schoolgenieparent.ProfilePicAsyncTaskPost;
+import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.ImageStorage;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 import realizer.com.schoolgenieparent.Utils.Singleton;
