@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,13 +24,9 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.UUID;
 
 import realizer.com.schoolgenieparent.DrawerActivity;
@@ -44,6 +39,7 @@ import realizer.com.schoolgenieparent.backend.DatabaseQueries;
 import realizer.com.schoolgenieparent.homework.ParentHomeWorkFragment;
 import realizer.com.schoolgenieparent.homework.model.TeacherHomeworkModel;
 import realizer.com.schoolgenieparent.homework.newhomework.adapter.NewHomeworkGalleryAdapter;
+import realizer.com.schoolgenieparent.homework.newhomework.customgallery.multiselectgallery.PhotoAlbumActivity;
 
 /**
  * Created by Bhagyashri on 10/6/2016.
@@ -78,7 +74,14 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
         ((DrawerActivity) getActivity()).getSupportActionBar().show();
 
         initiateView(rootView);
-
+        if (htext.equalsIgnoreCase("HomeWork"))
+        {
+            homeworktext.setHint("Enter Homework Text");
+        }
+        else
+        {
+            homeworktext.setHint("Enter Classwork Text");
+        }
 
         Calendar c = Calendar.getInstance();
         int month = c.get(Calendar.MONTH) + 1;
@@ -99,7 +102,7 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
         }
         String datearr[] = date.split("/");
         String date1 = datearr[1]+"/"+datearr[0]+"/"+datearr[2];
-        datetext.setText(Config.getDate(date1,"D"));
+        datetext.setText(Config.getDate(date1, "D"));
 
         return rootView;
     }
@@ -114,7 +117,7 @@ public class NewHomeworkActivity extends Fragment implements OnBackPressFragment
         addImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),CustomPhotoGalleryActivity.class);
+                Intent intent = new Intent(getActivity(),PhotoAlbumActivity.class);
                 getActivity().startActivity(intent);
             }
         });

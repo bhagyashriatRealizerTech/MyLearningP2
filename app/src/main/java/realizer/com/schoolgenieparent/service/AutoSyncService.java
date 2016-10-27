@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -217,9 +216,8 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
     @Override
     public void onTaskCompleted(String s) {
         Log.d("String", s);
-
+        //s =s.replace("\"","");
         final String[] onTaskString=s.split("@@@");
-
         if(onTaskString[1].equalsIgnoreCase("Exception"))
         {
             if (onTaskString[0].equalsIgnoreCase("true")) {
@@ -439,7 +437,8 @@ public class AutoSyncService extends Service implements OnTaskCompleted {
                 }
             }
         }
-        else {
+        else
+        {
             if(onTaskString[0].replace("\"","").equals("success"))
             {
                 long n = qr.deleteQueueRow(Integer.valueOf(onTaskString[2]),onTaskString[3]);

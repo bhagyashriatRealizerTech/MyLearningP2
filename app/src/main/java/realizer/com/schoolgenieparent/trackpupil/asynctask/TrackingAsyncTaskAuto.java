@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import realizer.com.schoolgenieparent.Utils.Config;
 import realizer.com.schoolgenieparent.Utils.OnTaskCompleted;
 
 /**
@@ -59,7 +60,7 @@ public class TrackingAsyncTaskAuto extends AsyncTask<Void, Void,StringBuilder> {
     @Override
     protected StringBuilder doInBackground(Void... params) {
         resultLogin = new StringBuilder();
-        String my="http://104.217.254.180/SJRestWCF/svcEmp.svc/retrievePupilLocation/"+DriverUserId+"/"+UniqueNo+"/"+userId+"/"+deviceid;
+        String my= Config.URL+"retrievePupilLocation/"+DriverUserId+"/"+UniqueNo+"/"+userId+"/"+deviceid;
         HttpGet httpGet = new HttpGet(my);
         httpGet.setHeader("AccessToken",accessToken);
         HttpClient client = new DefaultHttpClient();

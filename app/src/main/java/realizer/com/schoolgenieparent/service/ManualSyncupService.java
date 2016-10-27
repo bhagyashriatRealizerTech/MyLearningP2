@@ -146,7 +146,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                 }
             }
         }
-       else if (onTaskString[1].equalsIgnoreCase("Homework"))
+        else if (onTaskString[1].equalsIgnoreCase("Homework"))
         {
             DALHomework dla = new DALHomework(this);
             JSONObject rootObj = null;
@@ -396,7 +396,7 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
                             if (count==0)
                             {
                                 count++;
-                               // Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Uploaded Successfully");
+                                // Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Uploaded Successfully");
                             }
                         }
                     }
@@ -412,11 +412,11 @@ public class ManualSyncupService extends Service implements OnTaskCompleted {
             @Override
             public void run() {
                 if (onTaskString[1].equalsIgnoreCase("Classwork"))
-                if (counter==0)
-                {
-                    counter++;
-                    Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Completed Successfully");
-                }
+                    if (counter==0)
+                    {
+                        counter++;
+                        Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Completed Successfully");
+                    }
                /* if (onTaskString[1].equalsIgnoreCase("Homework"))
                     Config.alertDialog(Singleton.getContext(), "Manual Sync", "Sync Downloaded Successfully");*/
                 if(Singleton.getManualserviceIntent() != null)

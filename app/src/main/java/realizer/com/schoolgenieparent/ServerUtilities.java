@@ -138,7 +138,7 @@ public final class ServerUtilities {
         String did = sharedpreferences.getString("DWEVICEID", "");
 
         //String my = "http://192.168.1.14/SJRestWCF/registerDevice/" + EmpId + "/" + regID;
-       String my = "http://104.217.254.180/SJRestWCF/svcEmp.svc/RegisterStudentDevice/" + EmpId + "/" + did+"/"+regID;
+       String my =Config.URL+"RegisterStudentDevice/" + EmpId + "/" + did+"/"+regID;
         Log.d("GCMDID", my);
         builder = new StringBuilder();
         HttpGet httpGet = new HttpGet(my);
@@ -174,7 +174,7 @@ public final class ServerUtilities {
 
     private static StringBuilder postUnregister(String EmpId,String did,String access) {
 
-        String my = "http://104.217.254.180/SJRestWCF/svcEmp.svc/deregisterStudentDevice/" + EmpId + "/" + did;
+        String my = Config.URL+"deregisterStudentDevice/" + EmpId + "/" + did;
         Log.d("GCMDID", my);
         builder = new StringBuilder();
         HttpGet httpGet = new HttpGet(my);

@@ -5,10 +5,13 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Interpolator;
@@ -29,6 +32,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -94,7 +100,7 @@ public class TrackShowMap extends AppCompatActivity implements OnTaskCompleted {
 
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
-                .title(userName + " is here!")
+                .title(userName + " is \""+getDriverCurrentAddress(currentLatitude,currentLongitude)+"\"")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
         mMarker = mMap.addMarker(options);
         mMarker.setPosition(latLng);
@@ -254,15 +260,45 @@ public class TrackShowMap extends AppCompatActivity implements OnTaskCompleted {
         switch (item.getItemId()) {
             case R.id.item1 :
                 showMapTypeSelectorDialog();
+                return true;
 
             case R.id.item_switch:
                 TrackingDialogBoxActivity fragment = new TrackingDialogBoxActivity();
                 FragmentManager fragmentManager = getFragmentManager();
                 fragment.setCancelable(true);
                 fragment.show(fragmentManager, "Dialog!");
+                return true;
 
             default :
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public String getDriverCurrentAddress(String lat,String lon)
+    {
+
+        Double latitude = Double.parseDouble(lat);
+        Double longitude = Double.parseDouble(lon);
+
+        Geocoder geocoder = new Geocoder(TrackShowMap.this, Locale.getDefault());
+        String city = "";
+        String address="";
+        String state = "";
+        String country="";
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            city = addresses.get(0).getLocality();
+            state = addresses.get(0).getAdminArea();
+            country = addresses.get(0).getCountryName();
+
+        } catch (IOException e) {
+            //Toast.makeText(getActivity(), "There is no any address", Toast.LENGTH_SHORT).show();
+            Log.e("Track.LocalizedMessage", e.getLocalizedMessage());
+            Log.e("Track(StackTrace)", e.getStackTrace().toString());
+            Log.e("Track(Cause)", e.getCause().toString());
+            Log.wtf("Track(Msg)", e.getMessage());
+        }
+        return address+","+city+","+country;
     }
 }

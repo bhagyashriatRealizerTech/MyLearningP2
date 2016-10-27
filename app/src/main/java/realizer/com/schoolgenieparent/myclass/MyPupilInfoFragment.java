@@ -97,7 +97,7 @@ public class MyPupilInfoFragment extends Fragment implements OnBackPressFragment
                 Date createdOn = new Date(Long.parseLong(timestamp));
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
                 String formattedDate = sdf.format(createdOn);
-                dob.setText(formattedDate);
+                dob.setText("-");
             }
             else
             {
